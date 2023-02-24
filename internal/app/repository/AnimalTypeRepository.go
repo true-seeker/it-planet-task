@@ -24,5 +24,5 @@ func (a *AnimalTypeRepository) Get(id int) (*entity.AnimalType, error) {
 		return nil, err
 	}
 
-	return &animalType, err
+	return &animalType, nil
 }
