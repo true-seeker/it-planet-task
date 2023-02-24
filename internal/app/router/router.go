@@ -11,6 +11,8 @@ import (
 func New(r *gin.Engine) *gin.Engine {
 	NewAnimalTypeHandler(r)
 	NewAccountHandler(r)
+	NewLocationHandler(r)
+
 	return r
 }
 
@@ -31,4 +33,13 @@ func NewAccountHandler(r *gin.Engine) {
 	accountGroup := r.Group("accounts")
 
 	accountGroup.GET("/:id", h.Get)
+}
+
+func NewLocationHandler(r *gin.Engine) {
+	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())
+	locationService := service.NewLocationService(locationRepo)
+	h := handler.NewLocationHandler(locationService)
+	locationGroup := r.Group("locations")
+
+	locationGroup.GET("/:id", h.Get)
 }
