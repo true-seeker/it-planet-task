@@ -27,7 +27,7 @@ func BuildPostgresConnectionString() string {
 
 }
 
-func GetOrOpenConnectionIfOpened() *gorm.DB {
+func GetConnectionOrCreateAndGet() *gorm.DB {
 	if DB != nil {
 		return DB
 	}
