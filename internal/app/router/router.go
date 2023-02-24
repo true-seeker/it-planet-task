@@ -10,6 +10,7 @@ import (
 
 func New(r *gin.Engine) *gin.Engine {
 	NewAnimalTypeHandler(r)
+	NewAccountHandler(r)
 	return r
 }
 
@@ -21,4 +22,13 @@ func NewAnimalTypeHandler(r *gin.Engine) {
 
 	animalTypeGroup.GET("/:id", h.Get)
 
+}
+
+func NewAccountHandler(r *gin.Engine) {
+	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
+	accountService := service.NewAccountService(accountRepo)
+	h := handler.NewAccountHandler(accountService)
+	accountGroup := r.Group("accounts")
+
+	accountGroup.GET("/:id", h.Get)
 }
