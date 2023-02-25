@@ -16,7 +16,8 @@ func LocationToLocationResponse(location *entity.Location) *response.Location {
 }
 
 func LocationsToLocationResponses(locations *[]entity.Location) *[]response.Location {
-	var rs []response.Location
+	rs := make([]response.Location, 0)
+
 	for _, location := range *locations {
 		rs = append(rs, *LocationToLocationResponse(&location))
 	}

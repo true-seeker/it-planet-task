@@ -17,7 +17,7 @@ func AccountToAccountResponse(account *entity.Account) *response.Account {
 }
 
 func AccountsToAccountResponses(accounts *[]entity.Account) *[]response.Account {
-	var rs []response.Account
+	rs := make([]response.Account, 0)
 
 	for _, account := range *accounts {
 		rs = append(rs, *AccountToAccountResponse(&account))

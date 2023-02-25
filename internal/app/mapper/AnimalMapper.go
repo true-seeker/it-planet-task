@@ -33,7 +33,8 @@ func AnimalToAnimalResponse(animal *entity.Animal) *response.Animal {
 }
 
 func AnimalsToAnimalResponses(animals *[]entity.Animal) *[]response.Animal {
-	var r []response.Animal
+	r := make([]response.Animal, 0)
+
 	for _, animal := range *animals {
 		r = append(r, *AnimalToAnimalResponse(&animal))
 	}
