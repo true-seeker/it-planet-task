@@ -7,6 +7,7 @@ import (
 
 type Animal interface {
 	Get(id int) (*response.Animal, error)
+	GetAnimalLocations(animalId int) (*[]response.Location, error)
 }
 
 type AnimalService struct {
@@ -37,4 +38,22 @@ func (a *AnimalService) Get(id int) (*response.Animal, error) {
 	animalResponse.DeathDateTime = animal.DeathDateTime
 	// TODO mapper
 	return animalResponse, nil
+}
+
+func (a *AnimalService) GetAnimalLocations(animalId int) (*[]response.Location, error) {
+	var locationsResponse []response.Location
+
+	locations, err := a.animalRepo.GetAnimalLocations(animalId)
+	if err != nil {
+		return nil, err
+	}
+	for _, location := range *locations {
+		locationResponse := response.Location{}
+		locationResponse.Id = location.Id
+		locationResponse.Latitude = location.Latitude
+		locationResponse.Longitude = location.Longitude
+		locationsResponse = append(locationsResponse, locationResponse)
+	}
+
+	return &locationsResponse, nil
 }

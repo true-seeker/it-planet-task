@@ -7,6 +7,7 @@ import (
 
 type Animal interface {
 	Get(id int) (*entity.Animal, error)
+	GetAnimalLocations(animalId int) (*[]entity.Location, error)
 }
 
 type AnimalRepository struct {
@@ -25,4 +26,19 @@ func (a *AnimalRepository) Get(id int) (*entity.Animal, error) {
 	}
 
 	return &animal, nil
+}
+
+func (a *AnimalRepository) GetAnimalLocations(animalId int) (*[]entity.Location, error) {
+	var animal entity.Animal
+
+	err := a.Db.
+		Preload("VisitedLocations").
+		Select("Id").
+		First(&animal, animalId).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &animal.VisitedLocations, nil
 }

@@ -33,3 +33,20 @@ func (a *AnimalHandler) Get(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, animal)
 }
+
+func (a *AnimalHandler) GetAnimalLocations(c *gin.Context) {
+	id, err := converter.StringToInt(c.Param("id"))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+	}
+	animal, err := a.service.GetAnimalLocations(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.AbortWithStatusJSON(http.StatusNotFound, err)
+
+		} else {
+			c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		}
+	}
+	c.JSON(http.StatusOK, animal)
+}
