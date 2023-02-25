@@ -12,6 +12,7 @@ func New(r *gin.Engine) *gin.Engine {
 	NewAnimalTypeHandler(r)
 	NewAccountHandler(r)
 	NewLocationHandler(r)
+	NewAnimalHandler(r)
 
 	return r
 }
@@ -42,4 +43,13 @@ func NewLocationHandler(r *gin.Engine) {
 	locationGroup := r.Group("locations")
 
 	locationGroup.GET("/:id", h.Get)
+}
+
+func NewAnimalHandler(r *gin.Engine) {
+	animalRepo := repository.NewAnimalRepository(helpers.GetConnectionOrCreateAndGet())
+	animalService := service.NewAnimalService(animalRepo)
+	h := handler.NewAnimalHandler(animalService)
+	animalGroup := r.Group("animals")
+
+	animalGroup.GET("/:id", h.Get)
 }
