@@ -34,6 +34,7 @@ func NewAccountRouter(r *gin.Engine) {
 	accountGroup := r.Group("accounts")
 
 	accountGroup.GET("/:id", h.Get)
+	accountGroup.GET("/search", h.Search)
 }
 
 func NewLocationRouter(r *gin.Engine) {

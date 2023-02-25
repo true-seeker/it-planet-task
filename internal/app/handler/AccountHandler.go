@@ -34,3 +34,11 @@ func (a *AccountHandler) Get(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, account)
 }
+
+func (a *AccountHandler) Search(c *gin.Context) {
+	accounts, err := a.service.Search()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+	}
+	c.JSON(http.StatusOK, accounts)
+}

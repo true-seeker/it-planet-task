@@ -7,6 +7,7 @@ import (
 
 type Account interface {
 	Get(id int) (*response.Account, error)
+	Search() (*[]response.Account, error)
 }
 
 type AccountService struct {
@@ -31,4 +32,25 @@ func (a *AccountService) Get(id int) (*response.Account, error) {
 	accountResponse.LastName = account.LastName
 
 	return accountResponse, nil
+}
+
+func (a *AccountService) Search() (*[]response.Account, error) {
+	var accountResponses []response.Account
+
+	accounts, err := a.accountRepo.Search()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, account := range *accounts {
+		accountResponse := response.Account{}
+		accountResponse.Id = account.Id
+		accountResponse.Email = account.Email
+		accountResponse.FirstName = account.FirstName
+		accountResponse.LastName = account.LastName
+
+		accountResponses = append(accountResponses, accountResponse)
+	}
+
+	return &accountResponses, nil
 }
