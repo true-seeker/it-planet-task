@@ -2,12 +2,15 @@ package repository
 
 import (
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
+	"it-planet-task/pkg/paginator"
+	"net/url"
 )
 
 type Account interface {
 	Get(id int) (*entity.Account, error)
-	Search() (*[]entity.Account, error)
+	Search(query url.Values) (*[]entity.Account, error)
 }
 
 type AccountRepository struct {
@@ -28,9 +31,13 @@ func (a *AccountRepository) Get(id int) (*entity.Account, error) {
 	return &account, nil
 }
 
-func (a *AccountRepository) Search() (*[]entity.Account, error) {
+func (a *AccountRepository) Search(query url.Values) (*[]entity.Account, error) {
 	var accounts []entity.Account
-	err := a.Db.Find(&accounts).Error
+	err := a.Db.
+		Scopes(paginator.Paginate(query),
+			filter.AccountFilter(query)).
+		Order("id").
+		Find(&accounts).Error
 	if err != nil {
 		return nil, err
 	}

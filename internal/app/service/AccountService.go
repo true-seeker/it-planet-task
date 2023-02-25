@@ -4,11 +4,12 @@ import (
 	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
+	"net/url"
 )
 
 type Account interface {
 	Get(id int) (*response.Account, error)
-	Search() (*[]response.Account, error)
+	Search(query url.Values) (*[]response.Account, error)
 }
 
 type AccountService struct {
@@ -32,10 +33,10 @@ func (a *AccountService) Get(id int) (*response.Account, error) {
 	return accountResponse, nil
 }
 
-func (a *AccountService) Search() (*[]response.Account, error) {
+func (a *AccountService) Search(query url.Values) (*[]response.Account, error) {
 	var accountResponses *[]response.Account
 
-	accounts, err := a.accountRepo.Search()
+	accounts, err := a.accountRepo.Search(query)
 	if err != nil {
 		return nil, err
 	}

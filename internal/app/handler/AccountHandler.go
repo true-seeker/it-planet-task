@@ -36,7 +36,8 @@ func (a *AccountHandler) Get(c *gin.Context) {
 }
 
 func (a *AccountHandler) Search(c *gin.Context) {
-	accounts, err := a.service.Search()
+	query := c.Request.URL.Query()
+	accounts, err := a.service.Search(query)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 	}
