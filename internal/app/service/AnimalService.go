@@ -9,6 +9,7 @@ import (
 type Animal interface {
 	Get(id int) (*response.Animal, error)
 	GetAnimalLocations(animalId int) (*[]response.Location, error)
+	Search() (*[]response.Animal, error)
 }
 
 type AnimalService struct {
@@ -43,4 +44,16 @@ func (a *AnimalService) GetAnimalLocations(animalId int) (*[]response.Location, 
 	locationsResponse = mapper.LocationsToLocationResponses(locations)
 
 	return locationsResponse, nil
+}
+
+func (a *AnimalService) Search() (*[]response.Animal, error) {
+	var animalResponses *[]response.Animal
+
+	animals, err := a.animalRepo.Search()
+	if err != nil {
+		return nil, err
+	}
+	animalResponses = mapper.AnimalsToAnimalResponses(animals)
+
+	return animalResponses, nil
 }

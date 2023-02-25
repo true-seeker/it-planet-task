@@ -54,5 +54,6 @@ func NewAnimalRouter(r *gin.Engine) *gin.RouterGroup {
 
 	animalGroup.GET("/:id", h.Get)
 	animalGroup.GET("/:id/locations", h.GetAnimalLocations)
+	animalGroup.GET("/search", h.Search)
 	return animalGroup
 }
