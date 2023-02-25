@@ -1,6 +1,7 @@
 package service
 
 import (
+	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
 )
@@ -25,9 +26,7 @@ func (l *LocationService) Get(id int) (*response.Location, error) {
 		return nil, err
 	}
 
-	locationResponse.Id = location.Id
-	locationResponse.Latitude = location.Latitude
-	locationResponse.Longitude = location.Longitude
+	locationResponse = mapper.LocationToLocationResponse(location)
 
 	return locationResponse, nil
 }

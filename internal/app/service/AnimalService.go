@@ -1,6 +1,7 @@
 package service
 
 import (
+	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
 )
@@ -26,34 +27,20 @@ func (a *AnimalService) Get(id int) (*response.Animal, error) {
 		return nil, err
 	}
 
-	animalResponse.Id = animal.Id
-	animalResponse.Weight = animal.Weight
-	animalResponse.Length = animal.Length
-	animalResponse.Gender = animal.Gender
-	animalResponse.Height = animal.Height
-	animalResponse.LifeStatus = animal.LifeStatus
-	animalResponse.ChippingDateTime = animal.ChippingDateTime
-	animalResponse.ChipperId = animal.ChipperId
-	animalResponse.ChippingLocationId = animal.ChippingLocationId
-	animalResponse.DeathDateTime = animal.DeathDateTime
+	animalResponse = mapper.AnimalToAnimalResponse(animal)
 	// TODO mapper
 	return animalResponse, nil
 }
 
 func (a *AnimalService) GetAnimalLocations(animalId int) (*[]response.Location, error) {
-	var locationsResponse []response.Location
+	var locationsResponse *[]response.Location
 
 	locations, err := a.animalRepo.GetAnimalLocations(animalId)
 	if err != nil {
 		return nil, err
 	}
-	for _, location := range *locations {
-		locationResponse := response.Location{}
-		locationResponse.Id = location.Id
-		locationResponse.Latitude = location.Latitude
-		locationResponse.Longitude = location.Longitude
-		locationsResponse = append(locationsResponse, locationResponse)
-	}
 
-	return &locationsResponse, nil
+	locationsResponse = mapper.LocationsToLocationResponses(locations)
+
+	return locationsResponse, nil
 }

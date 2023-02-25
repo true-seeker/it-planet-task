@@ -1,6 +1,7 @@
 package service
 
 import (
+	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
 )
@@ -25,8 +26,7 @@ func (a *AnimalTypeService) Get(id int) (*response.AnimalType, error) {
 		return nil, err
 	}
 
-	animalTypeResponse.Id = animalType.Id
-	animalTypeResponse.Title = animalType.Title
+	animalTypeResponse = mapper.AnimalTypeToAnimalTypeResponse(animalType)
 
 	return animalTypeResponse, nil
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
 )
@@ -26,31 +27,20 @@ func (a *AccountService) Get(id int) (*response.Account, error) {
 		return nil, err
 	}
 
-	accountResponse.Id = account.Id
-	accountResponse.Email = account.Email
-	accountResponse.FirstName = account.FirstName
-	accountResponse.LastName = account.LastName
+	accountResponse = mapper.AccountToAccountResponse(account)
 
 	return accountResponse, nil
 }
 
 func (a *AccountService) Search() (*[]response.Account, error) {
-	var accountResponses []response.Account
+	var accountResponses *[]response.Account
 
 	accounts, err := a.accountRepo.Search()
 	if err != nil {
 		return nil, err
 	}
 
-	for _, account := range *accounts {
-		accountResponse := response.Account{}
-		accountResponse.Id = account.Id
-		accountResponse.Email = account.Email
-		accountResponse.FirstName = account.FirstName
-		accountResponse.LastName = account.LastName
+	accountResponses = mapper.AccountsToAccountResponses(accounts)
 
-		accountResponses = append(accountResponses, accountResponse)
-	}
-
-	return &accountResponses, nil
+	return accountResponses, nil
 }
