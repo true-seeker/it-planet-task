@@ -8,7 +8,7 @@ import (
 func AnimalToAnimalResponse(animal *entity.Animal) *response.Animal {
 	r := &response.Animal{
 		Id:                 animal.Id,
-		AnimalTypes:        nil,
+		AnimalTypesId:      nil,
 		Weight:             animal.Weight,
 		Height:             animal.Height,
 		Length:             animal.Length,
@@ -17,16 +17,16 @@ func AnimalToAnimalResponse(animal *entity.Animal) *response.Animal {
 		ChippingDateTime:   animal.ChippingDateTime,
 		ChipperId:          animal.ChipperId,
 		ChippingLocationId: animal.ChippingLocationId,
-		VisitedLocations:   nil,
+		VisitedLocationsId: nil,
 		DeathDateTime:      animal.DeathDateTime,
 	}
 
 	for _, visitedLoc := range animal.VisitedLocations {
-		r.VisitedLocations = append(r.VisitedLocations, visitedLoc.Id)
+		r.VisitedLocationsId = append(r.VisitedLocationsId, visitedLoc.Id)
 	}
 
 	for _, animalType := range animal.AnimalTypes {
-		r.AnimalTypes = append(r.AnimalTypes, animalType.Id)
+		r.AnimalTypesId = append(r.AnimalTypesId, animalType.Id)
 	}
 
 	return r

@@ -3,16 +3,16 @@ package response
 import "time"
 
 type Animal struct {
-	Id                 int
-	AnimalTypes        []int
-	Weight             float32
-	Height             float32
-	Length             float32
-	Gender             string
-	LifeStatus         string
-	ChippingDateTime   time.Time
-	ChipperId          int
-	ChippingLocationId int
-	VisitedLocations   []int
-	DeathDateTime      time.Time
+	Id                 int        `json:"id"`
+	AnimalTypesId      []int      `json:"animalTypes"`
+	Weight             float32    `json:"weight"`
+	Height             float32    `json:"height"`
+	Length             float32    `json:"length"`
+	Gender             string     `json:"gender"`
+	LifeStatus         string     `json:"lifeStatus"`
+	ChippingDateTime   time.Time  `json:"chippingDateTime"`
+	ChipperId          int        `json:"chipperId"`
+	ChippingLocationId int        `json:"chippingLocationId"`
+	VisitedLocationsId []int      `json:"visitedLocations"`
+	DeathDateTime      *time.Time `json:"deathDateTime"`
 }

@@ -1,7 +1,7 @@
 package response
 
 type Location struct {
-	Id        int
-	Latitude  float32
-	Longitude float32
+	Id        int     `json:"id"`
+	Latitude  float32 `json:"latitude"`
+	Longitude float32 `json:"longitude"`
 }

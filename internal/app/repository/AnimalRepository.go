@@ -23,7 +23,11 @@ func NewAnimalRepository(db *gorm.DB) Animal {
 
 func (a *AnimalRepository) Get(id int) (*entity.Animal, error) {
 	var animal entity.Animal
-	err := a.Db.First(&animal, id).Error
+	err := a.Db.
+		Preload("VisitedLocations").
+		Preload("AnimalTypes").
+		First(&animal, id).Error
+
 	if err != nil {
 		return nil, err
 	}

@@ -1,8 +1,8 @@
 package response
 
 type Account struct {
-	Id        int
-	FirstName string
-	LastName  string
-	Email     string
+	Id        int    `json:"id"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
 }
