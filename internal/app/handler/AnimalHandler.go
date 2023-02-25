@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/pkg/converter"
 	"net/http"
@@ -52,8 +53,8 @@ func (a *AnimalHandler) GetAnimalLocations(c *gin.Context) {
 }
 
 func (a *AnimalHandler) Search(c *gin.Context) {
-	query := c.Request.URL.Query()
-	animals, err := a.service.Search(query)
+	params := filter.NewAnimalFilterParams(c.Request.URL.Query())
+	animals, err := a.service.Search(params)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 	}

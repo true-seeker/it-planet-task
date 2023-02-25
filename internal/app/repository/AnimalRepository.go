@@ -5,13 +5,12 @@ import (
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/pkg/paginator"
-	"net/url"
 )
 
 type Animal interface {
 	Get(id int) (*entity.Animal, error)
 	GetAnimalLocations(animalId int) (*[]entity.Location, error)
-	Search(query url.Values) (*[]entity.Animal, error)
+	Search(params *filter.AnimalFilterParams) (*[]entity.Animal, error)
 }
 
 type AnimalRepository struct {
@@ -47,10 +46,10 @@ func (a *AnimalRepository) GetAnimalLocations(animalId int) (*[]entity.Location,
 	return &animal.VisitedLocations, nil
 }
 
-func (a *AnimalRepository) Search(query url.Values) (*[]entity.Animal, error) {
+func (a *AnimalRepository) Search(params *filter.AnimalFilterParams) (*[]entity.Animal, error) {
 	var animals []entity.Animal
 	err := a.Db.
-		Scopes(paginator.Paginate(query), filter.AnimalFilter(query)).
+		Scopes(paginator.Paginate(params), filter.AnimalFilter(params)).
 		Order("id").
 		Find(&animals).Error
 	if err != nil {

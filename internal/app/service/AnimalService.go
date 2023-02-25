@@ -1,16 +1,16 @@
 package service
 
 import (
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
-	"net/url"
 )
 
 type Animal interface {
 	Get(id int) (*response.Animal, error)
 	GetAnimalLocations(animalId int) (*[]response.Location, error)
-	Search(query url.Values) (*[]response.Animal, error)
+	Search(params *filter.AnimalFilterParams) (*[]response.Animal, error)
 }
 
 type AnimalService struct {
@@ -47,10 +47,10 @@ func (a *AnimalService) GetAnimalLocations(animalId int) (*[]response.Location, 
 	return locationsResponse, nil
 }
 
-func (a *AnimalService) Search(query url.Values) (*[]response.Animal, error) {
+func (a *AnimalService) Search(params *filter.AnimalFilterParams) (*[]response.Animal, error) {
 	var animalResponses *[]response.Animal
 
-	animals, err := a.animalRepo.Search(query)
+	animals, err := a.animalRepo.Search(params)
 	if err != nil {
 		return nil, err
 	}

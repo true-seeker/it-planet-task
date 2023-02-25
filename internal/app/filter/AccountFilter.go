@@ -3,28 +3,59 @@ package filter
 import (
 	"fmt"
 	"gorm.io/gorm"
+	"it-planet-task/pkg/paginator"
 	"net/url"
 	"strings"
 )
 
-func AccountFilter(q url.Values) func(db *gorm.DB) *gorm.DB {
+type AccountFilterParams struct {
+	FirstName string
+	LastName  string
+	Email     string
+
+	Pagination paginator.Pagination
+}
+
+func NewAccountFilterParams(q url.Values) *AccountFilterParams {
+	params := &AccountFilterParams{}
+	if q.Get("firstName") != "" {
+		params.FirstName = q.Get("firstName")
+	}
+	if q.Get("lastName") != "" {
+		params.LastName = q.Get("lastName")
+	}
+	if q.Get("email") != "" {
+		params.Email = q.Get("email")
+	}
+
+	if q.Get("from") != "" {
+		params.Pagination.From = q.Get("from")
+	}
+	if q.Get("size") != "" {
+		params.Pagination.Size = q.Get("size")
+	}
+	return params
+}
+
+func (a *AccountFilterParams) GetPagination() *paginator.Pagination {
+	return &a.Pagination
+}
+
+func AccountFilter(params *AccountFilterParams) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		firstName := q.Get("firstName")
-		if firstName != "" {
+		if params.FirstName != "" {
 			db = db.Where("LOWER(first_name) LIKE ?",
-				fmt.Sprintf("%%%s%%", strings.ToLower(firstName)))
+				fmt.Sprintf("%%%s%%", strings.ToLower(params.FirstName)))
 		}
 
-		lastName := q.Get("lastName")
-		if lastName != "" {
+		if params.LastName != "" {
 			db = db.Where("LOWER(last_name) LIKE ?",
-				fmt.Sprintf("%%%s%%", strings.ToLower(lastName)))
+				fmt.Sprintf("%%%s%%", strings.ToLower(params.LastName)))
 		}
 
-		email := q.Get("email")
-		if email != "" {
+		if params.Email != "" {
 			db = db.Where("LOWER(email) LIKE ?",
-				fmt.Sprintf("%%%s%%", strings.ToLower(email)))
+				fmt.Sprintf("%%%s%%", strings.ToLower(params.Email)))
 		}
 
 		return db

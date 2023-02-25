@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/pkg/converter"
 	"net/http"
@@ -36,8 +37,8 @@ func (a *AccountHandler) Get(c *gin.Context) {
 }
 
 func (a *AccountHandler) Search(c *gin.Context) {
-	query := c.Request.URL.Query()
-	accounts, err := a.service.Search(query)
+	params := filter.NewAccountFilterParams(c.Request.URL.Query())
+	accounts, err := a.service.Search(params)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 	}
