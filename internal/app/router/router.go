@@ -9,25 +9,25 @@ import (
 )
 
 func New(r *gin.Engine) *gin.Engine {
-	NewAnimalTypeHandler(r)
-	NewAccountHandler(r)
-	NewLocationHandler(r)
-	NewAnimalHandler(r)
+	animalGroup := NewAnimalRouter(r)
+	NewAnimalTypeRouter(animalGroup)
+	NewAccountRouter(r)
+	NewLocationRouter(r)
 
 	return r
 }
 
-func NewAnimalTypeHandler(r *gin.Engine) {
+func NewAnimalTypeRouter(parentGroup *gin.RouterGroup) {
 	animalTypeRepo := repository.NewAnimalTypeRepository(helpers.GetConnectionOrCreateAndGet())
 	animalTypeService := service.NewAnimalTypeService(animalTypeRepo)
 	h := handler.NewAnimalTypeHandler(animalTypeService)
-	animalTypeGroup := r.Group("animal_type")
+	animalTypeGroup := parentGroup.Group("types")
 
 	animalTypeGroup.GET("/:id", h.Get)
 
 }
 
-func NewAccountHandler(r *gin.Engine) {
+func NewAccountRouter(r *gin.Engine) {
 	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
 	accountService := service.NewAccountService(accountRepo)
 	h := handler.NewAccountHandler(accountService)
@@ -36,7 +36,7 @@ func NewAccountHandler(r *gin.Engine) {
 	accountGroup.GET("/:id", h.Get)
 }
 
-func NewLocationHandler(r *gin.Engine) {
+func NewLocationRouter(r *gin.Engine) {
 	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())
 	locationService := service.NewLocationService(locationRepo)
 	h := handler.NewLocationHandler(locationService)
@@ -45,11 +45,12 @@ func NewLocationHandler(r *gin.Engine) {
 	locationGroup.GET("/:id", h.Get)
 }
 
-func NewAnimalHandler(r *gin.Engine) {
+func NewAnimalRouter(r *gin.Engine) *gin.RouterGroup {
 	animalRepo := repository.NewAnimalRepository(helpers.GetConnectionOrCreateAndGet())
 	animalService := service.NewAnimalService(animalRepo)
 	h := handler.NewAnimalHandler(animalService)
 	animalGroup := r.Group("animals")
 
 	animalGroup.GET("/:id", h.Get)
+	return animalGroup
 }
