@@ -4,12 +4,13 @@ import (
 	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
+	"net/url"
 )
 
 type Animal interface {
 	Get(id int) (*response.Animal, error)
 	GetAnimalLocations(animalId int) (*[]response.Location, error)
-	Search() (*[]response.Animal, error)
+	Search(query url.Values) (*[]response.Animal, error)
 }
 
 type AnimalService struct {
@@ -29,7 +30,7 @@ func (a *AnimalService) Get(id int) (*response.Animal, error) {
 	}
 
 	animalResponse = mapper.AnimalToAnimalResponse(animal)
-	// TODO mapper
+
 	return animalResponse, nil
 }
 
@@ -46,10 +47,10 @@ func (a *AnimalService) GetAnimalLocations(animalId int) (*[]response.Location, 
 	return locationsResponse, nil
 }
 
-func (a *AnimalService) Search() (*[]response.Animal, error) {
+func (a *AnimalService) Search(query url.Values) (*[]response.Animal, error) {
 	var animalResponses *[]response.Animal
 
-	animals, err := a.animalRepo.Search()
+	animals, err := a.animalRepo.Search(query)
 	if err != nil {
 		return nil, err
 	}

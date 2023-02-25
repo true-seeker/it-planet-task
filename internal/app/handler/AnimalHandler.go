@@ -52,7 +52,8 @@ func (a *AnimalHandler) GetAnimalLocations(c *gin.Context) {
 }
 
 func (a *AnimalHandler) Search(c *gin.Context) {
-	animals, err := a.service.Search()
+	query := c.Request.URL.Query()
+	animals, err := a.service.Search(query)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 	}
