@@ -3,6 +3,8 @@ package filter
 import (
 	"fmt"
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/validator"
+	"it-planet-task/pkg/errorHandler"
 	"it-planet-task/pkg/paginator"
 	"net/url"
 	"strings"
@@ -16,7 +18,7 @@ type AccountFilterParams struct {
 	Pagination paginator.Pagination
 }
 
-func NewAccountFilterParams(q url.Values) *AccountFilterParams {
+func NewAccountFilterParams(q url.Values) (*AccountFilterParams, *errorHandler.HttpErr) {
 	params := &AccountFilterParams{}
 	if q.Get("firstName") != "" {
 		params.FirstName = q.Get("firstName")
@@ -27,14 +29,14 @@ func NewAccountFilterParams(q url.Values) *AccountFilterParams {
 	if q.Get("email") != "" {
 		params.Email = q.Get("email")
 	}
+	pagination, httpErr := validator.ValidateAndReturnPagination(q.Get("from"), q.Get("size"))
+	if httpErr != nil {
+		return nil, httpErr
+	}
 
-	if q.Get("from") != "" {
-		params.Pagination.From = q.Get("from")
-	}
-	if q.Get("size") != "" {
-		params.Pagination.Size = q.Get("size")
-	}
-	return params
+	params.Pagination = *pagination
+
+	return params, nil
 }
 
 func (a *AccountFilterParams) GetPagination() *paginator.Pagination {
