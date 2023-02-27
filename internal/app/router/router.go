@@ -9,10 +9,12 @@ import (
 )
 
 func New(r *gin.Engine) *gin.Engine {
+	api := r.Group("/api")
+
 	animalRepo := repository.NewAnimalRepository(helpers.GetConnectionOrCreateAndGet())
 	animalService := service.NewAnimalService(animalRepo)
 	animalHandler := handler.NewAnimalHandler(animalService)
-	animalGroup := r.Group("animals")
+	animalGroup := api.Group("animals")
 	{
 		animalGroup.GET("/:id", animalHandler.Get)
 		animalGroup.GET("/:id/locations", animalHandler.GetAnimalLocations)
@@ -30,7 +32,7 @@ func New(r *gin.Engine) *gin.Engine {
 	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
 	accountService := service.NewAccountService(accountRepo)
 	accountHandler := handler.NewAccountHandler(accountService)
-	accountGroup := r.Group("accounts")
+	accountGroup := api.Group("accounts")
 	{
 		accountGroup.GET("/:id", accountHandler.Get)
 		accountGroup.GET("/search", accountHandler.Search)
@@ -39,7 +41,7 @@ func New(r *gin.Engine) *gin.Engine {
 	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())
 	locationService := service.NewLocationService(locationRepo)
 	locationHandler := handler.NewLocationHandler(locationService)
-	locationGroup := r.Group("locations")
+	locationGroup := api.Group("locations")
 	{
 		locationGroup.GET("/:id", locationHandler.Get)
 	}
