@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  database:
+    image: postgres:latest
+    container_name: db
+    volumes:
+      - /var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=golang
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=568219
+
+
+  webapi:
+    image: webapi
+    build: ../
+    ports:
+      - "80:80"
+    depends_on:
+      - database
+    command:
+      - ./it_planet_task
+#    environment:
+#      - POSTGRES_USER=user
+#      - POSTGRES_PASSWORD=password
+
+
+  tests:
+    image: mrexpen/planet_olymp_phase1
+#    pull_policy: always
+    ports:
+      - "8090:8080"
+    depends_on:
+      - webapi
+    environment:
+      SERVER_URL: http://webapi
+      STAGE: 0
+      # all - запуск всех тестов из трёх доступных этапов
+      # 0, 1 или 2 - запуск тестов для соответствующего этапа
