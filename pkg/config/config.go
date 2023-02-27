@@ -20,7 +20,7 @@ func Init(env string) {
 	config.AddConfigPath("/app/configs/")
 	err = config.ReadInConfig()
 	if err != nil {
-		log.Fatal("error on parsing configuration file", err)
+		log.Println("error on parsing configuration file", err)
 	}
 	initFlags()
 }
@@ -41,24 +41,24 @@ func initFlags() {
 	flag.Parse()
 
 	if *dbAddr != "" {
-		config.Set("database.address", dbAddr)
+		config.Set("database.address", *dbAddr)
 	}
 	if *dbUser != "" {
-		config.Set("database.user", dbUser)
+		config.Set("database.user", *dbUser)
 	}
 	if *dbPass != "" {
-		config.Set("database.password", dbPass)
+		config.Set("database.password", *dbPass)
 	}
 	if *dbName != "" {
-		config.Set("database.dbname", dbName)
+		config.Set("database.dbname", *dbName)
 	}
 	if *dbPort != "" {
-		config.Set("database.port", dbPort)
+		config.Set("database.port", *dbPort)
 	}
 	if *srvAddr != "" {
-		config.Set("server.address", srvAddr)
+		config.Set("server.address", *srvAddr)
 	}
 	if *srvPort != "" {
-		config.Set("server.port", srvPort)
+		config.Set("server.port", *srvPort)
 	}
 }
