@@ -31,7 +31,7 @@ func ValidateAndReturnPagination(from, size string) (*paginator.Pagination, *err
 		if httpErr != nil {
 			return nil, httpErr
 		}
-		if size < 0 {
+		if size <= 0 {
 			return nil, &errorHandler.HttpErr{
 				Err:        errors.New("size must be greater than 0"),
 				StatusCode: http.StatusBadRequest,
