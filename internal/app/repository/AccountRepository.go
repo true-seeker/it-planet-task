@@ -11,6 +11,7 @@ type Account interface {
 	Get(id int) (*entity.Account, error)
 	Search(params *filter.AccountFilterParams) (*[]entity.Account, error)
 	IsAlreadyExists(account *entity.Account) bool
+	CheckCredentials(account *entity.Account) bool
 }
 
 type AccountRepository struct {
@@ -49,4 +50,10 @@ func (a *AccountRepository) IsAlreadyExists(account *entity.Account) bool {
 	ac := entity.Account{}
 	a.Db.Where("email = ?", account.Email).First(&ac)
 	return ac.Id != 0
+}
+
+func (a *AccountRepository) CheckCredentials(account *entity.Account) bool {
+	var acc entity.Account
+	a.Db.Where("email = ? AND password = ?", account.Email, account.Password).First(&acc)
+	return acc.Id != 0
 }

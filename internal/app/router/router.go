@@ -6,10 +6,11 @@ import (
 	"it-planet-task/internal/app/handler"
 	"it-planet-task/internal/app/repository"
 	"it-planet-task/internal/app/service"
+	"it-planet-task/internal/pkg/middleware"
 )
 
 func New(r *gin.Engine) *gin.Engine {
-	api := r.Group("/api")
+	api := r.Group("/api", middleware.BasicAuth)
 
 	animalRepo := repository.NewAnimalRepository(helpers.GetConnectionOrCreateAndGet())
 	animalService := service.NewAnimalService(animalRepo)

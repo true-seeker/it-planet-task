@@ -12,6 +12,7 @@ type Account interface {
 	Get(id int) (*response.Account, error)
 	Search(params *filter.AccountFilterParams) (*[]response.Account, error)
 	IsAlreadyExists(account *entity.Account) bool
+	CheckCredentials(account *entity.Account) bool
 }
 
 type AccountService struct {
@@ -50,4 +51,8 @@ func (a *AccountService) Search(params *filter.AccountFilterParams) (*[]response
 
 func (a *AccountService) IsAlreadyExists(account *entity.Account) bool {
 	return a.accountRepo.IsAlreadyExists(account)
+}
+
+func (a *AccountService) CheckCredentials(account *entity.Account) bool {
+	return a.accountRepo.CheckCredentials(account)
 }
