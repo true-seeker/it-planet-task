@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  database:
+    image: postgres:latest
+    container_name: db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  webapi:
+    image: webapi
+    build: ../
+    ports:
+      - "80:80"
+    depends_on:
+      database:
+        condition: service_healthy
+    command: ./it_planet_task -dbAddr=db -dbUser=postgres -dbPass=123456 -dbName=postgres -dbPort=5432 -srvAddr=webapi -srvPort=80
+
+
+  tests:
+    image: mrexpen/planet_olymp_phase1
+    pull_policy: always
+    ports:
+      - "8090:8080"
+    depends_on:
+      - webapi
+    environment:
+      SERVER_URL: http://webapi
+      STAGE: 0
+      # all - запуск всех тестов из трёх доступных этапов
+      # 0, 1 или 2 - запуск тестов для соответствующего этапа
