@@ -4,12 +4,15 @@ services:
   database:
     image: postgres:latest
     container_name: db
-    volumes:
-      - /var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=golang
+      - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=568219
+      - POSTGRES_PASSWORD=123456
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 
   webapi:
@@ -18,17 +21,14 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - database
-    command:
-      - ./it_planet_task
-#    environment:
-#      - POSTGRES_USER=user
-#      - POSTGRES_PASSWORD=password
+      database:
+        condition: service_healthy
+    command: ./it_planet_task -dbAddr=db -dbUser=postgres -dbPass=123456 -dbName=postgres -dbPort=5432 -srvAddr=webapi -srvPort=80
 
 
   tests:
     image: mrexpen/planet_olymp_phase1
-#    pull_policy: always
+    pull_policy: always
     ports:
       - "8090:8080"
     depends_on:
