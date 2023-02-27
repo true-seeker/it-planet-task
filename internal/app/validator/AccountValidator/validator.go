@@ -10,21 +10,21 @@ import (
 )
 
 func ValidateRegistration(account *entity.Account) *errorHandler.HttpErr {
-	if strings.Trim(account.FirstName, " ") == "" {
+	if strings.Trim(account.FirstName, " \t\n") == "" {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("firstName is empty"),
 			StatusCode: http.StatusBadRequest,
 		}
 	}
 
-	if strings.Trim(account.LastName, " ") == "" {
+	if strings.Trim(account.LastName, " \t\n") == "" {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("lastName is empty"),
 			StatusCode: http.StatusBadRequest,
 		}
 	}
 
-	if strings.Trim(account.Email, " ") == "" {
+	if strings.Trim(account.Email, " \t\n") == "" {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("email is empty"),
 			StatusCode: http.StatusBadRequest,
@@ -38,7 +38,7 @@ func ValidateRegistration(account *entity.Account) *errorHandler.HttpErr {
 		}
 	}
 
-	if strings.Trim(account.Password, " ") == "" {
+	if strings.Trim(account.Password, " \t\n") == "" {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("password is empty"),
 			StatusCode: http.StatusBadRequest,

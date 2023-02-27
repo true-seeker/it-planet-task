@@ -10,16 +10,16 @@ import (
 )
 
 func New(r *gin.Engine) *gin.Engine {
-	api := r.Group("/api", middleware.BasicAuth)
+	api := r.Group("/api")
 
 	animalRepo := repository.NewAnimalRepository(helpers.GetConnectionOrCreateAndGet())
 	animalService := service.NewAnimalService(animalRepo)
 	animalHandler := handler.NewAnimalHandler(animalService)
 	animalGroup := api.Group("animals")
 	{
-		animalGroup.GET("/:id", animalHandler.Get)
-		animalGroup.GET("/:id/locations", animalHandler.GetAnimalLocations)
-		animalGroup.GET("/search", animalHandler.Search)
+		animalGroup.GET("/:id", middleware.OptionalBasicAuth, animalHandler.Get)
+		animalGroup.GET("/:id/locations", middleware.OptionalBasicAuth, animalHandler.GetAnimalLocations)
+		animalGroup.GET("/search", middleware.OptionalBasicAuth, animalHandler.Search)
 	}
 
 	animalTypeRepo := repository.NewAnimalTypeRepository(helpers.GetConnectionOrCreateAndGet())
@@ -27,7 +27,7 @@ func New(r *gin.Engine) *gin.Engine {
 	animalTypeHandler := handler.NewAnimalTypeHandler(animalTypeService)
 	animalTypeGroup := animalGroup.Group("types")
 	{
-		animalTypeGroup.GET("/:id", animalTypeHandler.Get)
+		animalTypeGroup.GET("/:id", middleware.OptionalBasicAuth, animalTypeHandler.Get)
 	}
 
 	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
@@ -35,8 +35,8 @@ func New(r *gin.Engine) *gin.Engine {
 	accountHandler := handler.NewAccountHandler(accountService)
 	accountGroup := api.Group("accounts")
 	{
-		accountGroup.GET("/:id", accountHandler.Get)
-		accountGroup.GET("/search", accountHandler.Search)
+		accountGroup.GET("/:id", middleware.OptionalBasicAuth, accountHandler.Get)
+		accountGroup.GET("/search", middleware.OptionalBasicAuth, accountHandler.Search)
 	}
 
 	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())
@@ -44,7 +44,7 @@ func New(r *gin.Engine) *gin.Engine {
 	locationHandler := handler.NewLocationHandler(locationService)
 	locationGroup := api.Group("locations")
 	{
-		locationGroup.GET("/:id", locationHandler.Get)
+		locationGroup.GET("/:id", middleware.OptionalBasicAuth, locationHandler.Get)
 	}
 
 	authRepo := repository.NewAuthRepository(helpers.GetConnectionOrCreateAndGet())

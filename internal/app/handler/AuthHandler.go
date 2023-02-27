@@ -19,15 +19,14 @@ func NewAuthHandler(service service.Auth, accountService service.Account) *AuthH
 }
 
 func (a *AuthHandler) Register(c *gin.Context) {
-
-	isAuthenticated, err := middleware.IsAccountExists(c)
-	if isAuthenticated || err != nil {
+	isAuthenticated, _ := middleware.IsAccountExists(c)
+	if isAuthenticated {
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
 	newAccount := &entity.Account{}
-	err = c.BindJSON(&newAccount)
+	err := c.BindJSON(&newAccount)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
@@ -50,5 +49,5 @@ func (a *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, account)
+	c.JSON(http.StatusCreated, account)
 }

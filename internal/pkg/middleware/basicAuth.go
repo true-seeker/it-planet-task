@@ -29,10 +29,25 @@ func IsAccountExists(c *gin.Context) (bool, error) {
 
 }
 
+func OptionalBasicAuth(c *gin.Context) {
+	isExists, err := IsAccountExists(c)
+	if err != nil {
+		c.Next()
+		return
+	}
+	if !isExists {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		c.Next()
+		return
+	}
+	c.Next()
+}
+
 func BasicAuth(c *gin.Context) {
 	isExists, err := IsAccountExists(c)
 	if err != nil || !isExists {
 		c.AbortWithStatus(http.StatusUnauthorized)
+		c.Next()
 		return
 	}
 	c.Next()
