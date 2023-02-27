@@ -5,6 +5,7 @@ import (
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator/AccountValidator"
+	"it-planet-task/internal/pkg/middleware"
 	"net/http"
 )
 
@@ -18,8 +19,15 @@ func NewAuthHandler(service service.Auth, accountService service.Account) *AuthH
 }
 
 func (a *AuthHandler) Register(c *gin.Context) {
+
+	isAuthenticated, err := middleware.IsAccountExists(c)
+	if isAuthenticated || err != nil {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
 	newAccount := &entity.Account{}
-	err := c.BindJSON(&newAccount)
+	err = c.BindJSON(&newAccount)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return

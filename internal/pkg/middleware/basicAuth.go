@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"it-planet-task/helpers"
 	"it-planet-task/internal/app/model/entity"
@@ -9,12 +10,11 @@ import (
 	"net/http"
 )
 
-func BasicAuth(c *gin.Context) {
+func IsAccountExists(c *gin.Context) (bool, error) {
 	r := c.Request
 	login, password, ok := r.BasicAuth()
 	if !ok {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
+		return false, errors.New("")
 	}
 
 	account := &entity.Account{
@@ -25,9 +25,13 @@ func BasicAuth(c *gin.Context) {
 	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
 	accountService := service.NewAccountService(accountRepo)
 
-	isExists := accountService.CheckCredentials(account)
+	return accountService.CheckCredentials(account), nil
 
-	if !isExists {
+}
+
+func BasicAuth(c *gin.Context) {
+	isExists, err := IsAccountExists(c)
+	if err != nil || !isExists {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

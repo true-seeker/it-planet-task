@@ -51,7 +51,7 @@ func New(r *gin.Engine) *gin.Engine {
 	authService := service.NewAuthService(authRepo)
 	authHandler := handler.NewAuthHandler(authService, accountService)
 	{
-		r.POST("/registration", authHandler.Register)
+		r.POST("api/registration", authHandler.Register)
 	}
 
 	return r
