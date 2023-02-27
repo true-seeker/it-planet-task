@@ -10,6 +10,7 @@ import (
 type Account interface {
 	Get(id int) (*entity.Account, error)
 	Search(params *filter.AccountFilterParams) (*[]entity.Account, error)
+	IsAlreadyExists(account *entity.Account) bool
 }
 
 type AccountRepository struct {
@@ -42,4 +43,10 @@ func (a *AccountRepository) Search(params *filter.AccountFilterParams) (*[]entit
 	}
 
 	return &accounts, nil
+}
+
+func (a *AccountRepository) IsAlreadyExists(account *entity.Account) bool {
+	ac := entity.Account{}
+	a.Db.Where("email = ?", account.Email).First(&ac)
+	return ac.Id != 0
 }

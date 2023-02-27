@@ -13,6 +13,7 @@ func New(r *gin.Engine) *gin.Engine {
 	NewAnimalTypeRouter(animalGroup)
 	NewAccountRouter(r)
 	NewLocationRouter(r)
+	NewAuthRouter(r)
 
 	return r
 }
@@ -56,4 +57,14 @@ func NewAnimalRouter(r *gin.Engine) *gin.RouterGroup {
 	animalGroup.GET("/:id/locations", h.GetAnimalLocations)
 	animalGroup.GET("/search", h.Search)
 	return animalGroup
+}
+
+func NewAuthRouter(r *gin.Engine) {
+	authRepo := repository.NewAuthRepository(helpers.GetConnectionOrCreateAndGet())
+	authService := service.NewAuthService(authRepo)
+	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
+	accountService := service.NewAccountService(accountRepo)
+	h := handler.NewAuthHandler(authService, accountService)
+
+	r.POST("/registration", h.Register)
 }

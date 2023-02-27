@@ -3,6 +3,7 @@ package service
 import (
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/mapper"
+	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
 )
@@ -10,6 +11,7 @@ import (
 type Account interface {
 	Get(id int) (*response.Account, error)
 	Search(params *filter.AccountFilterParams) (*[]response.Account, error)
+	IsAlreadyExists(account *entity.Account) bool
 }
 
 type AccountService struct {
@@ -44,4 +46,8 @@ func (a *AccountService) Search(params *filter.AccountFilterParams) (*[]response
 	accountResponses = mapper.AccountsToAccountResponses(accounts)
 
 	return accountResponses, nil
+}
+
+func (a *AccountService) IsAlreadyExists(account *entity.Account) bool {
+	return a.accountRepo.IsAlreadyExists(account)
 }
