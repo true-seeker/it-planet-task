@@ -9,62 +9,47 @@ import (
 )
 
 func New(r *gin.Engine) *gin.Engine {
-	animalGroup := NewAnimalRouter(r)
-	NewAnimalTypeRouter(animalGroup)
-	NewAccountRouter(r)
-	NewLocationRouter(r)
-	NewAuthRouter(r)
-
-	return r
-}
-
-func NewAnimalTypeRouter(parentGroup *gin.RouterGroup) {
-	animalTypeRepo := repository.NewAnimalTypeRepository(helpers.GetConnectionOrCreateAndGet())
-	animalTypeService := service.NewAnimalTypeService(animalTypeRepo)
-	h := handler.NewAnimalTypeHandler(animalTypeService)
-	animalTypeGroup := parentGroup.Group("types")
-
-	animalTypeGroup.GET("/:id", h.Get)
-
-}
-
-func NewAccountRouter(r *gin.Engine) {
-	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
-	accountService := service.NewAccountService(accountRepo)
-	h := handler.NewAccountHandler(accountService)
-	accountGroup := r.Group("accounts")
-
-	accountGroup.GET("/:id", h.Get)
-	accountGroup.GET("/search", h.Search)
-}
-
-func NewLocationRouter(r *gin.Engine) {
-	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())
-	locationService := service.NewLocationService(locationRepo)
-	h := handler.NewLocationHandler(locationService)
-	locationGroup := r.Group("locations")
-
-	locationGroup.GET("/:id", h.Get)
-}
-
-func NewAnimalRouter(r *gin.Engine) *gin.RouterGroup {
 	animalRepo := repository.NewAnimalRepository(helpers.GetConnectionOrCreateAndGet())
 	animalService := service.NewAnimalService(animalRepo)
-	h := handler.NewAnimalHandler(animalService)
+	animalHandler := handler.NewAnimalHandler(animalService)
 	animalGroup := r.Group("animals")
+	{
+		animalGroup.GET("/:id", animalHandler.Get)
+		animalGroup.GET("/:id/locations", animalHandler.GetAnimalLocations)
+		animalGroup.GET("/search", animalHandler.Search)
+	}
 
-	animalGroup.GET("/:id", h.Get)
-	animalGroup.GET("/:id/locations", h.GetAnimalLocations)
-	animalGroup.GET("/search", h.Search)
-	return animalGroup
-}
+	animalTypeRepo := repository.NewAnimalTypeRepository(helpers.GetConnectionOrCreateAndGet())
+	animalTypeService := service.NewAnimalTypeService(animalTypeRepo)
+	animalTypeHandler := handler.NewAnimalTypeHandler(animalTypeService)
+	animalTypeGroup := animalGroup.Group("types")
+	{
+		animalTypeGroup.GET("/:id", animalTypeHandler.Get)
+	}
 
-func NewAuthRouter(r *gin.Engine) {
-	authRepo := repository.NewAuthRepository(helpers.GetConnectionOrCreateAndGet())
-	authService := service.NewAuthService(authRepo)
 	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
 	accountService := service.NewAccountService(accountRepo)
-	h := handler.NewAuthHandler(authService, accountService)
+	accountHandler := handler.NewAccountHandler(accountService)
+	accountGroup := r.Group("accounts")
+	{
+		accountGroup.GET("/:id", accountHandler.Get)
+		accountGroup.GET("/search", accountHandler.Search)
+	}
 
-	r.POST("/registration", h.Register)
+	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())
+	locationService := service.NewLocationService(locationRepo)
+	locationHandler := handler.NewLocationHandler(locationService)
+	locationGroup := r.Group("locations")
+	{
+		locationGroup.GET("/:id", locationHandler.Get)
+	}
+
+	authRepo := repository.NewAuthRepository(helpers.GetConnectionOrCreateAndGet())
+	authService := service.NewAuthService(authRepo)
+	authHandler := handler.NewAuthHandler(authService, accountService)
+	{
+		r.POST("/registration", authHandler.Register)
+	}
+
+	return r
 }
