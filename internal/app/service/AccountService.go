@@ -15,6 +15,7 @@ type Account interface {
 	Search(params *filter.AccountFilterParams) (*[]response.Account, error)
 	IsAlreadyExists(account *entity.Account) bool
 	CheckCredentials(account *entity.Account) bool
+	Delete(id int) error
 }
 
 type AccountService struct {
@@ -77,4 +78,8 @@ func (a *AccountService) GetByEmail(account *entity.Account) (*response.Account,
 	account = a.accountRepo.GetByEmail(account)
 	accountResponse = mapper.AccountToAccountResponse(account)
 	return accountResponse, nil
+}
+
+func (a *AccountService) Delete(id int) error {
+	return a.accountRepo.Delete(id)
 }

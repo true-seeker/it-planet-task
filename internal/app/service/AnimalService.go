@@ -3,6 +3,7 @@ package service
 import (
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/mapper"
+	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
 )
@@ -11,6 +12,7 @@ type Animal interface {
 	Get(id int) (*response.Animal, error)
 	GetAnimalLocations(animalId int) (*[]response.Location, error)
 	Search(params *filter.AnimalFilterParams) (*[]response.Animal, error)
+	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 }
 
 type AnimalService struct {
@@ -57,4 +59,12 @@ func (a *AnimalService) Search(params *filter.AnimalFilterParams) (*[]response.A
 	animalResponses = mapper.AnimalsToAnimalResponses(animals)
 
 	return animalResponses, nil
+}
+
+func (a *AnimalService) GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error) {
+	animals, err := a.animalRepo.GetAnimalsByAccountId(accountId)
+	if err != nil {
+		return nil, err
+	}
+	return animals, nil
 }

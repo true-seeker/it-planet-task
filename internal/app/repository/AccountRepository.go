@@ -13,6 +13,7 @@ type Account interface {
 	Search(params *filter.AccountFilterParams) (*[]entity.Account, error)
 	GetByEmail(account *entity.Account) *entity.Account
 	CheckCredentials(account *entity.Account) bool
+	Delete(id int) error
 }
 
 type AccountRepository struct {
@@ -66,4 +67,12 @@ func (a *AccountRepository) Update(account *entity.Account) (*entity.Account, er
 	}
 
 	return account, nil
+}
+
+func (a *AccountRepository) Delete(id int) error {
+	err := a.Db.Delete(&entity.Account{}, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

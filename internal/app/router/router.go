@@ -32,12 +32,13 @@ func New(r *gin.Engine) *gin.Engine {
 
 	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
 	accountService := service.NewAccountService(accountRepo)
-	accountHandler := handler.NewAccountHandler(accountService)
+	accountHandler := handler.NewAccountHandler(accountService, animalService)
 	accountGroup := api.Group("accounts")
 	{
 		accountGroup.GET("/:id", middleware.OptionalBasicAuth, accountHandler.Get)
 		accountGroup.GET("/search", middleware.OptionalBasicAuth, accountHandler.Search)
 		accountGroup.PUT("/:id", middleware.BasicAuth, accountHandler.Update)
+		accountGroup.DELETE("/:id", middleware.BasicAuth, accountHandler.Delete)
 	}
 
 	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())

@@ -11,6 +11,7 @@ type Animal interface {
 	Get(id int) (*entity.Animal, error)
 	GetAnimalLocations(animalId int) (*[]entity.Location, error)
 	Search(params *filter.AnimalFilterParams) (*[]entity.Animal, error)
+	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 }
 
 type AnimalRepository struct {
@@ -55,6 +56,19 @@ func (a *AnimalRepository) Search(params *filter.AnimalFilterParams) (*[]entity.
 	err := a.Db.
 		Scopes(paginator.Paginate(params), filter.AnimalFilter(params)).
 		Order("id").
+		Find(&animals).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &animals, nil
+}
+
+func (a *AnimalRepository) GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error) {
+	var animals []entity.Animal
+
+	err := a.Db.
+		Where("chipper_id = ?", accountId).
 		Find(&animals).Error
 	if err != nil {
 		return nil, err

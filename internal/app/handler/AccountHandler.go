@@ -14,11 +14,12 @@ import (
 )
 
 type AccountHandler struct {
-	service service.Account
+	service       service.Account
+	animalService service.Animal
 }
 
-func NewAccountHandler(service service.Account) *AccountHandler {
-	return &AccountHandler{service: service}
+func NewAccountHandler(service service.Account, animalService service.Animal) *AccountHandler {
+	return &AccountHandler{service: service, animalService: animalService}
 }
 
 func (a *AccountHandler) Get(c *gin.Context) {
@@ -106,4 +107,32 @@ func (a *AccountHandler) Update(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, account)
+}
+
+func (a *AccountHandler) Delete(c *gin.Context) {
+	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if id <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		return
+	}
+	authenticatedAccountEmail, _, _ := middleware.GetCredentials(c)
+	authenticatedAccount, _ := a.service.GetByEmail(&entity.Account{Email: authenticatedAccountEmail})
+	if authenticatedAccount.Id != id {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	animals, _ := a.animalService.GetAnimalsByAccountId(authenticatedAccount.Id)
+	if len(*animals) != 0 {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	a.service.Delete(id)
+
+	c.Status(http.StatusOK)
 }
