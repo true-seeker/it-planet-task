@@ -50,8 +50,11 @@ func (a *LocationRepository) Update(location *entity.Location) (*entity.Location
 }
 
 func (a *LocationRepository) Delete(id int) error {
-	//TODO implement me
-	panic("implement me")
+	err := a.Db.Delete(&entity.Location{}, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *LocationRepository) GetByCords(location *entity.Location) (*entity.Location, error) {

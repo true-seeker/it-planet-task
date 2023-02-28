@@ -14,6 +14,7 @@ type Animal interface {
 	Search(params *filter.AnimalFilterParams) (*[]response.Animal, error)
 	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByAnimalTypeId(animalTypeId int) (*[]entity.Animal, error)
+	GetAnimalsByLocationId(locationId int) (*[]entity.Animal, error)
 }
 
 type AnimalService struct {
@@ -72,6 +73,14 @@ func (a *AnimalService) GetAnimalsByAccountId(accountId int) (*[]entity.Animal, 
 
 func (a *AnimalService) GetAnimalsByAnimalTypeId(animalTypeId int) (*[]entity.Animal, error) {
 	animals, err := a.animalRepo.GetAnimalsByAnimalTypeId(animalTypeId)
+	if err != nil {
+		return nil, err
+	}
+	return animals, nil
+}
+
+func (a *AnimalService) GetAnimalsByLocationId(locationId int) (*[]entity.Animal, error) {
+	animals, err := a.animalRepo.GetAnimalsByLocationId(locationId)
 	if err != nil {
 		return nil, err
 	}

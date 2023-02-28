@@ -46,7 +46,7 @@ func New(r *gin.Engine) *gin.Engine {
 
 	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())
 	locationService := service.NewLocationService(locationRepo)
-	locationHandler := handler.NewLocationHandler(locationService)
+	locationHandler := handler.NewLocationHandler(locationService, animalService)
 	locationGroup := api.Group("locations")
 	{
 		locationGroup.GET("/:id", middleware.OptionalBasicAuth, locationHandler.Get)

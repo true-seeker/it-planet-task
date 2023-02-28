@@ -63,8 +63,7 @@ func (l *LocationService) Update(location *entity.Location) (*response.Location,
 }
 
 func (l *LocationService) Delete(id int) error {
-	//TODO implement me
-	panic("implement me")
+	return l.locationRepo.Delete(id)
 }
 
 func (l *LocationService) GetByCords(location *entity.Location) (*entity.Location, error) {

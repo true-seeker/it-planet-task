@@ -12,11 +12,12 @@ import (
 )
 
 type LocationHandler struct {
-	service service.Location
+	service       service.Location
+	animalService service.Animal
 }
 
-func NewLocationHandler(service service.Location) *LocationHandler {
-	return &LocationHandler{service: service}
+func NewLocationHandler(service service.Location, animalService service.Animal) *LocationHandler {
+	return &LocationHandler{service: service, animalService: animalService}
 }
 
 func (l *LocationHandler) Get(c *gin.Context) {
@@ -129,5 +130,37 @@ func (l *LocationHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, location)
 }
 func (l *LocationHandler) Delete(c *gin.Context) {
+	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if id <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		return
+	}
 
+	_, err := l.service.Get(id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	animals, err := l.animalService.GetAnimalsByLocationId(id)
+	if err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+	if len(*animals) > 0 {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	err = l.service.Delete(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
