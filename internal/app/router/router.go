@@ -50,6 +50,9 @@ func New(r *gin.Engine) *gin.Engine {
 	locationGroup := api.Group("locations")
 	{
 		locationGroup.GET("/:id", middleware.OptionalBasicAuth, locationHandler.Get)
+		locationGroup.POST("/", middleware.BasicAuth, locationHandler.Create)
+		locationGroup.PUT("/:id", middleware.BasicAuth, locationHandler.Update)
+		locationGroup.DELETE("/:id", middleware.BasicAuth, locationHandler.Delete)
 	}
 
 	authRepo := repository.NewAuthRepository(helpers.GetConnectionOrCreateAndGet())

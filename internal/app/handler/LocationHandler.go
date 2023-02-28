@@ -40,3 +40,14 @@ func (l *LocationHandler) Get(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, location)
 }
+
+func (l *LocationHandler) Create(c *gin.Context) {
+
+}
+
+func (l *LocationHandler) Update(c *gin.Context) {
+
+}
+func (l *LocationHandler) Delete(c *gin.Context) {
+
+}
