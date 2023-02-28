@@ -41,8 +41,12 @@ func (a *LocationRepository) Create(location *entity.Location) (*entity.Location
 }
 
 func (a *LocationRepository) Update(location *entity.Location) (*entity.Location, error) {
-	//TODO implement me
-	panic("implement me")
+	err := a.Db.Save(&location).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return location, nil
 }
 
 func (a *LocationRepository) Delete(id int) error {

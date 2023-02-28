@@ -50,8 +50,16 @@ func (l *LocationService) Create(location *entity.Location) (*response.Location,
 }
 
 func (l *LocationService) Update(location *entity.Location) (*response.Location, error) {
-	//TODO implement me
-	panic("implement me")
+	locationResponse := &response.Location{}
+
+	location, err := l.locationRepo.Update(location)
+	if err != nil {
+		return nil, err
+	}
+
+	locationResponse = mapper.LocationToLocationResponse(location)
+
+	return locationResponse, nil
 }
 
 func (l *LocationService) Delete(id int) error {

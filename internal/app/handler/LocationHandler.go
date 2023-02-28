@@ -77,7 +77,56 @@ func (l *LocationHandler) Create(c *gin.Context) {
 }
 
 func (l *LocationHandler) Update(c *gin.Context) {
+	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if id <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		return
+	}
 
+	oldLocation, err := l.service.Get(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+	if oldLocation.Id == 0 {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	newLocation := &entity.Location{}
+	err = c.BindJSON(&newLocation)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	httpErr = LocationValidator.ValidateLocation(newLocation)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+
+	duplicateLocation, err := l.service.GetByCords(newLocation)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+	if duplicateLocation.Id != 0 && oldLocation.Id != duplicateLocation.Id {
+		c.AbortWithStatus(http.StatusConflict)
+		return
+	}
+	newLocation.Id = id
+	location, err := l.service.Update(newLocation)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, location)
 }
 func (l *LocationHandler) Delete(c *gin.Context) {
 
