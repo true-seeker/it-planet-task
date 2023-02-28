@@ -28,6 +28,9 @@ func New(r *gin.Engine) *gin.Engine {
 	animalTypeGroup := animalGroup.Group("types")
 	{
 		animalTypeGroup.GET("/:id", middleware.OptionalBasicAuth, animalTypeHandler.Get)
+		animalTypeGroup.POST("/", middleware.BasicAuth, animalTypeHandler.Create)
+		animalTypeGroup.PUT("/:id", middleware.BasicAuth, animalTypeHandler.Update)
+		animalTypeGroup.DELETE("/:id", middleware.BasicAuth, animalTypeHandler.Delete)
 	}
 
 	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())

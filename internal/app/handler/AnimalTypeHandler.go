@@ -40,3 +40,14 @@ func (a *AnimalTypeHandler) Get(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, animalType)
 }
+
+func (a *AnimalTypeHandler) Create(c *gin.Context) {
+}
+
+func (a *AnimalTypeHandler) Update(c *gin.Context) {
+
+}
+
+func (a *AnimalTypeHandler) Delete(c *gin.Context) {
+
+}

@@ -7,6 +7,9 @@ import (
 
 type AnimalType interface {
 	Get(id int) (*entity.AnimalType, error)
+	Create(animalType *entity.AnimalType) (*entity.AnimalType, error)
+	Update(animalType *entity.AnimalType) (*entity.AnimalType, error)
+	Delete(animalTypeId int) error
 }
 
 type AnimalTypeRepository struct {
@@ -25,4 +28,19 @@ func (a *AnimalTypeRepository) Get(id int) (*entity.AnimalType, error) {
 	}
 
 	return &animalType, nil
+}
+
+func (a *AnimalTypeRepository) Create(animalType *entity.AnimalType) (*entity.AnimalType, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a *AnimalTypeRepository) Update(animalType *entity.AnimalType) (*entity.AnimalType, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a *AnimalTypeRepository) Delete(animalTypeId int) error {
+	//TODO implement me
+	panic("implement me")
 }
