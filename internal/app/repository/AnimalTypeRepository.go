@@ -10,6 +10,7 @@ type AnimalType interface {
 	Create(animalType *entity.AnimalType) (*entity.AnimalType, error)
 	Update(animalType *entity.AnimalType) (*entity.AnimalType, error)
 	Delete(animalTypeId int) error
+	GetByTitle(animalType *entity.AnimalType) *entity.AnimalType
 }
 
 type AnimalTypeRepository struct {
@@ -31,16 +32,33 @@ func (a *AnimalTypeRepository) Get(id int) (*entity.AnimalType, error) {
 }
 
 func (a *AnimalTypeRepository) Create(animalType *entity.AnimalType) (*entity.AnimalType, error) {
-	//TODO implement me
-	panic("implement me")
+	err := a.Db.Create(&animalType).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return animalType, nil
 }
 
 func (a *AnimalTypeRepository) Update(animalType *entity.AnimalType) (*entity.AnimalType, error) {
-	//TODO implement me
-	panic("implement me")
+	err := a.Db.Save(&animalType).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return animalType, nil
 }
 
 func (a *AnimalTypeRepository) Delete(animalTypeId int) error {
-	//TODO implement me
-	panic("implement me")
+	err := a.Db.Delete(&entity.AnimalType{}, animalTypeId).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AnimalTypeRepository) GetByTitle(animalType *entity.AnimalType) *entity.AnimalType {
+	ant := &entity.AnimalType{}
+	a.Db.Where("title = ?", animalType.Title).First(ant)
+	return ant
 }

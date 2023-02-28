@@ -12,6 +12,7 @@ type AnimalType interface {
 	Create(animalType *entity.AnimalType) (*response.AnimalType, error)
 	Update(animalType *entity.AnimalType) (*response.AnimalType, error)
 	Delete(animalTypeId int) error
+	GetByTitle(animalType *entity.AnimalType) *entity.AnimalType
 }
 
 type AnimalTypeService struct {
@@ -36,16 +37,35 @@ func (a *AnimalTypeService) Get(id int) (*response.AnimalType, error) {
 }
 
 func (a *AnimalTypeService) Create(animalType *entity.AnimalType) (*response.AnimalType, error) {
-	//TODO implement me
-	panic("implement me")
+	animalTypeResponse := &response.AnimalType{}
+
+	animalType, err := a.animalTypeRepo.Create(animalType)
+	if err != nil {
+		return nil, err
+	}
+
+	animalTypeResponse = mapper.AnimalTypeToAnimalTypeResponse(animalType)
+
+	return animalTypeResponse, nil
 }
 
 func (a *AnimalTypeService) Update(animalType *entity.AnimalType) (*response.AnimalType, error) {
-	//TODO implement me
-	panic("implement me")
+	animalTypeResponse := &response.AnimalType{}
+
+	animalType, err := a.animalTypeRepo.Update(animalType)
+	if err != nil {
+		return nil, err
+	}
+
+	animalTypeResponse = mapper.AnimalTypeToAnimalTypeResponse(animalType)
+
+	return animalTypeResponse, nil
 }
 
 func (a *AnimalTypeService) Delete(animalTypeId int) error {
-	//TODO implement me
-	panic("implement me")
+	return a.animalTypeRepo.Delete(animalTypeId)
+}
+
+func (a *AnimalTypeService) GetByTitle(animalType *entity.AnimalType) *entity.AnimalType {
+	return a.animalTypeRepo.GetByTitle(animalType)
 }
