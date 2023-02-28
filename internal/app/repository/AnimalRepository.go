@@ -14,6 +14,9 @@ type Animal interface {
 	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByAnimalTypeId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByLocationId(locationId int) (*[]entity.Animal, error)
+	Create(animal *entity.Animal) (*entity.Animal, error)
+	Update(animal *entity.Animal) (*entity.Animal, error)
+	Delete(id int) error
 }
 
 type AnimalRepository struct {
@@ -102,4 +105,19 @@ func (a *AnimalRepository) GetAnimalsByLocationId(locationId int) (*[]entity.Ani
 	}
 
 	return &animals, nil
+}
+
+func (a *AnimalRepository) Create(animal *entity.Animal) (*entity.Animal, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a *AnimalRepository) Update(animal *entity.Animal) (*entity.Animal, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a *AnimalRepository) Delete(id int) error {
+	//TODO implement me
+	panic("implement me")
 }

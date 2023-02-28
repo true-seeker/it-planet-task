@@ -20,6 +20,9 @@ func New(r *gin.Engine) *gin.Engine {
 		animalGroup.GET("/:id", middleware.OptionalBasicAuth, animalHandler.Get)
 		animalGroup.GET("/:id/locations", middleware.OptionalBasicAuth, animalHandler.GetAnimalLocations)
 		animalGroup.GET("/search", middleware.OptionalBasicAuth, animalHandler.Search)
+		animalGroup.POST("/", middleware.BasicAuth, animalHandler.Create)
+		animalGroup.PUT("/:id", middleware.BasicAuth, animalHandler.Update)
+		animalGroup.DELETE("/:id", middleware.BasicAuth, animalHandler.Delete)
 	}
 
 	animalTypeRepo := repository.NewAnimalTypeRepository(helpers.GetConnectionOrCreateAndGet())

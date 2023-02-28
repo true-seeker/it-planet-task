@@ -76,3 +76,15 @@ func (a *AnimalHandler) Search(c *gin.Context) {
 
 	c.JSON(http.StatusOK, animals)
 }
+
+func (a *AnimalHandler) Create(c *gin.Context) {
+
+}
+
+func (a *AnimalHandler) Update(c *gin.Context) {
+
+}
+
+func (a *AnimalHandler) Delete(c *gin.Context) {
+
+}
