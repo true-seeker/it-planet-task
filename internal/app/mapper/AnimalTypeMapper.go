@@ -13,3 +13,12 @@ func AnimalTypeToAnimalTypeResponse(animalType *entity.AnimalType) *response.Ani
 
 	return r
 }
+
+func AnimalTypesToAnimalTypeResponses(animalTypes *[]entity.AnimalType) *[]response.AnimalType {
+	rs := make([]response.AnimalType, 0)
+
+	for _, elem := range *animalTypes {
+		rs = append(rs, *AnimalTypeToAnimalTypeResponse(&elem))
+	}
+	return &rs
+}

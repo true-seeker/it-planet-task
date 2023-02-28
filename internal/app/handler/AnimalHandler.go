@@ -5,18 +5,24 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"it-planet-task/internal/app/filter"
+	"it-planet-task/internal/app/mapper"
+	"it-planet-task/internal/app/model/input"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
+	"it-planet-task/internal/app/validator/AnimalValidator"
 	"it-planet-task/pkg/converter"
 	"net/http"
 )
 
 type AnimalHandler struct {
-	service service.Animal
+	service           service.Animal
+	animalTypeService service.AnimalType
+	accountService    service.Account
+	locationService   service.Location
 }
 
-func NewAnimalHandler(service service.Animal) *AnimalHandler {
-	return &AnimalHandler{service: service}
+func NewAnimalHandler(service service.Animal, animalTypeService service.AnimalType, accountService service.Account, locationService service.Location) *AnimalHandler {
+	return &AnimalHandler{service: service, animalTypeService: animalTypeService, accountService: accountService, locationService: locationService}
 }
 
 func (a *AnimalHandler) Get(c *gin.Context) {
@@ -78,7 +84,49 @@ func (a *AnimalHandler) Search(c *gin.Context) {
 }
 
 func (a *AnimalHandler) Create(c *gin.Context) {
+	animalInput := &input.AnimalCreate{}
+	err := c.BindJSON(&animalInput)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
 
+	httpErr := AnimalValidator.ValidateAnimalCreateInput(animalInput)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	newAnimal := mapper.AnimalCreateInputToAnimal(animalInput)
+
+	_, err = a.accountService.Get(newAnimal.ChipperId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	_, err = a.locationService.Get(newAnimal.ChippingLocationId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	animalTypes, err := a.animalTypeService.GetByIds(&animalInput.AnimalTypeIds)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+	if len(*animalTypes) < len(animalInput.AnimalTypeIds) {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	animal, err := a.service.Create(newAnimal)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, animal)
 }
 
 func (a *AnimalHandler) Update(c *gin.Context) {

@@ -12,9 +12,19 @@ import (
 func New(r *gin.Engine) *gin.Engine {
 	api := r.Group("/api")
 
+	animalTypeRepo := repository.NewAnimalTypeRepository(helpers.GetConnectionOrCreateAndGet())
+	animalTypeService := service.NewAnimalTypeService(animalTypeRepo)
+
+	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
+	accountService := service.NewAccountService(accountRepo)
+
+	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())
+	locationService := service.NewLocationService(locationRepo)
+
 	animalRepo := repository.NewAnimalRepository(helpers.GetConnectionOrCreateAndGet())
 	animalService := service.NewAnimalService(animalRepo)
-	animalHandler := handler.NewAnimalHandler(animalService)
+
+	animalHandler := handler.NewAnimalHandler(animalService, animalTypeService, accountService, locationService)
 	animalGroup := api.Group("animals")
 	{
 		animalGroup.GET("/:id", middleware.OptionalBasicAuth, animalHandler.Get)
@@ -25,8 +35,6 @@ func New(r *gin.Engine) *gin.Engine {
 		animalGroup.DELETE("/:id", middleware.BasicAuth, animalHandler.Delete)
 	}
 
-	animalTypeRepo := repository.NewAnimalTypeRepository(helpers.GetConnectionOrCreateAndGet())
-	animalTypeService := service.NewAnimalTypeService(animalTypeRepo)
 	animalTypeHandler := handler.NewAnimalTypeHandler(animalTypeService, animalService)
 	animalTypeGroup := animalGroup.Group("types")
 	{
@@ -36,8 +44,6 @@ func New(r *gin.Engine) *gin.Engine {
 		animalTypeGroup.DELETE("/:id", middleware.BasicAuth, animalTypeHandler.Delete)
 	}
 
-	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
-	accountService := service.NewAccountService(accountRepo)
 	accountHandler := handler.NewAccountHandler(accountService, animalService)
 	accountGroup := api.Group("accounts")
 	{
@@ -47,8 +53,6 @@ func New(r *gin.Engine) *gin.Engine {
 		accountGroup.DELETE("/:id", middleware.BasicAuth, accountHandler.Delete)
 	}
 
-	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())
-	locationService := service.NewLocationService(locationRepo)
 	locationHandler := handler.NewLocationHandler(locationService, animalService)
 	locationGroup := api.Group("locations")
 	{

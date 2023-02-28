@@ -108,8 +108,12 @@ func (a *AnimalRepository) GetAnimalsByLocationId(locationId int) (*[]entity.Ani
 }
 
 func (a *AnimalRepository) Create(animal *entity.Animal) (*entity.Animal, error) {
-	//TODO implement me
-	panic("implement me")
+	err := a.Db.Create(&animal).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return animal, nil
 }
 
 func (a *AnimalRepository) Update(animal *entity.Animal) (*entity.Animal, error) {

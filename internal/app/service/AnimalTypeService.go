@@ -13,6 +13,7 @@ type AnimalType interface {
 	Update(animalType *entity.AnimalType) (*response.AnimalType, error)
 	Delete(animalTypeId int) error
 	GetByTitle(animalType *entity.AnimalType) *entity.AnimalType
+	GetByIds(ids *[]int) (*[]response.AnimalType, error)
 }
 
 type AnimalTypeService struct {
@@ -68,4 +69,17 @@ func (a *AnimalTypeService) Delete(animalTypeId int) error {
 
 func (a *AnimalTypeService) GetByTitle(animalType *entity.AnimalType) *entity.AnimalType {
 	return a.animalTypeRepo.GetByTitle(animalType)
+}
+
+func (a *AnimalTypeService) GetByIds(ids *[]int) (*[]response.AnimalType, error) {
+	animalTypeResponses := &[]response.AnimalType{}
+
+	animalTypes, err := a.animalTypeRepo.GetByIds(ids)
+	if err != nil {
+		return nil, err
+	}
+
+	animalTypeResponses = mapper.AnimalTypesToAnimalTypeResponses(animalTypes)
+
+	return animalTypeResponses, nil
 }

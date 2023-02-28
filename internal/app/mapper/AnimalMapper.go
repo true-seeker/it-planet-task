@@ -2,6 +2,7 @@ package mapper
 
 import (
 	"it-planet-task/internal/app/model/entity"
+	"it-planet-task/internal/app/model/input"
 	"it-planet-task/internal/app/model/response"
 )
 
@@ -17,7 +18,7 @@ func AnimalToAnimalResponse(animal *entity.Animal) *response.Animal {
 		ChippingDateTime:   animal.ChippingDateTime,
 		ChipperId:          animal.ChipperId,
 		ChippingLocationId: animal.ChippingLocationId,
-		VisitedLocationsId: nil,
+		VisitedLocationsId: []int{},
 		DeathDateTime:      animal.DeathDateTime,
 	}
 
@@ -40,4 +41,21 @@ func AnimalsToAnimalResponses(animals *[]entity.Animal) *[]response.Animal {
 	}
 
 	return &r
+}
+
+func AnimalCreateInputToAnimal(input *input.AnimalCreate) *entity.Animal {
+	r := &entity.Animal{
+		Weight:             *input.Weight,
+		Height:             *input.Height,
+		Length:             *input.Length,
+		Gender:             *input.Gender,
+		ChipperId:          *input.ChipperId,
+		ChippingLocationId: *input.ChippingLocationId,
+	}
+
+	for _, animalTypeId := range input.AnimalTypeIds {
+		r.AnimalTypes = append(r.AnimalTypes, entity.AnimalType{Id: animalTypeId})
+	}
+
+	return r
 }

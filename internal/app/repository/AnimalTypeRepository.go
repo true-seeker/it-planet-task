@@ -11,6 +11,7 @@ type AnimalType interface {
 	Update(animalType *entity.AnimalType) (*entity.AnimalType, error)
 	Delete(animalTypeId int) error
 	GetByTitle(animalType *entity.AnimalType) *entity.AnimalType
+	GetByIds(ids *[]int) (*[]entity.AnimalType, error)
 }
 
 type AnimalTypeRepository struct {
@@ -61,4 +62,13 @@ func (a *AnimalTypeRepository) GetByTitle(animalType *entity.AnimalType) *entity
 	ant := &entity.AnimalType{}
 	a.Db.Where("title = ?", animalType.Title).First(ant)
 	return ant
+}
+
+func (a *AnimalTypeRepository) GetByIds(ids *[]int) (*[]entity.AnimalType, error) {
+	ants := &[]entity.AnimalType{}
+	err := a.Db.Find(ants, ids).Error
+	if err != nil {
+		return nil, err
+	}
+	return ants, nil
 }

@@ -6,6 +6,8 @@ import (
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
+	"it-planet-task/internal/app/validator/AnimalValidator"
+	"time"
 )
 
 type Animal interface {
@@ -91,8 +93,20 @@ func (a *AnimalService) GetAnimalsByLocationId(locationId int) (*[]entity.Animal
 }
 
 func (a *AnimalService) Create(animal *entity.Animal) (*response.Animal, error) {
-	//TODO implement me
-	panic("implement me")
+	animalResponse := &response.Animal{}
+
+	animal.LifeStatus = AnimalValidator.Alive
+	animal.ChippingDateTime = time.Now()
+	animal.DeathDateTime = nil
+
+	animal, err := a.animalRepo.Create(animal)
+	if err != nil {
+		return nil, err
+	}
+
+	animalResponse = mapper.AnimalToAnimalResponse(animal)
+
+	return animalResponse, nil
 }
 
 func (a *AnimalService) Update(animal *entity.Animal) (*response.Animal, error) {
