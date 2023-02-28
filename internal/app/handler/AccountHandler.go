@@ -132,7 +132,11 @@ func (a *AccountHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	a.service.Delete(id)
+	err := a.service.Delete(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
 
 	c.Status(http.StatusOK)
 }
