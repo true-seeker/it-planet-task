@@ -4,8 +4,10 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
+	"it-planet-task/internal/app/validator/LocationValidator"
 	"net/http"
 )
 
@@ -42,7 +44,36 @@ func (l *LocationHandler) Get(c *gin.Context) {
 }
 
 func (l *LocationHandler) Create(c *gin.Context) {
+	newLocation := &entity.Location{}
+	err := c.BindJSON(&newLocation)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
 
+	httpErr := LocationValidator.ValidateLocation(newLocation)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+
+	duplicateLocation, err := l.service.GetByCords(newLocation)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+	if duplicateLocation.Id != 0 {
+		c.AbortWithStatus(http.StatusConflict)
+		return
+	}
+
+	location, err := l.service.Create(newLocation)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, location)
 }
 
 func (l *LocationHandler) Update(c *gin.Context) {

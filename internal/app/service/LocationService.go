@@ -12,6 +12,7 @@ type Location interface {
 	Create(location *entity.Location) (*response.Location, error)
 	Update(location *entity.Location) (*response.Location, error)
 	Delete(id int) error
+	GetByCords(location *entity.Location) (*entity.Location, error)
 }
 
 type LocationService struct {
@@ -36,8 +37,16 @@ func (l *LocationService) Get(id int) (*response.Location, error) {
 }
 
 func (l *LocationService) Create(location *entity.Location) (*response.Location, error) {
-	//TODO implement me
-	panic("implement me")
+	locationResponse := &response.Location{}
+
+	location, err := l.locationRepo.Create(location)
+	if err != nil {
+		return nil, err
+	}
+
+	locationResponse = mapper.LocationToLocationResponse(location)
+
+	return locationResponse, nil
 }
 
 func (l *LocationService) Update(location *entity.Location) (*response.Location, error) {
@@ -48,4 +57,8 @@ func (l *LocationService) Update(location *entity.Location) (*response.Location,
 func (l *LocationService) Delete(id int) error {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (l *LocationService) GetByCords(location *entity.Location) (*entity.Location, error) {
+	return l.locationRepo.GetByCords(location)
 }
