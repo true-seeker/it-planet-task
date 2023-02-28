@@ -3,28 +3,28 @@ package AccountValidator
 import (
 	"errors"
 	"it-planet-task/internal/app/model/entity"
+	"it-planet-task/internal/app/validator"
 	"it-planet-task/pkg/errorHandler"
 	"net/http"
 	"net/mail"
-	"strings"
 )
 
 func ValidateAccount(account *entity.Account) *errorHandler.HttpErr {
-	if strings.Trim(account.FirstName, " \t\n") == "" {
+	if validator.IsStringEmpty(account.FirstName) {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("firstName is empty"),
 			StatusCode: http.StatusBadRequest,
 		}
 	}
 
-	if strings.Trim(account.LastName, " \t\n") == "" {
+	if validator.IsStringEmpty(account.LastName) {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("lastName is empty"),
 			StatusCode: http.StatusBadRequest,
 		}
 	}
 
-	if strings.Trim(account.Email, " \t\n") == "" {
+	if validator.IsStringEmpty(account.Email) {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("email is empty"),
 			StatusCode: http.StatusBadRequest,
@@ -38,7 +38,7 @@ func ValidateAccount(account *entity.Account) *errorHandler.HttpErr {
 		}
 	}
 
-	if strings.Trim(account.Password, " \t\n") == "" {
+	if validator.IsStringEmpty(account.Password) {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("password is empty"),
 			StatusCode: http.StatusBadRequest,
