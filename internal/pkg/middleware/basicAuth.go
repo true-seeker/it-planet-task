@@ -10,9 +10,13 @@ import (
 	"net/http"
 )
 
-func IsAccountExists(c *gin.Context) (bool, error) {
+func GetCredentials(c *gin.Context) (string, string, bool) {
 	r := c.Request
-	login, password, ok := r.BasicAuth()
+	return r.BasicAuth()
+}
+
+func IsAccountExists(c *gin.Context) (bool, error) {
+	login, password, ok := GetCredentials(c)
 	if !ok {
 		return false, errors.New("")
 	}

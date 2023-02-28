@@ -37,6 +37,7 @@ func New(r *gin.Engine) *gin.Engine {
 	{
 		accountGroup.GET("/:id", middleware.OptionalBasicAuth, accountHandler.Get)
 		accountGroup.GET("/search", middleware.OptionalBasicAuth, accountHandler.Search)
+		accountGroup.PUT("/:id", middleware.BasicAuth, accountHandler.Update)
 	}
 
 	locationRepo := repository.NewLocationRepository(helpers.GetConnectionOrCreateAndGet())

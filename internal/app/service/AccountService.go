@@ -10,6 +10,8 @@ import (
 
 type Account interface {
 	Get(id int) (*response.Account, error)
+	GetByEmail(account *entity.Account) (*response.Account, error)
+	Update(account *entity.Account) (*response.Account, error)
 	Search(params *filter.AccountFilterParams) (*[]response.Account, error)
 	IsAlreadyExists(account *entity.Account) bool
 	CheckCredentials(account *entity.Account) bool
@@ -50,9 +52,29 @@ func (a *AccountService) Search(params *filter.AccountFilterParams) (*[]response
 }
 
 func (a *AccountService) IsAlreadyExists(account *entity.Account) bool {
-	return a.accountRepo.IsAlreadyExists(account)
+	return a.accountRepo.GetByEmail(account).Id != 0
 }
 
 func (a *AccountService) CheckCredentials(account *entity.Account) bool {
 	return a.accountRepo.CheckCredentials(account)
+}
+
+func (a *AccountService) Update(account *entity.Account) (*response.Account, error) {
+	accountResponse := &response.Account{}
+
+	account, err := a.accountRepo.Update(account)
+	if err != nil {
+		return nil, err
+	}
+
+	accountResponse = mapper.AccountToAccountResponse(account)
+
+	return accountResponse, nil
+}
+
+func (a *AccountService) GetByEmail(account *entity.Account) (*response.Account, error) {
+	accountResponse := &response.Account{}
+	account = a.accountRepo.GetByEmail(account)
+	accountResponse = mapper.AccountToAccountResponse(account)
+	return accountResponse, nil
 }

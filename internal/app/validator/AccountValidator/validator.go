@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func ValidateRegistration(account *entity.Account) *errorHandler.HttpErr {
+func ValidateAccount(account *entity.Account) *errorHandler.HttpErr {
 	if strings.Trim(account.FirstName, " \t\n") == "" {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("firstName is empty"),

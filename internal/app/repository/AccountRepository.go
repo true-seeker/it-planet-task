@@ -9,8 +9,9 @@ import (
 
 type Account interface {
 	Get(id int) (*entity.Account, error)
+	Update(account *entity.Account) (*entity.Account, error)
 	Search(params *filter.AccountFilterParams) (*[]entity.Account, error)
-	IsAlreadyExists(account *entity.Account) bool
+	GetByEmail(account *entity.Account) *entity.Account
 	CheckCredentials(account *entity.Account) bool
 }
 
@@ -46,14 +47,23 @@ func (a *AccountRepository) Search(params *filter.AccountFilterParams) (*[]entit
 	return &accounts, nil
 }
 
-func (a *AccountRepository) IsAlreadyExists(account *entity.Account) bool {
-	ac := entity.Account{}
-	a.Db.Where("email = ?", account.Email).First(&ac)
-	return ac.Id != 0
+func (a *AccountRepository) GetByEmail(account *entity.Account) *entity.Account {
+	ac := &entity.Account{}
+	a.Db.Where("email = ?", account.Email).First(ac)
+	return ac
 }
 
 func (a *AccountRepository) CheckCredentials(account *entity.Account) bool {
 	var acc entity.Account
 	a.Db.Where("email = ? AND password = ?", account.Email, account.Password).First(&acc)
 	return acc.Id != 0
+}
+
+func (a *AccountRepository) Update(account *entity.Account) (*entity.Account, error) {
+	err := a.Db.Save(&account).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return account, nil
 }
