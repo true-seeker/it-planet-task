@@ -20,6 +20,7 @@ type Animal interface {
 	Create(animal *entity.Animal) (*response.Animal, error)
 	Update(newAnimal *entity.Animal, oldAnimal *response.Animal) (*response.Animal, error)
 	Delete(id int) error
+	AddAnimalType(animalId, typeId int) (*response.Animal, error)
 }
 
 type AnimalService struct {
@@ -132,4 +133,16 @@ func (a *AnimalService) Update(newAnimal *entity.Animal, oldAnimal *response.Ani
 
 func (a *AnimalService) Delete(id int) error {
 	return a.animalRepo.Delete(id)
+}
+
+func (a *AnimalService) AddAnimalType(animalId, typeId int) (*response.Animal, error) {
+	animalResponse := &response.Animal{}
+	animal, err := a.animalRepo.AddAnimalType(animalId, typeId)
+	if err != nil {
+		return nil, err
+	}
+
+	animalResponse = mapper.AnimalToAnimalResponse(animal)
+
+	return animalResponse, nil
 }

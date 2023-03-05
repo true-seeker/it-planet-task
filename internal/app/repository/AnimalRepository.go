@@ -17,6 +17,7 @@ type Animal interface {
 	Create(animal *entity.Animal) (*entity.Animal, error)
 	Update(animal *entity.Animal) (*entity.Animal, error)
 	Delete(id int) error
+	AddAnimalType(animalId, typeId int) (*entity.Animal, error)
 }
 
 type AnimalRepository struct {
@@ -131,4 +132,9 @@ func (a *AnimalRepository) Delete(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AnimalRepository) AddAnimalType(animalId, typeId int) (*entity.Animal, error) {
+	a.Db.Exec("INSERT INTO animal_animal_type(animal_id, animal_type_id) VALUES (?,?)", animalId, typeId)
+	return a.Get(animalId)
 }

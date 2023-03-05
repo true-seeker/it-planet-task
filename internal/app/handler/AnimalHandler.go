@@ -213,7 +213,51 @@ func (a *AnimalHandler) Delete(c *gin.Context) {
 }
 
 func (a *AnimalHandler) AddAnimalType(c *gin.Context) {
+	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if animalId <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
+		return
+	}
+	typeId, httpErr := validator.ValidateAndReturnIntField(c.Param("typeId"), "typeId")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if typeId <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "typeId must be greater than 0")
+		return
+	}
 
+	animalResponse, err := a.service.Get(animalId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	_, err = a.animalTypeService.Get(typeId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	for _, elem := range animalResponse.AnimalTypesId {
+		if elem == typeId {
+			c.AbortWithStatusJSON(http.StatusConflict, err)
+			return
+		}
+	}
+
+	animalResponse, err = a.service.AddAnimalType(animalId, typeId)
+	if err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	c.JSON(http.StatusCreated, animalResponse)
 }
 
 func (a *AnimalHandler) EditAnimalType(c *gin.Context) {
