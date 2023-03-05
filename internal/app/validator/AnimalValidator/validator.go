@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"it-planet-task/internal/app/model/input"
+	"it-planet-task/internal/app/model/response"
 	"it-planet-task/pkg/errorHandler"
 	"net/http"
 )
@@ -38,31 +39,7 @@ func ValidateGender(gender string) *errorHandler.HttpErr {
 	return nil
 }
 
-func ValidateAnimalCreateInput(input *input.AnimalCreate) *errorHandler.HttpErr {
-	if input.AnimalTypeIds == nil || len(input.AnimalTypeIds) == 0 {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("animal types are empty"),
-			StatusCode: http.StatusBadRequest,
-		}
-	}
-
-	animalTypeIds := map[int]bool{}
-	for _, animalTypeId := range input.AnimalTypeIds {
-		if animalTypeId <= 0 {
-			return &errorHandler.HttpErr{
-				Err:        errors.New("animal type id must be greater than 0"),
-				StatusCode: http.StatusBadRequest,
-			}
-		}
-		if animalTypeIds[animalTypeId] {
-			return &errorHandler.HttpErr{
-				Err:        errors.New("duplicated animal type id"),
-				StatusCode: http.StatusConflict,
-			}
-		}
-		animalTypeIds[animalTypeId] = true
-	}
-
+func validateAnimalInput(input *input.Animal) *errorHandler.HttpErr {
 	if input.Weight == nil {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("weight is missing"),
@@ -138,6 +115,56 @@ func ValidateAnimalCreateInput(input *input.AnimalCreate) *errorHandler.HttpErr 
 			StatusCode: http.StatusBadRequest,
 		}
 	}
+	return nil
+}
+
+func ValidateAnimalCreateInput(input *input.Animal) *errorHandler.HttpErr {
+	if input.AnimalTypeIds == nil || len(input.AnimalTypeIds) == 0 {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("animal types are empty"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	animalTypeIds := map[int]bool{}
+	for _, animalTypeId := range input.AnimalTypeIds {
+		if animalTypeId <= 0 {
+			return &errorHandler.HttpErr{
+				Err:        errors.New("animal type id must be greater than 0"),
+				StatusCode: http.StatusBadRequest,
+			}
+		}
+		if animalTypeIds[animalTypeId] {
+			return &errorHandler.HttpErr{
+				Err:        errors.New("duplicated animal type id"),
+				StatusCode: http.StatusConflict,
+			}
+		}
+		animalTypeIds[animalTypeId] = true
+	}
+
+	httpErr := validateAnimalInput(input)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	return nil
+}
+
+func ValidateAnimalUpdateInput(input *input.Animal, oldAnimal *response.Animal) *errorHandler.HttpErr {
+	httpErr := validateAnimalInput(input)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	if *input.LifeStatus == Alive && oldAnimal.LifeStatus == Dead {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("cant set status Alive to Dead animal"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	// TODO Новая точка чипирования совпадает с первой посещенной точкой локации
 
 	return nil
 }

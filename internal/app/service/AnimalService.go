@@ -18,7 +18,7 @@ type Animal interface {
 	GetAnimalsByAnimalTypeId(animalTypeId int) (*[]entity.Animal, error)
 	GetAnimalsByLocationId(locationId int) (*[]entity.Animal, error)
 	Create(animal *entity.Animal) (*response.Animal, error)
-	Update(animal *entity.Animal) (*response.Animal, error)
+	Update(newAnimal *entity.Animal, oldAnimal *response.Animal) (*response.Animal, error)
 	Delete(id int) error
 }
 
@@ -109,9 +109,25 @@ func (a *AnimalService) Create(animal *entity.Animal) (*response.Animal, error) 
 	return animalResponse, nil
 }
 
-func (a *AnimalService) Update(animal *entity.Animal) (*response.Animal, error) {
-	//TODO implement me
-	panic("implement me")
+func (a *AnimalService) Update(newAnimal *entity.Animal, oldAnimal *response.Animal) (*response.Animal, error) {
+	animalResponse := &response.Animal{}
+
+	if oldAnimal.LifeStatus == AnimalValidator.Alive && newAnimal.LifeStatus == AnimalValidator.Dead {
+		deathDateTime := time.Now()
+		newAnimal.DeathDateTime = &deathDateTime
+	} else {
+		newAnimal.DeathDateTime = oldAnimal.DeathDateTime
+	}
+	newAnimal.ChippingDateTime = oldAnimal.ChippingDateTime
+
+	newAnimal, err := a.animalRepo.Update(newAnimal)
+	if err != nil {
+		return nil, err
+	}
+
+	animalResponse = mapper.AnimalToAnimalResponse(newAnimal)
+
+	return animalResponse, nil
 }
 
 func (a *AnimalService) Delete(id int) error {

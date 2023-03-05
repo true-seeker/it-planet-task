@@ -1,6 +1,6 @@
 package input
 
-type AnimalCreate struct {
+type Animal struct {
 	AnimalTypeIds      []int    `json:"animalTypes"`
 	Weight             *float32 `json:"weight"`
 	Height             *float32 `json:"height"`
@@ -8,4 +8,5 @@ type AnimalCreate struct {
 	Gender             *string  `json:"gender"`
 	ChipperId          *int     `json:"chipperId"`
 	ChippingLocationId *int     `json:"chippingLocationId"`
+	LifeStatus         *string  `json:"lifeStatus"`
 }

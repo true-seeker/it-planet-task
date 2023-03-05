@@ -43,7 +43,7 @@ func AnimalsToAnimalResponses(animals *[]entity.Animal) *[]response.Animal {
 	return &r
 }
 
-func AnimalCreateInputToAnimal(input *input.AnimalCreate) *entity.Animal {
+func AnimalInputToAnimal(input *input.Animal) *entity.Animal {
 	r := &entity.Animal{
 		Weight:             *input.Weight,
 		Height:             *input.Height,
@@ -51,6 +51,9 @@ func AnimalCreateInputToAnimal(input *input.AnimalCreate) *entity.Animal {
 		Gender:             *input.Gender,
 		ChipperId:          *input.ChipperId,
 		ChippingLocationId: *input.ChippingLocationId,
+	}
+	if input.LifeStatus != nil {
+		r.LifeStatus = *input.LifeStatus
 	}
 
 	for _, animalTypeId := range input.AnimalTypeIds {
