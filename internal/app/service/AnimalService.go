@@ -24,6 +24,7 @@ type Animal interface {
 	AddAnimalType(animalId, typeId int) (*response.Animal, error)
 	EditAnimalType(animalId int, animalTypeUpdateInput *input.AnimalTypeUpdate) (*response.Animal, error)
 	DeleteAnimalType(animalId int, typeId int) (*response.Animal, error)
+	AddLocationPoint(animalId int, pointId int) (*response.Animal, error)
 }
 
 type AnimalService struct {
@@ -165,6 +166,18 @@ func (a *AnimalService) EditAnimalType(animalId int, animalTypeUpdateInput *inpu
 func (a *AnimalService) DeleteAnimalType(animalId int, typeId int) (*response.Animal, error) {
 	animalResponse := &response.Animal{}
 	animal, err := a.animalRepo.DeleteAnimalType(animalId, typeId)
+	if err != nil {
+		return nil, err
+	}
+
+	animalResponse = mapper.AnimalToAnimalResponse(animal)
+
+	return animalResponse, nil
+}
+
+func (a *AnimalService) AddLocationPoint(animalId int, pointId int) (*response.Animal, error) {
+	animalResponse := &response.Animal{}
+	animal, err := a.animalRepo.AddLocationPoint(animalId, pointId)
 	if err != nil {
 		return nil, err
 	}

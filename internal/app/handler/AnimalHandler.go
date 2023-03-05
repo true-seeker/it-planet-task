@@ -376,5 +376,58 @@ func (a *AnimalHandler) DeleteAnimalType(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, animalResponse)
+}
+
+func (a *AnimalHandler) AddLocationPoint(c *gin.Context) {
+	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if animalId <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
+		return
+	}
+	pointId, httpErr := validator.ValidateAndReturnIntField(c.Param("pointId"), "pointId")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if pointId <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "pointId must be greater than 0")
+		return
+	}
+
+	animalResponse, err := a.service.Get(animalId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	if animalResponse.LifeStatus == AnimalValidator.Dead {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "animal is dead")
+		return
+	}
+	// todo Животное находится в точке чипирования и никуда не перемещалось
+
+	_, err = a.locationService.Get(pointId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	animalResponse, err = a.service.AddLocationPoint(animalId, pointId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+	c.JSON(http.StatusCreated, animalResponse)
+}
+
+func (a *AnimalHandler) EditLocationPoint(c *gin.Context) {
+
+}
+
+func (a *AnimalHandler) DeleteLocationPoint(c *gin.Context) {
 
 }

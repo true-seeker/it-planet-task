@@ -36,6 +36,9 @@ func New(r *gin.Engine) *gin.Engine {
 		animalGroup.POST("/:id/types/:typeId", middleware.BasicAuth, animalHandler.AddAnimalType)
 		animalGroup.PUT("/:id/types", middleware.BasicAuth, animalHandler.EditAnimalType)
 		animalGroup.DELETE("/:id/types/:typeId", middleware.BasicAuth, animalHandler.DeleteAnimalType)
+		animalGroup.POST("/:id/locations/:pointId", middleware.BasicAuth, animalHandler.AddLocationPoint)
+		animalGroup.PUT("/:id/locations", middleware.BasicAuth, animalHandler.EditLocationPoint)
+		animalGroup.DELETE("/:id/locations/:visitedPointId", middleware.BasicAuth, animalHandler.DeleteLocationPoint)
 	}
 
 	animalTypeHandler := handler.NewAnimalTypeHandler(animalTypeService, animalService)
