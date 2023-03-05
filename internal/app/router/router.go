@@ -28,17 +28,19 @@ func New(r *gin.Engine) *gin.Engine {
 	animalGroup := api.Group("animals")
 	{
 		animalGroup.GET("/:id", middleware.OptionalBasicAuth, animalHandler.Get)
-		animalGroup.GET("/:id/locations", middleware.OptionalBasicAuth, animalHandler.GetAnimalLocations)
 		animalGroup.GET("/search", middleware.OptionalBasicAuth, animalHandler.Search)
 		animalGroup.POST("/", middleware.BasicAuth, animalHandler.Create)
 		animalGroup.PUT("/:id", middleware.BasicAuth, animalHandler.Update)
 		animalGroup.DELETE("/:id", middleware.BasicAuth, animalHandler.Delete)
+
 		animalGroup.POST("/:id/types/:typeId", middleware.BasicAuth, animalHandler.AddAnimalType)
 		animalGroup.PUT("/:id/types", middleware.BasicAuth, animalHandler.EditAnimalType)
 		animalGroup.DELETE("/:id/types/:typeId", middleware.BasicAuth, animalHandler.DeleteAnimalType)
-		animalGroup.POST("/:id/locations/:pointId", middleware.BasicAuth, animalHandler.AddLocationPoint)
-		animalGroup.PUT("/:id/locations", middleware.BasicAuth, animalHandler.EditLocationPoint)
-		animalGroup.DELETE("/:id/locations/:visitedPointId", middleware.BasicAuth, animalHandler.DeleteLocationPoint)
+
+		animalGroup.GET("/:id/locations", middleware.OptionalBasicAuth, animalHandler.GetAnimalLocations)
+		animalGroup.POST("/:id/locations/:pointId", middleware.BasicAuth, animalHandler.AddAnimalLocationPoint)
+		animalGroup.PUT("/:id/locations", middleware.BasicAuth, animalHandler.EditAnimalLocationPoint)
+		animalGroup.DELETE("/:id/locations/:visitedPointId", middleware.BasicAuth, animalHandler.DeleteAnimalLocationPoint)
 	}
 
 	animalTypeHandler := handler.NewAnimalTypeHandler(animalTypeService, animalService)

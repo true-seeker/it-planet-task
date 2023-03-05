@@ -15,3 +15,8 @@ type AnimalTypeUpdate struct {
 	OldTypeId *int `json:"oldTypeId"`
 	NewTypeId *int `json:"newTypeId"`
 }
+
+type AnimalLocationPointUpdate struct {
+	VisitedLocationPointId *int `json:"visitedLocationPointId"`
+	LocationPointId        *int `json:"locationPointId"`
+}

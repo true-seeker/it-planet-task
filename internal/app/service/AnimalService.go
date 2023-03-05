@@ -13,7 +13,7 @@ import (
 
 type Animal interface {
 	Get(id int) (*response.Animal, error)
-	GetAnimalLocations(animalId int) (*[]response.Location, error)
+	GetAnimalLocations(animalId int) (*[]response.AnimalLocation, error)
 	Search(params *filter.AnimalFilterParams) (*[]response.Animal, error)
 	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByAnimalTypeId(animalTypeId int) (*[]entity.Animal, error)
@@ -24,7 +24,8 @@ type Animal interface {
 	AddAnimalType(animalId, typeId int) (*response.Animal, error)
 	EditAnimalType(animalId int, animalTypeUpdateInput *input.AnimalTypeUpdate) (*response.Animal, error)
 	DeleteAnimalType(animalId int, typeId int) (*response.Animal, error)
-	AddLocationPoint(animalId int, pointId int) (*response.Animal, error)
+	AddAnimalLocationPoint(animalId int, pointId int) (*response.AnimalLocation, error)
+	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*response.AnimalLocation, error)
 }
 
 type AnimalService struct {
@@ -48,17 +49,17 @@ func (a *AnimalService) Get(id int) (*response.Animal, error) {
 	return animalResponse, nil
 }
 
-func (a *AnimalService) GetAnimalLocations(animalId int) (*[]response.Location, error) {
-	var locationsResponse *[]response.Location
+func (a *AnimalService) GetAnimalLocations(animalId int) (*[]response.AnimalLocation, error) {
+	var animalLocationsResponse *[]response.AnimalLocation
 
-	locations, err := a.animalRepo.GetAnimalLocations(animalId)
+	animalLocations, err := a.animalRepo.GetAnimalLocations(animalId)
 	if err != nil {
 		return nil, err
 	}
 
-	locationsResponse = mapper.LocationsToLocationResponses(locations)
+	animalLocationsResponse = mapper.AnimalLocationsToAnimalLocationResponses(animalLocations)
 
-	return locationsResponse, nil
+	return animalLocationsResponse, nil
 }
 
 func (a *AnimalService) Search(params *filter.AnimalFilterParams) (*[]response.Animal, error) {
@@ -175,14 +176,33 @@ func (a *AnimalService) DeleteAnimalType(animalId int, typeId int) (*response.An
 	return animalResponse, nil
 }
 
-func (a *AnimalService) AddLocationPoint(animalId int, pointId int) (*response.Animal, error) {
-	animalResponse := &response.Animal{}
-	animal, err := a.animalRepo.AddLocationPoint(animalId, pointId)
+func (a *AnimalService) AddAnimalLocationPoint(animalId int, pointId int) (*response.AnimalLocation, error) {
+	animalLocationResponse := &response.AnimalLocation{}
+
+	animalLocation := &entity.AnimalLocation{
+		DateTimeOfVisitLocationPoint: time.Now(),
+		LocationPointId:              pointId,
+	}
+
+	animalLocation, err := a.animalRepo.AddAnimalLocationPoint(animalId, animalLocation)
 	if err != nil {
 		return nil, err
 	}
 
-	animalResponse = mapper.AnimalToAnimalResponse(animal)
+	animalLocationResponse = mapper.AnimalLocationToAnimalLocationResponse(animalLocation)
 
-	return animalResponse, nil
+	return animalLocationResponse, nil
+}
+
+func (a *AnimalService) EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*response.AnimalLocation, error) {
+	animalLocationResponse := &response.AnimalLocation{}
+
+	animalLocation, err := a.animalRepo.EditAnimalLocationPoint(visitedLocationPointId, locationPointId)
+	if err != nil {
+		return nil, err
+	}
+
+	animalLocationResponse = mapper.AnimalLocationToAnimalLocationResponse(animalLocation)
+
+	return animalLocationResponse, nil
 }

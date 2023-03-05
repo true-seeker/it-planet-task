@@ -196,3 +196,31 @@ func ValidateAnimalTypeUpdateInput(input *input.AnimalTypeUpdate) *errorHandler.
 	}
 	return nil
 }
+
+func ValidateAnimalLocationPointUpdate(input *input.AnimalLocationPointUpdate) *errorHandler.HttpErr {
+	if input.VisitedLocationPointId == nil {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("visitedLocationPointId is missing"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	if *input.VisitedLocationPointId <= 0 {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("visitedLocationPointId must be greater than 0"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	if input.LocationPointId == nil {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("locationPointId is missing"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	if *input.LocationPointId <= 0 {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("locationPointId must be greater than 0"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	return nil
+}
