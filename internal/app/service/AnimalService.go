@@ -4,6 +4,7 @@ import (
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/entity"
+	"it-planet-task/internal/app/model/input"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
 	"it-planet-task/internal/app/validator/AnimalValidator"
@@ -21,6 +22,7 @@ type Animal interface {
 	Update(newAnimal *entity.Animal, oldAnimal *response.Animal) (*response.Animal, error)
 	Delete(id int) error
 	AddAnimalType(animalId, typeId int) (*response.Animal, error)
+	EditAnimalType(animalId int, animalTypeUpdateInput *input.AnimalTypeUpdate) (*response.Animal, error)
 }
 
 type AnimalService struct {
@@ -138,6 +140,18 @@ func (a *AnimalService) Delete(id int) error {
 func (a *AnimalService) AddAnimalType(animalId, typeId int) (*response.Animal, error) {
 	animalResponse := &response.Animal{}
 	animal, err := a.animalRepo.AddAnimalType(animalId, typeId)
+	if err != nil {
+		return nil, err
+	}
+
+	animalResponse = mapper.AnimalToAnimalResponse(animal)
+
+	return animalResponse, nil
+}
+
+func (a *AnimalService) EditAnimalType(animalId int, animalTypeUpdateInput *input.AnimalTypeUpdate) (*response.Animal, error) {
+	animalResponse := &response.Animal{}
+	animal, err := a.animalRepo.EditAnimalType(animalId, animalTypeUpdateInput)
 	if err != nil {
 		return nil, err
 	}

@@ -10,3 +10,8 @@ type Animal struct {
 	ChippingLocationId *int     `json:"chippingLocationId"`
 	LifeStatus         *string  `json:"lifeStatus"`
 }
+
+type AnimalTypeUpdate struct {
+	OldTypeId *int `json:"oldTypeId"`
+	NewTypeId *int `json:"newTypeId"`
+}

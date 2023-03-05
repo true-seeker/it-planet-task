@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
+	"it-planet-task/internal/app/model/input"
 	"it-planet-task/pkg/paginator"
 )
 
@@ -18,6 +19,7 @@ type Animal interface {
 	Update(animal *entity.Animal) (*entity.Animal, error)
 	Delete(id int) error
 	AddAnimalType(animalId, typeId int) (*entity.Animal, error)
+	EditAnimalType(animalId int, input *input.AnimalTypeUpdate) (*entity.Animal, error)
 }
 
 type AnimalRepository struct {
@@ -136,5 +138,10 @@ func (a *AnimalRepository) Delete(id int) error {
 
 func (a *AnimalRepository) AddAnimalType(animalId, typeId int) (*entity.Animal, error) {
 	a.Db.Exec("INSERT INTO animal_animal_type(animal_id, animal_type_id) VALUES (?,?)", animalId, typeId)
+	return a.Get(animalId)
+}
+
+func (a *AnimalRepository) EditAnimalType(animalId int, input *input.AnimalTypeUpdate) (*entity.Animal, error) {
+	a.Db.Exec("UPDATE animal_animal_type SET animal_type_id = ? WHERE animal_id = ? AND animal_type_id = ?", input.NewTypeId, animalId, input.OldTypeId)
 	return a.Get(animalId)
 }

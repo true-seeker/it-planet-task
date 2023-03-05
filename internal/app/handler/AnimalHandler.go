@@ -261,7 +261,66 @@ func (a *AnimalHandler) AddAnimalType(c *gin.Context) {
 }
 
 func (a *AnimalHandler) EditAnimalType(c *gin.Context) {
+	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if animalId <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
+		return
+	}
 
+	animalTypeUpdateInput := &input.AnimalTypeUpdate{}
+	err := c.BindJSON(&animalTypeUpdateInput)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	httpErr = AnimalValidator.ValidateAnimalTypeUpdateInput(animalTypeUpdateInput)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	animalResponse, err := a.service.Get(animalId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	_, err = a.animalTypeService.Get(*animalTypeUpdateInput.NewTypeId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+	_, err = a.animalTypeService.Get(*animalTypeUpdateInput.OldTypeId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	animalTypeIdsMap := make(map[int]bool)
+	for _, elem := range animalResponse.AnimalTypesId {
+		if elem == *animalTypeUpdateInput.NewTypeId {
+			c.AbortWithStatusJSON(http.StatusConflict, err)
+			return
+		}
+		animalTypeIdsMap[elem] = true
+	}
+	if !animalTypeIdsMap[*animalTypeUpdateInput.OldTypeId] {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	animalResponse, err = a.service.EditAnimalType(animalId, animalTypeUpdateInput)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, animalResponse)
 }
 
 func (a *AnimalHandler) DeleteAnimalType(c *gin.Context) {

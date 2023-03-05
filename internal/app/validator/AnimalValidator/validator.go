@@ -168,3 +168,31 @@ func ValidateAnimalUpdateInput(input *input.Animal, oldAnimal *response.Animal) 
 
 	return nil
 }
+
+func ValidateAnimalTypeUpdateInput(input *input.AnimalTypeUpdate) *errorHandler.HttpErr {
+	if input.OldTypeId == nil {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("oldTypeId is missing"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	if *input.OldTypeId <= 0 {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("oldTypeId must be greater than 0"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	if input.NewTypeId == nil {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("newTypeId is missing"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	if *input.NewTypeId <= 0 {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("newTypeId must be greater than 0"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	return nil
+}
