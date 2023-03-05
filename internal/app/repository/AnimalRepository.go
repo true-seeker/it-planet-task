@@ -105,8 +105,9 @@ func (a *AnimalRepository) GetAnimalsByAnimalTypeId(animalTypeId int) (*[]entity
 
 func (a *AnimalRepository) GetAnimalsByLocationId(locationId int) (*[]entity.Animal, error) {
 	var animals []entity.Animal
-	err := a.Db.Joins("left outer join animal_visited_locations on animal_id=animals.id").
-		Where("location_id = ?", locationId).
+	err := a.Db.Joins("left outer join animal_visited_locations on animal_id=animals.id "+
+		"left outer join animal_locations on animal_location_id=animal_locations.id ").
+		Where("location_point_id = ?", locationId).
 		Find(&animals).Error
 	if err != nil {
 		return nil, err

@@ -54,11 +54,11 @@ func (a *AnimalTypeHandler) Create(c *gin.Context) {
 
 	httpErr := AnimalTypeValidator.ValidateAnimalType(newAnimalType)
 	if httpErr != nil {
-		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err)
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
-	duplicateAnimalType := a.service.GetByTitle(newAnimalType)
+	duplicateAnimalType := a.service.GetByType(newAnimalType)
 	if duplicateAnimalType.Id != 0 {
 		c.AbortWithStatus(http.StatusConflict)
 		return
@@ -91,15 +91,15 @@ func (a *AnimalTypeHandler) Update(c *gin.Context) {
 		return
 	}
 
-	duplicateAnimalType := a.service.GetByTitle(newAnimalType)
+	duplicateAnimalType := a.service.GetByType(newAnimalType)
 	if duplicateAnimalType.Id != 0 && id != duplicateAnimalType.Id {
 		c.AbortWithStatus(http.StatusConflict)
 		return
 	}
 
-	oldAnimalType, _ := a.service.Get(id)
-	if oldAnimalType.Id == 0 {
-		c.AbortWithStatus(http.StatusNotFound)
+	_, err = a.service.Get(id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
 		return
 	}
 

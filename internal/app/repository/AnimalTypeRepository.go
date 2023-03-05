@@ -10,7 +10,7 @@ type AnimalType interface {
 	Create(animalType *entity.AnimalType) (*entity.AnimalType, error)
 	Update(animalType *entity.AnimalType) (*entity.AnimalType, error)
 	Delete(animalTypeId int) error
-	GetByTitle(animalType *entity.AnimalType) *entity.AnimalType
+	GetByType(animalType *entity.AnimalType) *entity.AnimalType
 	GetByIds(ids *[]int) (*[]entity.AnimalType, error)
 }
 
@@ -58,9 +58,9 @@ func (a *AnimalTypeRepository) Delete(animalTypeId int) error {
 	return nil
 }
 
-func (a *AnimalTypeRepository) GetByTitle(animalType *entity.AnimalType) *entity.AnimalType {
+func (a *AnimalTypeRepository) GetByType(animalType *entity.AnimalType) *entity.AnimalType {
 	ant := &entity.AnimalType{}
-	a.Db.Where("title = ?", animalType.Title).First(ant)
+	a.Db.Where("type = ?", animalType.Type).First(ant)
 	return ant
 }
 

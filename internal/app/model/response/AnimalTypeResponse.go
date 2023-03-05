@@ -1,6 +1,6 @@
 package response
 
 type AnimalType struct {
-	Id    int    `json:"id"`
-	Title string `json:"title"`
+	Id   int    `json:"id"`
+	Type string `json:"type"`
 }

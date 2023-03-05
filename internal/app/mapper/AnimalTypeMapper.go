@@ -7,8 +7,8 @@ import (
 
 func AnimalTypeToAnimalTypeResponse(animalType *entity.AnimalType) *response.AnimalType {
 	r := &response.AnimalType{
-		Id:    animalType.Id,
-		Title: animalType.Title,
+		Id:   animalType.Id,
+		Type: animalType.Type,
 	}
 
 	return r

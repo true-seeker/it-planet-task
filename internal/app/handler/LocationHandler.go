@@ -89,12 +89,8 @@ func (l *LocationHandler) Update(c *gin.Context) {
 	}
 
 	oldLocation, err := l.service.Get(id)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
-		return
-	}
-	if oldLocation.Id == 0 {
-		c.AbortWithStatus(http.StatusNotFound)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
 		return
 	}
 
@@ -129,6 +125,7 @@ func (l *LocationHandler) Update(c *gin.Context) {
 
 	c.JSON(http.StatusOK, location)
 }
+
 func (l *LocationHandler) Delete(c *gin.Context) {
 	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
 	if httpErr != nil {
@@ -148,7 +145,7 @@ func (l *LocationHandler) Delete(c *gin.Context) {
 
 	animals, err := l.animalService.GetAnimalsByLocationId(id)
 	if err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	if len(*animals) > 0 {
@@ -158,7 +155,7 @@ func (l *LocationHandler) Delete(c *gin.Context) {
 
 	err = l.service.Delete(id)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 

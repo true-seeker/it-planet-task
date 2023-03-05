@@ -9,9 +9,9 @@ import (
 )
 
 func ValidateAnimalType(animalType *entity.AnimalType) *errorHandler.HttpErr {
-	if validator.IsStringEmpty(animalType.Title) {
+	if validator.IsStringEmpty(animalType.Type) {
 		return &errorHandler.HttpErr{
-			Err:        errors.New("title is empty"),
+			Err:        errors.New("type is empty"),
 			StatusCode: http.StatusBadRequest,
 		}
 	}

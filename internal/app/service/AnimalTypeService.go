@@ -12,7 +12,7 @@ type AnimalType interface {
 	Create(animalType *entity.AnimalType) (*response.AnimalType, error)
 	Update(animalType *entity.AnimalType) (*response.AnimalType, error)
 	Delete(animalTypeId int) error
-	GetByTitle(animalType *entity.AnimalType) *entity.AnimalType
+	GetByType(animalType *entity.AnimalType) *entity.AnimalType
 	GetByIds(ids *[]int) (*[]response.AnimalType, error)
 }
 
@@ -67,8 +67,8 @@ func (a *AnimalTypeService) Delete(animalTypeId int) error {
 	return a.animalTypeRepo.Delete(animalTypeId)
 }
 
-func (a *AnimalTypeService) GetByTitle(animalType *entity.AnimalType) *entity.AnimalType {
-	return a.animalTypeRepo.GetByTitle(animalType)
+func (a *AnimalTypeService) GetByType(animalType *entity.AnimalType) *entity.AnimalType {
+	return a.animalTypeRepo.GetByType(animalType)
 }
 
 func (a *AnimalTypeService) GetByIds(ids *[]int) (*[]response.AnimalType, error) {

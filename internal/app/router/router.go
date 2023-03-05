@@ -29,7 +29,7 @@ func New(r *gin.Engine) *gin.Engine {
 	{
 		animalGroup.GET("/:id", middleware.OptionalBasicAuth, animalHandler.Get)
 		animalGroup.GET("/search", middleware.OptionalBasicAuth, animalHandler.Search)
-		animalGroup.POST("/", middleware.BasicAuth, animalHandler.Create)
+		animalGroup.POST("", middleware.BasicAuth, animalHandler.Create)
 		animalGroup.PUT("/:id", middleware.BasicAuth, animalHandler.Update)
 		animalGroup.DELETE("/:id", middleware.BasicAuth, animalHandler.Delete)
 
@@ -47,7 +47,7 @@ func New(r *gin.Engine) *gin.Engine {
 	animalTypeGroup := animalGroup.Group("types")
 	{
 		animalTypeGroup.GET("/:id", middleware.OptionalBasicAuth, animalTypeHandler.Get)
-		animalTypeGroup.POST("/", middleware.BasicAuth, animalTypeHandler.Create)
+		animalTypeGroup.POST("", middleware.BasicAuth, animalTypeHandler.Create)
 		animalTypeGroup.PUT("/:id", middleware.BasicAuth, animalTypeHandler.Update)
 		animalTypeGroup.DELETE("/:id", middleware.BasicAuth, animalTypeHandler.Delete)
 	}
@@ -65,7 +65,7 @@ func New(r *gin.Engine) *gin.Engine {
 	locationGroup := api.Group("locations")
 	{
 		locationGroup.GET("/:id", middleware.OptionalBasicAuth, locationHandler.Get)
-		locationGroup.POST("/", middleware.BasicAuth, locationHandler.Create)
+		locationGroup.POST("", middleware.BasicAuth, locationHandler.Create)
 		locationGroup.PUT("/:id", middleware.BasicAuth, locationHandler.Update)
 		locationGroup.DELETE("/:id", middleware.BasicAuth, locationHandler.Delete)
 	}
