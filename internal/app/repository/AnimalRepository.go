@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"gorm.io/gorm"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
@@ -11,7 +10,6 @@ import (
 
 type Animal interface {
 	Get(id int) (*entity.Animal, error)
-	GetAnimalLocations(animalId int) (*[]entity.AnimalLocation, error)
 	Search(params *filter.AnimalFilterParams) (*[]entity.Animal, error)
 	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByAnimalTypeId(accountId int) (*[]entity.Animal, error)
@@ -22,9 +20,6 @@ type Animal interface {
 	AddAnimalType(animalId, typeId int) (*entity.Animal, error)
 	EditAnimalType(animalId int, input *input.AnimalTypeUpdate) (*entity.Animal, error)
 	DeleteAnimalType(animalId int, typeId int) (*entity.Animal, error)
-	AddAnimalLocationPoint(animalId int, newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error)
-	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*entity.AnimalLocation, error)
-	DeleteAnimalLocationPoint(id int) error
 }
 
 type AnimalRepository struct {
@@ -47,21 +42,6 @@ func (a *AnimalRepository) Get(id int) (*entity.Animal, error) {
 	}
 
 	return &animal, nil
-}
-
-func (a *AnimalRepository) GetAnimalLocations(animalId int) (*[]entity.AnimalLocation, error) {
-	var animal entity.Animal
-
-	err := a.Db.
-		Preload("VisitedLocations").
-		Select("Id").
-		First(&animal, animalId).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &animal.VisitedLocations, nil
 }
 
 func (a *AnimalRepository) Search(params *filter.AnimalFilterParams) (*[]entity.Animal, error) {
@@ -155,29 +135,4 @@ func (a *AnimalRepository) EditAnimalType(animalId int, input *input.AnimalTypeU
 func (a *AnimalRepository) DeleteAnimalType(animalId int, typeId int) (*entity.Animal, error) {
 	a.Db.Exec("DELETE FROM animal_animal_type WHERE animal_id = ? AND animal_type_id = ?", animalId, typeId)
 	return a.Get(animalId)
-}
-
-func (a *AnimalRepository) AddAnimalLocationPoint(animalId int, newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error) {
-	a.Db.Save(newAnimalLocation)
-
-	a.Db.Exec("INSERT INTO animal_visited_locations(animal_id, animal_location_id) VALUES (?,?)", animalId, newAnimalLocation.Id)
-
-	return newAnimalLocation, nil
-}
-
-func (a *AnimalRepository) EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*entity.AnimalLocation, error) {
-	fmt.Println(locationPointId, visitedLocationPointId)
-	a.Db.Exec("UPDATE animal_locations SET location_point_id = ? WHERE id = ?", locationPointId, visitedLocationPointId)
-	// TODO разбить на отдельный сервис и репозиторий
-	var animalLocation entity.AnimalLocation
-	a.Db.First(&animalLocation, visitedLocationPointId)
-	return &animalLocation, nil
-}
-
-func (a *AnimalRepository) DeleteAnimalLocationPoint(id int) error {
-	err := a.Db.Delete(&entity.AnimalLocation{}, id).Error
-	if err != nil {
-		return err
-	}
-	return nil
 }

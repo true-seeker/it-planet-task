@@ -13,7 +13,6 @@ import (
 
 type Animal interface {
 	Get(id int) (*response.Animal, error)
-	GetAnimalLocations(animalId int) (*[]response.AnimalLocation, error)
 	Search(params *filter.AnimalFilterParams) (*[]response.Animal, error)
 	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByAnimalTypeId(animalTypeId int) (*[]entity.Animal, error)
@@ -24,9 +23,6 @@ type Animal interface {
 	AddAnimalType(animalId, typeId int) (*response.Animal, error)
 	EditAnimalType(animalId int, animalTypeUpdateInput *input.AnimalTypeUpdate) (*response.Animal, error)
 	DeleteAnimalType(animalId int, typeId int) (*response.Animal, error)
-	AddAnimalLocationPoint(animalId int, pointId int) (*response.AnimalLocation, error)
-	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*response.AnimalLocation, error)
-	DeleteAnimalLocationPoint(visitedPointId int) error
 }
 
 type AnimalService struct {
@@ -48,19 +44,6 @@ func (a *AnimalService) Get(id int) (*response.Animal, error) {
 	animalResponse = mapper.AnimalToAnimalResponse(animal)
 
 	return animalResponse, nil
-}
-
-func (a *AnimalService) GetAnimalLocations(animalId int) (*[]response.AnimalLocation, error) {
-	var animalLocationsResponse *[]response.AnimalLocation
-
-	animalLocations, err := a.animalRepo.GetAnimalLocations(animalId)
-	if err != nil {
-		return nil, err
-	}
-
-	animalLocationsResponse = mapper.AnimalLocationsToAnimalLocationResponses(animalLocations)
-
-	return animalLocationsResponse, nil
 }
 
 func (a *AnimalService) Search(params *filter.AnimalFilterParams) (*[]response.Animal, error) {
@@ -175,39 +158,4 @@ func (a *AnimalService) DeleteAnimalType(animalId int, typeId int) (*response.An
 	animalResponse = mapper.AnimalToAnimalResponse(animal)
 
 	return animalResponse, nil
-}
-
-func (a *AnimalService) AddAnimalLocationPoint(animalId int, pointId int) (*response.AnimalLocation, error) {
-	animalLocationResponse := &response.AnimalLocation{}
-
-	animalLocation := &entity.AnimalLocation{
-		DateTimeOfVisitLocationPoint: time.Now(),
-		LocationPointId:              pointId,
-	}
-
-	animalLocation, err := a.animalRepo.AddAnimalLocationPoint(animalId, animalLocation)
-	if err != nil {
-		return nil, err
-	}
-
-	animalLocationResponse = mapper.AnimalLocationToAnimalLocationResponse(animalLocation)
-
-	return animalLocationResponse, nil
-}
-
-func (a *AnimalService) EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*response.AnimalLocation, error) {
-	animalLocationResponse := &response.AnimalLocation{}
-
-	animalLocation, err := a.animalRepo.EditAnimalLocationPoint(visitedLocationPointId, locationPointId)
-	if err != nil {
-		return nil, err
-	}
-
-	animalLocationResponse = mapper.AnimalLocationToAnimalLocationResponse(animalLocation)
-
-	return animalLocationResponse, nil
-}
-
-func (a *AnimalService) DeleteAnimalLocationPoint(visitedPointId int) error {
-	return a.animalRepo.DeleteAnimalLocationPoint(visitedPointId)
 }

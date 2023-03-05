@@ -24,6 +24,9 @@ func New(r *gin.Engine) *gin.Engine {
 	animalRepo := repository.NewAnimalRepository(helpers.GetConnectionOrCreateAndGet())
 	animalService := service.NewAnimalService(animalRepo)
 
+	animalLocationRepo := repository.NewAnimalLocationRepository(helpers.GetConnectionOrCreateAndGet())
+	animalLocationService := service.NewAnimalLocationService(animalLocationRepo)
+
 	animalHandler := handler.NewAnimalHandler(animalService, animalTypeService, accountService, locationService)
 	animalGroup := api.Group("animals")
 	{
@@ -36,11 +39,14 @@ func New(r *gin.Engine) *gin.Engine {
 		animalGroup.POST("/:id/types/:typeId", middleware.BasicAuth, animalHandler.AddAnimalType)
 		animalGroup.PUT("/:id/types", middleware.BasicAuth, animalHandler.EditAnimalType)
 		animalGroup.DELETE("/:id/types/:typeId", middleware.BasicAuth, animalHandler.DeleteAnimalType)
+	}
 
-		animalGroup.GET("/:id/locations", middleware.OptionalBasicAuth, animalHandler.GetAnimalLocations)
-		animalGroup.POST("/:id/locations/:pointId", middleware.BasicAuth, animalHandler.AddAnimalLocationPoint)
-		animalGroup.PUT("/:id/locations", middleware.BasicAuth, animalHandler.EditAnimalLocationPoint)
-		animalGroup.DELETE("/:id/locations/:visitedPointId", middleware.BasicAuth, animalHandler.DeleteAnimalLocationPoint)
+	animalLocationHandler := handler.NewAnimalLocationHandler(animalLocationService, animalService, locationService)
+	{
+		animalGroup.GET("/:id/locations", middleware.OptionalBasicAuth, animalLocationHandler.GetAnimalLocations)
+		animalGroup.POST("/:id/locations/:pointId", middleware.BasicAuth, animalLocationHandler.AddAnimalLocationPoint)
+		animalGroup.PUT("/:id/locations", middleware.BasicAuth, animalLocationHandler.EditAnimalLocationPoint)
+		animalGroup.DELETE("/:id/locations/:visitedPointId", middleware.BasicAuth, animalLocationHandler.DeleteAnimalLocationPoint)
 	}
 
 	animalTypeHandler := handler.NewAnimalTypeHandler(animalTypeService, animalService)
