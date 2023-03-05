@@ -24,6 +24,7 @@ type Animal interface {
 	DeleteAnimalType(animalId int, typeId int) (*entity.Animal, error)
 	AddAnimalLocationPoint(animalId int, newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error)
 	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*entity.AnimalLocation, error)
+	DeleteAnimalLocationPoint(id int) error
 }
 
 type AnimalRepository struct {
@@ -170,4 +171,12 @@ func (a *AnimalRepository) EditAnimalLocationPoint(visitedLocationPointId int, l
 	var animalLocation entity.AnimalLocation
 	a.Db.First(&animalLocation, visitedLocationPointId)
 	return &animalLocation, nil
+}
+
+func (a *AnimalRepository) DeleteAnimalLocationPoint(id int) error {
+	err := a.Db.Delete(&entity.AnimalLocation{}, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

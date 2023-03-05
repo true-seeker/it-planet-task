@@ -486,5 +486,46 @@ func (a *AnimalHandler) EditAnimalLocationPoint(c *gin.Context) {
 }
 
 func (a *AnimalHandler) DeleteAnimalLocationPoint(c *gin.Context) {
+	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if animalId <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
+		return
+	}
+
+	visitedPointId, httpErr := validator.ValidateAndReturnIntField(c.Param("visitedPointId"), "visitedPointId")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if visitedPointId <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "visitedPointId must be greater than 0")
+		return
+	}
+
+	animalResponse, err := a.service.Get(animalId)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	animalLocationsMap := make(map[int]bool)
+	for _, animalLocationId := range animalResponse.VisitedLocationsId {
+		animalLocationsMap[animalLocationId] = true
+	}
+	if !animalLocationsMap[visitedPointId] {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	err = a.service.DeleteAnimalLocationPoint(visitedPointId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+	c.Status(http.StatusOK)
 
 }

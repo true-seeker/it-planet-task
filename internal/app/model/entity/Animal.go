@@ -15,6 +15,6 @@ type Animal struct {
 	Chipper            Account
 	ChippingLocationId int `gorm:"not_null"`
 	ChippingLocation   Location
-	VisitedLocations   []AnimalLocation `gorm:"many2many:animal_visited_locations;not_null"`
+	VisitedLocations   []AnimalLocation `gorm:"many2many:animal_visited_locations;not_null;constraint:OnDelete:CASCADE;"`
 	DeathDateTime      *time.Time
 }
