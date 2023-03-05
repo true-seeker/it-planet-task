@@ -49,6 +49,7 @@ func (a *AnimalRepository) Search(params *filter.AnimalFilterParams) (*[]entity.
 	err := a.Db.
 		Scopes(paginator.Paginate(params), filter.AnimalFilter(params)).
 		Order("id").
+		Preload("AnimalTypes").
 		Find(&animals).Error
 	if err != nil {
 		return nil, err
@@ -72,8 +73,8 @@ func (a *AnimalRepository) GetAnimalsByAccountId(accountId int) (*[]entity.Anima
 
 func (a *AnimalRepository) GetAnimalsByAnimalTypeId(animalTypeId int) (*[]entity.Animal, error) {
 	var animals []entity.Animal
-	err := a.Db.Joins("left outer join animal_animal_type on animal_id=animals.id"+
-		" left outer join animal_types on animal_type_id=animal_types.id ").
+	err := a.Db.Joins("join animal_animal_type on animal_id=animals.id"+
+		" join animal_types on animal_type_id=animal_types.id ").
 		Where("animal_type_id = ?", animalTypeId).
 		Find(&animals).Error
 	if err != nil {
@@ -85,8 +86,8 @@ func (a *AnimalRepository) GetAnimalsByAnimalTypeId(animalTypeId int) (*[]entity
 
 func (a *AnimalRepository) GetAnimalsByLocationId(locationId int) (*[]entity.Animal, error) {
 	var animals []entity.Animal
-	err := a.Db.Joins("left outer join animal_visited_locations on animal_id=animals.id "+
-		"left outer join animal_locations on animal_location_id=animal_locations.id ").
+	err := a.Db.Joins("join animal_visited_locations on animal_id=animals.id "+
+		"join animal_locations on animal_location_id=animal_locations.id ").
 		Where("location_point_id = ?", locationId).
 		Find(&animals).Error
 	if err != nil {
@@ -102,7 +103,7 @@ func (a *AnimalRepository) Create(animal *entity.Animal) (*entity.Animal, error)
 		return nil, err
 	}
 
-	return animal, nil
+	return a.Get(animal.Id)
 }
 
 func (a *AnimalRepository) Update(animal *entity.Animal) (*entity.Animal, error) {

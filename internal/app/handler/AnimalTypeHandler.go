@@ -135,7 +135,7 @@ func (a *AnimalTypeHandler) Delete(c *gin.Context) {
 
 	animals, _ := a.animalService.GetAnimalsByAnimalTypeId(id)
 	if len(*animals) != 0 {
-		c.AbortWithStatus(http.StatusForbidden)
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 	err = a.service.Delete(id)

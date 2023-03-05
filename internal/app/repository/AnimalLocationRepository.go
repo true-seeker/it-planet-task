@@ -42,7 +42,7 @@ func (a *AnimalLocationRepository) AddAnimalLocationPoint(animalId int, newAnima
 
 	a.Db.Exec("INSERT INTO animal_visited_locations(animal_id, animal_location_id) VALUES (?,?)", animalId, newAnimalLocation.Id)
 
-	return newAnimalLocation, nil
+	return a.Get(newAnimalLocation.Id)
 }
 
 func (a *AnimalLocationRepository) EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*entity.AnimalLocation, error) {

@@ -128,7 +128,7 @@ func (a *AccountHandler) Delete(c *gin.Context) {
 
 	animals, _ := a.animalService.GetAnimalsByAccountId(authenticatedAccount.Id)
 	if len(*animals) != 0 {
-		c.AbortWithStatus(http.StatusForbidden)
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 

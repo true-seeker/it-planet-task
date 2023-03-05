@@ -96,7 +96,7 @@ func (a *AnimalHandler) Create(c *gin.Context) {
 		return
 	}
 	if len(*animalTypes) < len(animalInput.AnimalTypeIds) {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
 
