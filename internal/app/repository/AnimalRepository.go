@@ -20,6 +20,7 @@ type Animal interface {
 	Delete(id int) error
 	AddAnimalType(animalId, typeId int) (*entity.Animal, error)
 	EditAnimalType(animalId int, input *input.AnimalTypeUpdate) (*entity.Animal, error)
+	DeleteAnimalType(animalId int, typeId int) (*entity.Animal, error)
 }
 
 type AnimalRepository struct {
@@ -143,5 +144,10 @@ func (a *AnimalRepository) AddAnimalType(animalId, typeId int) (*entity.Animal, 
 
 func (a *AnimalRepository) EditAnimalType(animalId int, input *input.AnimalTypeUpdate) (*entity.Animal, error) {
 	a.Db.Exec("UPDATE animal_animal_type SET animal_type_id = ? WHERE animal_id = ? AND animal_type_id = ?", input.NewTypeId, animalId, input.OldTypeId)
+	return a.Get(animalId)
+}
+
+func (a *AnimalRepository) DeleteAnimalType(animalId int, typeId int) (*entity.Animal, error) {
+	a.Db.Exec("DELETE FROM animal_animal_type WHERE animal_id = ? AND animal_type_id = ?", animalId, typeId)
 	return a.Get(animalId)
 }
