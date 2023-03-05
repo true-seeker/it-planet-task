@@ -211,3 +211,15 @@ func (a *AnimalHandler) Delete(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+func (a *AnimalHandler) AddAnimalType(c *gin.Context) {
+
+}
+
+func (a *AnimalHandler) EditAnimalType(c *gin.Context) {
+
+}
+
+func (a *AnimalHandler) DeleteAnimalType(c *gin.Context) {
+
+}
