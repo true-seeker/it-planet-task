@@ -186,5 +186,28 @@ func (a *AnimalHandler) Update(c *gin.Context) {
 }
 
 func (a *AnimalHandler) Delete(c *gin.Context) {
+	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+	if id <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		return
+	}
+	// todo Животное покинуло локацию чипирования, при этом есть другие посещенные точки
 
+	_, err := a.service.Get(id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		return
+	}
+
+	err = a.service.Delete(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }

@@ -4,7 +4,7 @@ import "time"
 
 type Animal struct {
 	Id                 int          `gorm:"primary_key"`
-	AnimalTypes        []AnimalType `gorm:"many2many:animal_animal_type;not_null"`
+	AnimalTypes        []AnimalType `gorm:"many2many:animal_animal_type;not_null;constraint:OnDelete:CASCADE;"`
 	Weight             float32      `gorm:"not_null"`
 	Height             float32      `gorm:"not_null"`
 	Length             float32      `gorm:"not_null"`

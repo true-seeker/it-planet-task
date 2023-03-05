@@ -126,6 +126,9 @@ func (a *AnimalRepository) Update(animal *entity.Animal) (*entity.Animal, error)
 }
 
 func (a *AnimalRepository) Delete(id int) error {
-	//TODO implement me
-	panic("implement me")
+	err := a.Db.Delete(&entity.Animal{}, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

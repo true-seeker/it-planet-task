@@ -131,6 +131,5 @@ func (a *AnimalService) Update(newAnimal *entity.Animal, oldAnimal *response.Ani
 }
 
 func (a *AnimalService) Delete(id int) error {
-	//TODO implement me
-	panic("implement me")
+	return a.animalRepo.Delete(id)
 }
