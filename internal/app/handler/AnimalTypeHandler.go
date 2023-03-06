@@ -21,13 +21,9 @@ func NewAnimalTypeHandler(service service.AnimalType, animalService service.Anim
 }
 
 func (a *AnimalTypeHandler) Get(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -74,13 +70,9 @@ func (a *AnimalTypeHandler) Create(c *gin.Context) {
 }
 
 func (a *AnimalTypeHandler) Update(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -117,13 +109,9 @@ func (a *AnimalTypeHandler) Update(c *gin.Context) {
 }
 
 func (a *AnimalTypeHandler) Delete(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 

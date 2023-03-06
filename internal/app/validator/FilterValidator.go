@@ -53,6 +53,21 @@ func ValidateAndReturnIntField(field, fieldName string) (int, *errorHandler.Http
 	return intField, nil
 }
 
+func ValidateAndReturnId(idStr, fieldName string) (int, *errorHandler.HttpErr) {
+	id, httpErr := ValidateAndReturnIntField(idStr, fieldName)
+	if httpErr != nil {
+		return 0, httpErr
+	}
+
+	if id <= 0 {
+		return 0, &errorHandler.HttpErr{
+			Err:        errors.New(fmt.Sprintf("%s must be greater than 0", fieldName)),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	return id, nil
+}
+
 func ValidateAndReturnDateTime(field, fieldName string) (*time.Time, *errorHandler.HttpErr) {
 	date, err := time.Parse(config.TimeLayout, field)
 	if err != nil {

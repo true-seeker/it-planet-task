@@ -25,13 +25,9 @@ func NewAnimalHandler(service service.Animal, animalTypeService service.AnimalTy
 }
 
 func (a *AnimalHandler) Get(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -110,13 +106,9 @@ func (a *AnimalHandler) Create(c *gin.Context) {
 }
 
 func (a *AnimalHandler) Update(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -166,13 +158,9 @@ func (a *AnimalHandler) Update(c *gin.Context) {
 }
 
 func (a *AnimalHandler) Delete(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 	// todo Животное покинуло локацию чипирования, при этом есть другие посещенные точки
@@ -193,22 +181,14 @@ func (a *AnimalHandler) Delete(c *gin.Context) {
 }
 
 func (a *AnimalHandler) AddAnimalType(c *gin.Context) {
-	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	if animalId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
-		return
-	}
-	typeId, httpErr := validator.ValidateAndReturnIntField(c.Param("typeId"), "typeId")
+	typeId, httpErr := validator.ValidateAndReturnId(c.Param("typeId"), "typeId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if typeId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "typeId must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -241,13 +221,9 @@ func (a *AnimalHandler) AddAnimalType(c *gin.Context) {
 }
 
 func (a *AnimalHandler) EditAnimalType(c *gin.Context) {
-	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if animalId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -304,22 +280,14 @@ func (a *AnimalHandler) EditAnimalType(c *gin.Context) {
 }
 
 func (a *AnimalHandler) DeleteAnimalType(c *gin.Context) {
-	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	if animalId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
-		return
-	}
-	typeId, httpErr := validator.ValidateAndReturnIntField(c.Param("typeId"), "typeId")
+	typeId, httpErr := validator.ValidateAndReturnId(c.Param("typeId"), "typeId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if typeId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "typeId must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 

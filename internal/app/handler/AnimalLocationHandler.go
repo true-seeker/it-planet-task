@@ -22,13 +22,9 @@ func NewAnimalLocationHandler(service service.AnimalLocation, animalService serv
 }
 
 func (a *AnimalLocationHandler) GetAnimalLocations(c *gin.Context) {
-	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if animalId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -47,22 +43,15 @@ func (a *AnimalLocationHandler) GetAnimalLocations(c *gin.Context) {
 }
 
 func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
-	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	if animalId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
-		return
-	}
-	pointId, httpErr := validator.ValidateAndReturnIntField(c.Param("pointId"), "pointId")
+
+	pointId, httpErr := validator.ValidateAndReturnId(c.Param("pointId"), "pointId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if pointId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "pointId must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -93,13 +82,9 @@ func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
 }
 
 func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
-	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if animalId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -149,23 +134,15 @@ func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
 }
 
 func (a *AnimalLocationHandler) DeleteAnimalLocationPoint(c *gin.Context) {
-	animalId, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "animalId")
+	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if animalId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "animalId must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
-	visitedPointId, httpErr := validator.ValidateAndReturnIntField(c.Param("visitedPointId"), "visitedPointId")
+	visitedPointId, httpErr := validator.ValidateAndReturnId(c.Param("visitedPointId"), "visitedPointId")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if visitedPointId <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "visitedPointId must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 

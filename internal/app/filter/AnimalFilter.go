@@ -1,13 +1,11 @@
 package filter
 
 import (
-	"errors"
 	"gorm.io/gorm"
 	"it-planet-task/internal/app/validator"
 	"it-planet-task/internal/app/validator/AnimalValidator"
 	"it-planet-task/pkg/errorHandler"
 	"it-planet-task/pkg/paginator"
-	"net/http"
 	"net/url"
 	"time"
 )
@@ -46,29 +44,17 @@ func NewAnimalFilterParams(q url.Values) (*AnimalFilterParams, *errorHandler.Htt
 	}
 
 	if q.Get("chipperId") != "" {
-		chipperId, httpErr := validator.ValidateAndReturnIntField(q.Get("chipperId"), "chipperId")
+		chipperId, httpErr := validator.ValidateAndReturnId(q.Get("chipperId"), "chipperId")
 		if httpErr != nil {
 			return nil, httpErr
-		}
-		if chipperId <= 0 {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New("chipperId must be greater than 0"),
-				StatusCode: http.StatusBadRequest,
-			}
 		}
 		params.ChipperId = chipperId
 	}
 
 	if q.Get("chippingLocationId") != "" {
-		chipperLocationId, httpErr := validator.ValidateAndReturnIntField(q.Get("chippingLocationId"), "chippingLocationId")
+		chipperLocationId, httpErr := validator.ValidateAndReturnId(q.Get("chipperLocationId"), "chipperLocationId")
 		if httpErr != nil {
 			return nil, httpErr
-		}
-		if chipperLocationId <= 0 {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New("chipperLocationId must be greater than 0"),
-				StatusCode: http.StatusBadRequest,
-			}
 		}
 		params.ChippingLocationId = chipperLocationId
 	}

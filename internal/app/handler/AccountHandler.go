@@ -23,13 +23,9 @@ func NewAccountHandler(service service.Account, animalService service.Animal) *A
 }
 
 func (a *AccountHandler) Get(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -62,13 +58,9 @@ func (a *AccountHandler) Search(c *gin.Context) {
 }
 
 func (a *AccountHandler) Update(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 	authenticatedAccountEmail, _, _ := middleware.GetCredentials(c)
@@ -110,13 +102,9 @@ func (a *AccountHandler) Update(c *gin.Context) {
 }
 
 func (a *AccountHandler) Delete(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 	authenticatedAccountEmail, _, _ := middleware.GetCredentials(c)

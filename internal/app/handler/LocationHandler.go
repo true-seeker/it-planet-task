@@ -21,13 +21,9 @@ func NewLocationHandler(service service.Location, animalService service.Animal) 
 }
 
 func (l *LocationHandler) Get(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -78,13 +74,9 @@ func (l *LocationHandler) Create(c *gin.Context) {
 }
 
 func (l *LocationHandler) Update(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -127,13 +119,9 @@ func (l *LocationHandler) Update(c *gin.Context) {
 }
 
 func (l *LocationHandler) Delete(c *gin.Context) {
-	id, httpErr := validator.ValidateAndReturnIntField(c.Param("id"), "id")
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
-		return
-	}
-	if id <= 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "id must be greater than 0")
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
