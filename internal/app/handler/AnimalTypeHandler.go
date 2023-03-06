@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"it-planet-task/internal/app/model/entity"
@@ -30,10 +31,10 @@ func (a *AnimalTypeHandler) Get(c *gin.Context) {
 	animalType, err := a.service.Get(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, err)
+			c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Animal type with id %d does not exists", id))
 			return
 		} else {
-			c.AbortWithStatusJSON(http.StatusBadRequest, err)
+			c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 			return
 		}
 	}
@@ -44,7 +45,7 @@ func (a *AnimalTypeHandler) Create(c *gin.Context) {
 	newAnimalType := &entity.AnimalType{}
 	err := c.BindJSON(&newAnimalType)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -56,13 +57,13 @@ func (a *AnimalTypeHandler) Create(c *gin.Context) {
 
 	duplicateAnimalType := a.service.GetByType(newAnimalType)
 	if duplicateAnimalType.Id != 0 {
-		c.AbortWithStatus(http.StatusConflict)
+		c.AbortWithStatusJSON(http.StatusConflict, fmt.Sprintf("Animal type %s already exists", newAnimalType.Type))
 		return
 	}
 
 	animalType, err := a.service.Create(newAnimalType)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -79,19 +80,19 @@ func (a *AnimalTypeHandler) Update(c *gin.Context) {
 	newAnimalType := &entity.AnimalType{}
 	err := c.BindJSON(&newAnimalType)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	duplicateAnimalType := a.service.GetByType(newAnimalType)
 	if duplicateAnimalType.Id != 0 && id != duplicateAnimalType.Id {
-		c.AbortWithStatus(http.StatusConflict)
+		c.AbortWithStatusJSON(http.StatusConflict, fmt.Sprintf("Animal type %s already exists", newAnimalType.Type))
 		return
 	}
 
 	_, err = a.service.Get(id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Animal type with id %d does not exists", id))
 		return
 	}
 
@@ -117,18 +118,18 @@ func (a *AnimalTypeHandler) Delete(c *gin.Context) {
 
 	_, err := a.service.Get(id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Animal type with id %d does not exists", id))
 		return
 	}
 
 	animals, _ := a.animalService.GetAnimalsByAnimalTypeId(id)
 	if len(*animals) != 0 {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, fmt.Sprintf("There are animals with animal type id %d", id))
 		return
 	}
 	err = a.service.Delete(id)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 

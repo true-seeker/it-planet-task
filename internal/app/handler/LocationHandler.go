@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"it-planet-task/internal/app/model/entity"
@@ -30,10 +31,10 @@ func (l *LocationHandler) Get(c *gin.Context) {
 	location, err := l.service.Get(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, err)
+			c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Location with id %d does not exists", id))
 			return
 		} else {
-			c.AbortWithStatusJSON(http.StatusBadRequest, err)
+			c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 			return
 		}
 	}
@@ -44,7 +45,7 @@ func (l *LocationHandler) Create(c *gin.Context) {
 	newLocation := &entity.Location{}
 	err := c.BindJSON(&newLocation)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -56,17 +57,17 @@ func (l *LocationHandler) Create(c *gin.Context) {
 
 	duplicateLocation, err := l.service.GetByCords(newLocation)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	if duplicateLocation.Id != 0 {
-		c.AbortWithStatus(http.StatusConflict)
+		c.AbortWithStatusJSON(http.StatusConflict, "Location already exists")
 		return
 	}
 
 	location, err := l.service.Create(newLocation)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -82,14 +83,14 @@ func (l *LocationHandler) Update(c *gin.Context) {
 
 	oldLocation, err := l.service.Get(id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Location with id %d does not exists", id))
 		return
 	}
 
 	newLocation := &entity.Location{}
 	err = c.BindJSON(&newLocation)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -101,17 +102,17 @@ func (l *LocationHandler) Update(c *gin.Context) {
 
 	duplicateLocation, err := l.service.GetByCords(newLocation)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	if duplicateLocation.Id != 0 && oldLocation.Id != duplicateLocation.Id {
-		c.AbortWithStatus(http.StatusConflict)
+		c.AbortWithStatusJSON(http.StatusConflict, "Location already exists")
 		return
 	}
 	newLocation.Id = id
 	location, err := l.service.Update(newLocation)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -127,7 +128,7 @@ func (l *LocationHandler) Delete(c *gin.Context) {
 
 	_, err := l.service.Get(id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, err)
+		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Location with id %d does not exists", id))
 		return
 	}
 
@@ -137,7 +138,7 @@ func (l *LocationHandler) Delete(c *gin.Context) {
 		return
 	}
 	if len(*animals) > 0 {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, fmt.Sprintf("There are animals with loocation id %d", id))
 		return
 	}
 

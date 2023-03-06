@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"it-planet-task/internal/app/filter"
@@ -32,11 +33,10 @@ func (a *AccountHandler) Get(c *gin.Context) {
 	account, err := a.service.Get(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, err)
+			c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Account with id %d does not exists", id))
 			return
-
 		} else {
-			c.AbortWithStatusJSON(http.StatusBadRequest, err)
+			c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 			return
 		}
 	}
@@ -51,7 +51,7 @@ func (a *AccountHandler) Search(c *gin.Context) {
 	}
 	accounts, err := a.service.Search(params)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, accounts)
@@ -66,14 +66,14 @@ func (a *AccountHandler) Update(c *gin.Context) {
 	authenticatedAccountEmail, _, _ := middleware.GetCredentials(c)
 	authenticatedAccount, err := a.service.GetByEmail(&entity.Account{Email: authenticatedAccountEmail})
 	if authenticatedAccount.Id != id {
-		c.AbortWithStatus(http.StatusForbidden)
+		c.AbortWithStatusJSON(http.StatusForbidden, "Cant edit another's account")
 		return
 	}
 
 	newAccount := &entity.Account{}
 	err = c.BindJSON(&newAccount)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -86,7 +86,7 @@ func (a *AccountHandler) Update(c *gin.Context) {
 	duplicateAccount, err := a.service.GetByEmail(newAccount)
 	if duplicateAccount.Id != 0 {
 		if duplicateAccount.Id != authenticatedAccount.Id {
-			c.AbortWithStatus(http.StatusConflict)
+			c.AbortWithStatusJSON(http.StatusConflict, fmt.Sprintf("Account with email %s already exists", newAccount.Email))
 			return
 		}
 	}
@@ -94,7 +94,7 @@ func (a *AccountHandler) Update(c *gin.Context) {
 	newAccount.Id = authenticatedAccount.Id
 	account, err := a.service.Update(newAccount)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -110,19 +110,19 @@ func (a *AccountHandler) Delete(c *gin.Context) {
 	authenticatedAccountEmail, _, _ := middleware.GetCredentials(c)
 	authenticatedAccount, _ := a.service.GetByEmail(&entity.Account{Email: authenticatedAccountEmail})
 	if authenticatedAccount.Id != id {
-		c.AbortWithStatus(http.StatusForbidden)
+		c.AbortWithStatusJSON(http.StatusForbidden, "Cant delete another's account")
 		return
 	}
 
 	animals, _ := a.animalService.GetAnimalsByAccountId(authenticatedAccount.Id)
 	if len(*animals) != 0 {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, "Account has animals attached")
 		return
 	}
 
 	err := a.service.Delete(id)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
