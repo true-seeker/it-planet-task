@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
@@ -28,16 +26,12 @@ func (l *LocationHandler) Get(c *gin.Context) {
 		return
 	}
 
-	location, err := l.service.Get(id)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Location with id %d does not exists", id))
-			return
-		} else {
-			c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
-			return
-		}
+	location, httpErr := l.service.Get(id)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
 	}
+
 	c.JSON(http.StatusOK, location)
 }
 
@@ -81,14 +75,14 @@ func (l *LocationHandler) Update(c *gin.Context) {
 		return
 	}
 
-	oldLocation, err := l.service.Get(id)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Location with id %d does not exists", id))
+	oldLocation, httpErr := l.service.Get(id)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
 	newLocation := &entity.Location{}
-	err = c.BindJSON(&newLocation)
+	err := c.BindJSON(&newLocation)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -126,9 +120,9 @@ func (l *LocationHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	_, err := l.service.Get(id)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Location with id %d does not exists", id))
+	_, httpErr = l.service.Get(id)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 

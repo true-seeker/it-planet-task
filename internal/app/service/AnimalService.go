@@ -1,6 +1,9 @@
 package service
 
 import (
+	"errors"
+	"fmt"
+	"gorm.io/gorm"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/entity"
@@ -8,11 +11,13 @@ import (
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
 	"it-planet-task/internal/app/validator/AnimalValidator"
+	"it-planet-task/pkg/errorHandler"
+	"net/http"
 	"time"
 )
 
 type Animal interface {
-	Get(id int) (*response.Animal, error)
+	Get(id int) (*response.Animal, *errorHandler.HttpErr)
 	Search(params *filter.AnimalFilterParams) (*[]response.Animal, error)
 	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByAnimalTypeId(animalTypeId int) (*[]entity.Animal, error)
@@ -33,12 +38,22 @@ func NewAnimalService(animalRepo repository.Animal) Animal {
 	return &AnimalService{animalRepo: animalRepo}
 }
 
-func (a *AnimalService) Get(id int) (*response.Animal, error) {
+func (a *AnimalService) Get(id int) (*response.Animal, *errorHandler.HttpErr) {
 	animalResponse := &response.Animal{}
 
 	animal, err := a.animalRepo.Get(id)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &errorHandler.HttpErr{
+				Err:        errors.New(fmt.Sprintf("Animal with id %d does not exists", id)),
+				StatusCode: http.StatusNotFound,
+			}
+		} else {
+			return nil, &errorHandler.HttpErr{
+				Err:        err,
+				StatusCode: http.StatusBadRequest,
+			}
+		}
 	}
 
 	animalResponse = mapper.AnimalToAnimalResponse(animal)

@@ -1,14 +1,19 @@
 package service
 
 import (
+	"errors"
+	"fmt"
+	"gorm.io/gorm"
 	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
+	"it-planet-task/pkg/errorHandler"
+	"net/http"
 )
 
 type Location interface {
-	Get(id int) (*response.Location, error)
+	Get(id int) (*response.Location, *errorHandler.HttpErr)
 	Create(location *entity.Location) (*response.Location, error)
 	Update(location *entity.Location) (*response.Location, error)
 	Delete(id int) error
@@ -23,12 +28,22 @@ func NewLocationService(serviceRepo repository.Location) Location {
 	return &LocationService{locationRepo: serviceRepo}
 }
 
-func (l *LocationService) Get(id int) (*response.Location, error) {
+func (l *LocationService) Get(id int) (*response.Location, *errorHandler.HttpErr) {
 	locationResponse := &response.Location{}
 
 	location, err := l.locationRepo.Get(id)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &errorHandler.HttpErr{
+				Err:        errors.New(fmt.Sprintf("Location with id %d does not exists", id)),
+				StatusCode: http.StatusNotFound,
+			}
+		} else {
+			return nil, &errorHandler.HttpErr{
+				Err:        err,
+				StatusCode: http.StatusBadRequest,
+			}
+		}
 	}
 
 	locationResponse = mapper.LocationToLocationResponse(location)

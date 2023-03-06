@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
@@ -28,15 +26,10 @@ func (a *AnimalTypeHandler) Get(c *gin.Context) {
 		return
 	}
 
-	animalType, err := a.service.Get(id)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Animal type with id %d does not exists", id))
-			return
-		} else {
-			c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
-			return
-		}
+	animalType, httpErr := a.service.Get(id)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, animalType)
 }
@@ -90,9 +83,9 @@ func (a *AnimalTypeHandler) Update(c *gin.Context) {
 		return
 	}
 
-	_, err = a.service.Get(id)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Animal type with id %d does not exists", id))
+	_, httpErr = a.service.Get(id)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -116,9 +109,9 @@ func (a *AnimalTypeHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	_, err := a.service.Get(id)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Animal type with id %d does not exists", id))
+	_, httpErr = a.service.Get(id)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -127,7 +120,7 @@ func (a *AnimalTypeHandler) Delete(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, fmt.Sprintf("There are animals with animal type id %d", id))
 		return
 	}
-	err = a.service.Delete(id)
+	err := a.service.Delete(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return

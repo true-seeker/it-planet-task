@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"it-planet-task/internal/app/model/input"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
@@ -29,15 +27,10 @@ func (a *AnimalLocationHandler) GetAnimalLocations(c *gin.Context) {
 		return
 	}
 
-	animal, err := a.service.GetAnimalLocations(animalId)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Animal with id %d does not exists", animalId))
-			return
-		} else {
-			c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
-			return
-		}
+	animal, httpErr := a.service.GetAnimalLocations(animalId)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, animal)
 }
@@ -55,9 +48,9 @@ func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
 		return
 	}
 
-	animalResponse, err := a.animalService.Get(animalId)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Animal with id %d does not exists", animalId))
+	animalResponse, httpErr := a.animalService.Get(animalId)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -67,9 +60,9 @@ func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
 	}
 	// todo Животное находится в точке чипирования и никуда не перемещалось
 
-	_, err = a.locationService.Get(pointId)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Location with id %d does not exists", pointId))
+	_, httpErr = a.locationService.Get(pointId)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -102,9 +95,9 @@ func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
 	}
 	// TODO validate
 
-	animalResponse, err := a.animalService.Get(animalId)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Animal with id %d does not exists", animalId))
+	animalResponse, httpErr := a.animalService.Get(animalId)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -118,9 +111,9 @@ func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
 	}
 
 	// TODO AnimalLocation exists
-	_, err = a.locationService.Get(*animalLocationPointUpdateInput.LocationPointId)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Location with id %d does not exists", *animalLocationPointUpdateInput.LocationPointId))
+	_, httpErr = a.locationService.Get(*animalLocationPointUpdateInput.LocationPointId)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -146,9 +139,9 @@ func (a *AnimalLocationHandler) DeleteAnimalLocationPoint(c *gin.Context) {
 		return
 	}
 
-	animalResponse, err := a.animalService.Get(animalId)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Animal with id %d does not exists", animalId))
+	animalResponse, httpErr := a.animalService.Get(animalId)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
@@ -161,7 +154,7 @@ func (a *AnimalLocationHandler) DeleteAnimalLocationPoint(c *gin.Context) {
 		return
 	}
 
-	err = a.service.DeleteAnimalLocationPoint(visitedPointId)
+	err := a.service.DeleteAnimalLocationPoint(visitedPointId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return

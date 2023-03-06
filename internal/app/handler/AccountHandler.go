@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
@@ -30,15 +28,10 @@ func (a *AccountHandler) Get(c *gin.Context) {
 		return
 	}
 
-	account, err := a.service.Get(id)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf("Account with id %d does not exists", id))
-			return
-		} else {
-			c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
-			return
-		}
+	account, httpErr := a.service.Get(id)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, account)
 }

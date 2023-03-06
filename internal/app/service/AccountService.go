@@ -1,15 +1,20 @@
 package service
 
 import (
+	"errors"
+	"fmt"
+	"gorm.io/gorm"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
+	"it-planet-task/pkg/errorHandler"
+	"net/http"
 )
 
 type Account interface {
-	Get(id int) (*response.Account, error)
+	Get(id int) (*response.Account, *errorHandler.HttpErr)
 	GetByEmail(account *entity.Account) (*response.Account, error)
 	Update(account *entity.Account) (*response.Account, error)
 	Search(params *filter.AccountFilterParams) (*[]response.Account, error)
@@ -26,12 +31,22 @@ func NewAccountService(accountRepo repository.Account) Account {
 	return &AccountService{accountRepo: accountRepo}
 }
 
-func (a *AccountService) Get(id int) (*response.Account, error) {
+func (a *AccountService) Get(id int) (*response.Account, *errorHandler.HttpErr) {
 	accountResponse := &response.Account{}
 
 	account, err := a.accountRepo.Get(id)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &errorHandler.HttpErr{
+				Err:        errors.New(fmt.Sprintf("Account with id %d does not exists", id)),
+				StatusCode: http.StatusNotFound,
+			}
+		} else {
+			return nil, &errorHandler.HttpErr{
+				Err:        err,
+				StatusCode: http.StatusBadRequest,
+			}
+		}
 	}
 
 	accountResponse = mapper.AccountToAccountResponse(account)
