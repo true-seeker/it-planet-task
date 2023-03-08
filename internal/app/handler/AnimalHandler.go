@@ -13,14 +13,15 @@ import (
 )
 
 type AnimalHandler struct {
-	service           service.Animal
-	animalTypeService service.AnimalType
-	accountService    service.Account
-	locationService   service.Location
+	service               service.Animal
+	animalTypeService     service.AnimalType
+	accountService        service.Account
+	locationService       service.Location
+	animalLocationService service.AnimalLocation
 }
 
-func NewAnimalHandler(service service.Animal, animalTypeService service.AnimalType, accountService service.Account, locationService service.Location) *AnimalHandler {
-	return &AnimalHandler{service: service, animalTypeService: animalTypeService, accountService: accountService, locationService: locationService}
+func NewAnimalHandler(service service.Animal, animalTypeService service.AnimalType, accountService service.Account, locationService service.Location, animalLocationService service.AnimalLocation) *AnimalHandler {
+	return &AnimalHandler{service: service, animalTypeService: animalTypeService, accountService: accountService, locationService: locationService, animalLocationService: animalLocationService}
 }
 
 func (a *AnimalHandler) Get(c *gin.Context) {
@@ -123,6 +124,18 @@ func (a *AnimalHandler) Update(c *gin.Context) {
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
+	}
+
+	if len(oldAnimal.VisitedLocationsId) > 0 {
+		firstVisitedLocation, httpErr := a.animalLocationService.Get(oldAnimal.VisitedLocationsId[0])
+		if httpErr != nil {
+			c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+			return
+		}
+		if *animalInput.ChippingLocationId == firstVisitedLocation.LocationPointId {
+			c.AbortWithStatusJSON(http.StatusBadRequest, "new chipping location matches with first visited point")
+			return
+		}
 	}
 
 	animalInput.AnimalTypeIds = oldAnimal.AnimalTypesId

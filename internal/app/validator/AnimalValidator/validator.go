@@ -163,9 +163,6 @@ func ValidateAnimalUpdateInput(input *input.Animal, oldAnimal *response.Animal) 
 			StatusCode: http.StatusBadRequest,
 		}
 	}
-
-	// TODO Новая точка чипирования совпадает с первой посещенной точкой локации
-
 	return nil
 }
 

@@ -14,6 +14,7 @@ import (
 )
 
 type AnimalLocation interface {
+	Get(id int) (*response.AnimalLocation, *errorHandler.HttpErr)
 	GetAnimalLocations(animalId int) (*[]response.AnimalLocation, *errorHandler.HttpErr)
 	AddAnimalLocationPoint(animalId int, pointId int) (*response.AnimalLocation, error)
 	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*response.AnimalLocation, error)
@@ -84,4 +85,27 @@ func (a *AnimalLocationService) EditAnimalLocationPoint(visitedLocationPointId i
 
 func (a *AnimalLocationService) DeleteAnimalLocationPoint(visitedPointId int) error {
 	return a.animalLocationRepo.DeleteAnimalLocationPoint(visitedPointId)
+}
+
+func (a *AnimalLocationService) Get(id int) (*response.AnimalLocation, *errorHandler.HttpErr) {
+	animalLocationResponse := &response.AnimalLocation{}
+
+	animalLocation, err := a.animalLocationRepo.Get(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &errorHandler.HttpErr{
+				Err:        errors.New(fmt.Sprintf("Animal with id %d does not exists", id)),
+				StatusCode: http.StatusNotFound,
+			}
+		} else {
+			return nil, &errorHandler.HttpErr{
+				Err:        err,
+				StatusCode: http.StatusBadRequest,
+			}
+		}
+	}
+
+	animalLocationResponse = mapper.AnimalLocationToAnimalLocationResponse(animalLocation)
+
+	return animalLocationResponse, nil
 }

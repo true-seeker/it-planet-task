@@ -112,7 +112,7 @@ func (a *AnimalRepository) Update(animal *entity.Animal) (*entity.Animal, error)
 		return nil, err
 	}
 
-	return animal, nil
+	return a.Get(animal.Id)
 }
 
 func (a *AnimalRepository) Delete(id int) error {

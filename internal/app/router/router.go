@@ -27,7 +27,7 @@ func New(r *gin.Engine) *gin.Engine {
 	animalLocationRepo := repository.NewAnimalLocationRepository(helpers.GetConnectionOrCreateAndGet())
 	animalLocationService := service.NewAnimalLocationService(animalLocationRepo)
 
-	animalHandler := handler.NewAnimalHandler(animalService, animalTypeService, accountService, locationService)
+	animalHandler := handler.NewAnimalHandler(animalService, animalTypeService, accountService, locationService, animalLocationService)
 	animalGroup := api.Group("animals")
 	{
 		animalGroup.GET("/:id", middleware.OptionalBasicAuth, animalHandler.Get)
