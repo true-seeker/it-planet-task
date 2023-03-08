@@ -211,11 +211,26 @@ func (a *AnimalLocationHandler) DeleteAnimalLocationPoint(c *gin.Context) {
 		return
 	}
 
+	visitedLocations, httpErr := a.service.GetAnimalLocations(animalId)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	if len(*visitedLocations) >= 2 {
+		if (*visitedLocations)[0].Id == visitedPointId && (*visitedLocations)[1].LocationPointId == animalResponse.ChippingLocationId {
+			err := a.service.DeleteAnimalLocationPoint((*visitedLocations)[1].Id)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+				return
+			}
+		}
+	}
+
 	err := a.service.DeleteAnimalLocationPoint(visitedPointId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	c.Status(http.StatusOK)
-
 }
