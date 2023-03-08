@@ -172,9 +172,14 @@ func (a *AnimalHandler) Delete(c *gin.Context) {
 	}
 	// todo Животное покинуло локацию чипирования, при этом есть другие посещенные точки
 
-	_, httpErr = a.service.Get(id)
+	animalResponse, httpErr := a.service.Get(id)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	if len(animalResponse.VisitedLocationsId) > 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "animal has visited location points")
 		return
 	}
 

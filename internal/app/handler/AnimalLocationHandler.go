@@ -58,12 +58,35 @@ func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "Animal is dead")
 		return
 	}
-	// todo Животное находится в точке чипирования и никуда не перемещалось
 
-	_, httpErr = a.locationService.Get(pointId)
+	pointResponse, httpErr := a.locationService.Get(pointId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
+	}
+
+	if len(animalResponse.VisitedLocationsId) == 0 {
+		if pointResponse.Id == animalResponse.ChippingLocationId {
+			c.AbortWithStatusJSON(http.StatusBadRequest, "animal is in chipping location and hasn't move yet")
+			return
+		}
+	} else {
+		if animalResponse.VisitedLocationsId[len(animalResponse.VisitedLocationsId)-1] == pointId {
+			c.AbortWithStatusJSON(http.StatusBadRequest, "cat add location point where animal currently is")
+			return
+		}
+	}
+
+	visitedLocations, httpErr := a.service.GetAnimalLocations(animalId)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	for _, visitedLocation := range *visitedLocations {
+		if visitedLocation.LocationPointId == pointId {
+			c.AbortWithStatusJSON(http.StatusBadRequest, "duplicated location")
+			return
+		}
 	}
 
 	animalLocationResponse, err := a.service.AddAnimalLocationPoint(animalId, pointId)
