@@ -82,8 +82,8 @@ func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	for _, visitedLocation := range *visitedLocations {
-		if visitedLocation.LocationPointId == pointId {
+	if len(*visitedLocations) > 0 {
+		if (*visitedLocations)[len(*visitedLocations)-1].LocationPointId == pointId {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "duplicated location")
 			return
 		}
@@ -116,7 +116,6 @@ func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	// TODO validate
 
 	animalResponse, httpErr := a.animalService.Get(animalId)
 	if httpErr != nil {
@@ -133,11 +132,46 @@ func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
 		return
 	}
 
-	// TODO AnimalLocation exists
 	_, httpErr = a.locationService.Get(*animalLocationPointUpdateInput.LocationPointId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
+	}
+
+	visitedLocations, httpErr := a.service.GetAnimalLocations(animalId)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	firstVisitedLocation := (*visitedLocations)[0]
+	lastVisitedLocation := (*visitedLocations)[len(*visitedLocations)-1]
+	if *animalLocationPointUpdateInput.LocationPointId == animalResponse.ChippingLocationId && firstVisitedLocation.Id == *animalLocationPointUpdateInput.VisitedLocationPointId {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "cant set first animal location to chipping location point")
+		return
+	}
+	if lastVisitedLocation.LocationPointId == *animalLocationPointUpdateInput.LocationPointId {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "cant set animal location point to last location point")
+		return
+	}
+
+	for index, visitedLocation := range *visitedLocations {
+		if visitedLocation.Id == *animalLocationPointUpdateInput.VisitedLocationPointId {
+			if index > 0 {
+				previousLocationPoint := (*visitedLocations)[index-1]
+				if previousLocationPoint.LocationPointId == *animalLocationPointUpdateInput.LocationPointId {
+					c.AbortWithStatusJSON(http.StatusBadRequest, "cant set location point to previous location point")
+					return
+				}
+			}
+			if index < len(*visitedLocations)-1 {
+				nextLocationPoint := (*visitedLocations)[index+1]
+				if nextLocationPoint.LocationPointId == *animalLocationPointUpdateInput.LocationPointId {
+					c.AbortWithStatusJSON(http.StatusBadRequest, "cant set location point to next location point")
+					return
+				}
+			}
+			break
+		}
 	}
 
 	animalLocationResponse, err := a.service.EditAnimalLocationPoint(*animalLocationPointUpdateInput.VisitedLocationPointId, *animalLocationPointUpdateInput.LocationPointId)
