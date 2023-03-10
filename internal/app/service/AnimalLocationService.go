@@ -58,9 +58,10 @@ func (a *AnimalLocationService) AddAnimalLocationPoint(animalId int, pointId int
 	animalLocation := &entity.AnimalLocation{
 		DateTimeOfVisitLocationPoint: time.Now(),
 		LocationPointId:              pointId,
+		AnimalId:                     animalId,
 	}
 
-	animalLocation, err := a.animalLocationRepo.AddAnimalLocationPoint(animalId, animalLocation)
+	animalLocation, err := a.animalLocationRepo.AddAnimalLocationPoint(animalLocation)
 	if err != nil {
 		return nil, err
 	}

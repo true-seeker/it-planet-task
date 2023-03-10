@@ -8,7 +8,7 @@ import (
 
 type AnimalLocation interface {
 	GetAnimalLocations(animalId int) (*[]entity.AnimalLocation, error)
-	AddAnimalLocationPoint(animalId int, newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error)
+	AddAnimalLocationPoint(newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error)
 	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*entity.AnimalLocation, error)
 	DeleteAnimalLocationPoint(id int) error
 	Get(id int) (*entity.AnimalLocation, error)
@@ -37,10 +37,8 @@ func (a *AnimalLocationRepository) GetAnimalLocations(animalId int) (*[]entity.A
 	return &animal.VisitedLocations, nil
 }
 
-func (a *AnimalLocationRepository) AddAnimalLocationPoint(animalId int, newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error) {
+func (a *AnimalLocationRepository) AddAnimalLocationPoint(newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error) {
 	a.Db.Save(newAnimalLocation)
-
-	a.Db.Exec("INSERT INTO animal_visited_locations(animal_id, animal_location_id) VALUES (?,?)", animalId, newAnimalLocation.Id)
 
 	return a.Get(newAnimalLocation.Id)
 }

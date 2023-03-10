@@ -7,4 +7,5 @@ type AnimalLocation struct {
 	DateTimeOfVisitLocationPoint time.Time `gorm:"not_null"`
 	LocationPointId              int       `gorm:"not_null"`
 	LocationPoint                Location
+	AnimalId                     int
 }
