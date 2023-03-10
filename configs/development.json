@@ -1,13 +1,13 @@
 {
   "database": {
-    "address": "",
-    "user": "",
-    "password": "",
-    "dbname": "",
-    "port": ""
+    "address": "db",
+    "user": "postgres",
+    "password": "123456",
+    "dbname": "postgres",
+    "port": "5432"
   },
   "server": {
-    "address": "",
-    "port":
+    "address": "webapi",
+    "port": "8080"
   }
 }

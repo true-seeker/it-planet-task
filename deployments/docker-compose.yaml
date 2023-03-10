@@ -19,22 +19,22 @@ services:
     image: webapi
     build: ../
     ports:
-      - "80:80"
+      - "8080:8080"
     depends_on:
       database:
         condition: service_healthy
-    command: ./it_planet_task -dbAddr=db -dbUser=postgres -dbPass=123456 -dbName=postgres -dbPort=5432 -srvAddr=webapi -srvPort=80
+    command: ./it_planet_task -dbAddr=db -dbUser=postgres -dbPass=123456 -dbName=postgres -dbPort=5432 -srvAddr=webapi -srvPort=8080
 
 
   tests:
     image: mrexpen/planet_olymp_phase1
-#    pull_policy: always
+    pull_policy: always
     ports:
       - "8090:8080"
     depends_on:
       - webapi
     environment:
-      SERVER_URL: http://webapi/api
-      STAGE: 1
+      SERVER_URL: http://webapi:8080/api
+      STAGE: all
       # all - запуск всех тестов из трёх доступных этапов
       # 0, 1 или 2 - запуск тестов для соответствующего этапа
