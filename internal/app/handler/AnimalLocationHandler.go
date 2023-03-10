@@ -12,13 +12,13 @@ import (
 
 // AnimalLocationHandler Обработчик запросов для сущности "Точка локации живтоного"
 type AnimalLocationHandler struct {
-	service         service.AnimalLocation
-	animalService   service.Animal
-	locationService service.Location
+	animalLocationService service.AnimalLocation
+	animalService         service.Animal
+	locationService       service.Location
 }
 
-func NewAnimalLocationHandler(service service.AnimalLocation, animalService service.Animal, locationService service.Location) *AnimalLocationHandler {
-	return &AnimalLocationHandler{service: service, animalService: animalService, locationService: locationService}
+func NewAnimalLocationHandler(animalLocationService service.AnimalLocation, animalService service.Animal, locationService service.Location) *AnimalLocationHandler {
+	return &AnimalLocationHandler{animalLocationService: animalLocationService, animalService: animalService, locationService: locationService}
 }
 
 func (a *AnimalLocationHandler) GetAnimalLocations(c *gin.Context) {
@@ -28,7 +28,7 @@ func (a *AnimalLocationHandler) GetAnimalLocations(c *gin.Context) {
 		return
 	}
 
-	animal, httpErr := a.service.GetAnimalLocations(animalId)
+	animal, httpErr := a.animalLocationService.GetAnimalLocations(animalId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -78,7 +78,7 @@ func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
 		}
 	}
 
-	visitedLocations, httpErr := a.service.GetAnimalLocations(animalId)
+	visitedLocations, httpErr := a.animalLocationService.GetAnimalLocations(animalId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -90,7 +90,7 @@ func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
 		}
 	}
 
-	animalLocationResponse, err := a.service.AddAnimalLocationPoint(animalId, pointId)
+	animalLocationResponse, err := a.animalLocationService.AddAnimalLocationPoint(animalId, pointId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -139,7 +139,7 @@ func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
 		return
 	}
 
-	visitedLocations, httpErr := a.service.GetAnimalLocations(animalId)
+	visitedLocations, httpErr := a.animalLocationService.GetAnimalLocations(animalId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -175,7 +175,7 @@ func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
 		}
 	}
 
-	animalLocationResponse, err := a.service.EditAnimalLocationPoint(*animalLocationPointUpdateInput.VisitedLocationPointId, *animalLocationPointUpdateInput.LocationPointId)
+	animalLocationResponse, err := a.animalLocationService.EditAnimalLocationPoint(*animalLocationPointUpdateInput.VisitedLocationPointId, *animalLocationPointUpdateInput.LocationPointId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -212,7 +212,7 @@ func (a *AnimalLocationHandler) DeleteAnimalLocationPoint(c *gin.Context) {
 		return
 	}
 
-	visitedLocations, httpErr := a.service.GetAnimalLocations(animalId)
+	visitedLocations, httpErr := a.animalLocationService.GetAnimalLocations(animalId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -220,7 +220,7 @@ func (a *AnimalLocationHandler) DeleteAnimalLocationPoint(c *gin.Context) {
 
 	if len(*visitedLocations) >= 2 {
 		if (*visitedLocations)[0].Id == visitedPointId && (*visitedLocations)[1].LocationPointId == animalResponse.ChippingLocationId {
-			err := a.service.DeleteAnimalLocationPoint((*visitedLocations)[1].Id)
+			err := a.animalLocationService.DeleteAnimalLocationPoint((*visitedLocations)[1].Id)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 				return
@@ -228,7 +228,7 @@ func (a *AnimalLocationHandler) DeleteAnimalLocationPoint(c *gin.Context) {
 		}
 	}
 
-	err := a.service.DeleteAnimalLocationPoint(visitedPointId)
+	err := a.animalLocationService.DeleteAnimalLocationPoint(visitedPointId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return

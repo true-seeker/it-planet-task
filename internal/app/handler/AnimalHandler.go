@@ -14,15 +14,15 @@ import (
 
 // AnimalHandler Обработчик запросов для сущности "Животное"
 type AnimalHandler struct {
-	service               service.Animal
+	animalService         service.Animal
 	animalTypeService     service.AnimalType
 	accountService        service.Account
 	locationService       service.Location
 	animalLocationService service.AnimalLocation
 }
 
-func NewAnimalHandler(service service.Animal, animalTypeService service.AnimalType, accountService service.Account, locationService service.Location, animalLocationService service.AnimalLocation) *AnimalHandler {
-	return &AnimalHandler{service: service, animalTypeService: animalTypeService, accountService: accountService, locationService: locationService, animalLocationService: animalLocationService}
+func NewAnimalHandler(animalService service.Animal, animalTypeService service.AnimalType, accountService service.Account, locationService service.Location, animalLocationService service.AnimalLocation) *AnimalHandler {
+	return &AnimalHandler{animalService: animalService, animalTypeService: animalTypeService, accountService: accountService, locationService: locationService, animalLocationService: animalLocationService}
 }
 
 func (a *AnimalHandler) Get(c *gin.Context) {
@@ -32,7 +32,7 @@ func (a *AnimalHandler) Get(c *gin.Context) {
 		return
 	}
 
-	animal, httpErr := a.service.Get(id)
+	animal, httpErr := a.animalService.Get(id)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -46,7 +46,7 @@ func (a *AnimalHandler) Search(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	animals, err := a.service.Search(params)
+	animals, err := a.animalService.Search(params)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -92,7 +92,7 @@ func (a *AnimalHandler) Create(c *gin.Context) {
 		return
 	}
 
-	animal, err := a.service.Create(newAnimal)
+	animal, err := a.animalService.Create(newAnimal)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -115,7 +115,7 @@ func (a *AnimalHandler) Update(c *gin.Context) {
 		return
 	}
 
-	oldAnimal, httpErr := a.service.Get(id)
+	oldAnimal, httpErr := a.animalService.Get(id)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -156,7 +156,7 @@ func (a *AnimalHandler) Update(c *gin.Context) {
 
 	newAnimal.Id = oldAnimal.Id
 
-	animalResponse, err := a.service.Update(newAnimal, oldAnimal)
+	animalResponse, err := a.animalService.Update(newAnimal, oldAnimal)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -172,7 +172,7 @@ func (a *AnimalHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	animalResponse, httpErr := a.service.Get(id)
+	animalResponse, httpErr := a.animalService.Get(id)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -183,7 +183,7 @@ func (a *AnimalHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	err := a.service.Delete(id)
+	err := a.animalService.Delete(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -204,7 +204,7 @@ func (a *AnimalHandler) AddAnimalType(c *gin.Context) {
 		return
 	}
 
-	animalResponse, httpErr := a.service.Get(animalId)
+	animalResponse, httpErr := a.animalService.Get(animalId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -223,7 +223,7 @@ func (a *AnimalHandler) AddAnimalType(c *gin.Context) {
 		}
 	}
 
-	animalResponse, err := a.service.AddAnimalType(animalId, typeId)
+	animalResponse, err := a.animalService.AddAnimalType(animalId, typeId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -252,7 +252,7 @@ func (a *AnimalHandler) EditAnimalType(c *gin.Context) {
 		return
 	}
 
-	animalResponse, httpErr := a.service.Get(animalId)
+	animalResponse, httpErr := a.animalService.Get(animalId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -282,7 +282,7 @@ func (a *AnimalHandler) EditAnimalType(c *gin.Context) {
 		return
 	}
 
-	animalResponse, err = a.service.EditAnimalType(animalId, animalTypeUpdateInput)
+	animalResponse, err = a.animalService.EditAnimalType(animalId, animalTypeUpdateInput)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -303,7 +303,7 @@ func (a *AnimalHandler) DeleteAnimalType(c *gin.Context) {
 		return
 	}
 
-	animalResponse, httpErr := a.service.Get(animalId)
+	animalResponse, httpErr := a.animalService.Get(animalId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -329,7 +329,7 @@ func (a *AnimalHandler) DeleteAnimalType(c *gin.Context) {
 		return
 	}
 
-	animalResponse, err := a.service.DeleteAnimalType(animalId, typeId)
+	animalResponse, err := a.animalService.DeleteAnimalType(animalId, typeId)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())

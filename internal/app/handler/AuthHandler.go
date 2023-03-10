@@ -11,12 +11,12 @@ import (
 
 // AuthHandler Обработчик запросов, связанных с аутентификацией
 type AuthHandler struct {
-	service        service.Auth
+	authService    service.Auth
 	accountService service.Account
 }
 
-func NewAuthHandler(service service.Auth, accountService service.Account) *AuthHandler {
-	return &AuthHandler{service: service, accountService: accountService}
+func NewAuthHandler(authService service.Auth, accountService service.Account) *AuthHandler {
+	return &AuthHandler{authService: authService, accountService: accountService}
 }
 
 func (a *AuthHandler) Register(c *gin.Context) {
@@ -44,7 +44,7 @@ func (a *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	account, err := a.service.Register(newAccount)
+	account, err := a.authService.Register(newAccount)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return

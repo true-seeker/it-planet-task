@@ -12,12 +12,12 @@ import (
 
 // LocationHandler Обработчик запросов для сущности "Локация"
 type LocationHandler struct {
-	service       service.Location
-	animalService service.Animal
+	locationService service.Location
+	animalService   service.Animal
 }
 
-func NewLocationHandler(service service.Location, animalService service.Animal) *LocationHandler {
-	return &LocationHandler{service: service, animalService: animalService}
+func NewLocationHandler(locationService service.Location, animalService service.Animal) *LocationHandler {
+	return &LocationHandler{locationService: locationService, animalService: animalService}
 }
 
 func (l *LocationHandler) Get(c *gin.Context) {
@@ -27,7 +27,7 @@ func (l *LocationHandler) Get(c *gin.Context) {
 		return
 	}
 
-	location, httpErr := l.service.Get(id)
+	location, httpErr := l.locationService.Get(id)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -50,7 +50,7 @@ func (l *LocationHandler) Create(c *gin.Context) {
 		return
 	}
 
-	duplicateLocation, err := l.service.GetByCords(newLocation)
+	duplicateLocation, err := l.locationService.GetByCords(newLocation)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -60,7 +60,7 @@ func (l *LocationHandler) Create(c *gin.Context) {
 		return
 	}
 
-	location, err := l.service.Create(newLocation)
+	location, err := l.locationService.Create(newLocation)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -76,7 +76,7 @@ func (l *LocationHandler) Update(c *gin.Context) {
 		return
 	}
 
-	oldLocation, httpErr := l.service.Get(id)
+	oldLocation, httpErr := l.locationService.Get(id)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -95,7 +95,7 @@ func (l *LocationHandler) Update(c *gin.Context) {
 		return
 	}
 
-	duplicateLocation, err := l.service.GetByCords(newLocation)
+	duplicateLocation, err := l.locationService.GetByCords(newLocation)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -105,7 +105,7 @@ func (l *LocationHandler) Update(c *gin.Context) {
 		return
 	}
 	newLocation.Id = id
-	location, err := l.service.Update(newLocation)
+	location, err := l.locationService.Update(newLocation)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -121,7 +121,7 @@ func (l *LocationHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	_, httpErr = l.service.Get(id)
+	_, httpErr = l.locationService.Get(id)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -137,7 +137,7 @@ func (l *LocationHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	err = l.service.Delete(id)
+	err = l.locationService.Delete(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
