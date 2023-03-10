@@ -8,8 +8,7 @@ import (
 
 var config *viper.Viper
 
-// Init is an exported method that takes the environment starts the viper
-// (external lib) and returns the configuration struct.
+// Init Инициализация конфигурационного файла из файла в директории it-planet-task/configs
 func Init(env string) {
 	var err error
 	config = viper.New()
@@ -29,6 +28,7 @@ func GetConfig() *viper.Viper {
 	return config
 }
 
+// initFlags Чтение флагов, переданных при запуске исполняемого файла
 func initFlags() {
 	dbAddr := flag.String("dbAddr", "", "database.address")
 	dbUser := flag.String("dbUser", "", "database.user")

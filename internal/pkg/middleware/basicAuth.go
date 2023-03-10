@@ -33,6 +33,8 @@ func IsAccountExists(c *gin.Context) (bool, error) {
 
 }
 
+// OptionalBasicAuth middleware для методов, в которых не требуется
+// аутентификация, но можно передать авторизационные данные
 func OptionalBasicAuth(c *gin.Context) {
 	isExists, err := IsAccountExists(c)
 	if err != nil {
@@ -47,6 +49,7 @@ func OptionalBasicAuth(c *gin.Context) {
 	c.Next()
 }
 
+// BasicAuth middleware для basic auth
 func BasicAuth(c *gin.Context) {
 	isExists, err := IsAccountExists(c)
 	if err != nil || !isExists {

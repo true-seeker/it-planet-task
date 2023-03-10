@@ -9,7 +9,8 @@ import (
 	"it-planet-task/internal/pkg/middleware"
 )
 
-func New(r *gin.Engine) *gin.Engine {
+// InitRoutes Инициализация путей эндпоинтов, сервисов и репозиториев
+func InitRoutes(r *gin.Engine) *gin.Engine {
 	api := r.Group("/api")
 
 	animalTypeRepo := repository.NewAnimalTypeRepository(helpers.GetConnectionOrCreateAndGet())

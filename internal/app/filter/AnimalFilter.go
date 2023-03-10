@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// AnimalFilterParams Фильтр поиска по животным
 type AnimalFilterParams struct {
 	StartDateTime      *time.Time
 	EndDateTime        *time.Time
@@ -25,6 +26,7 @@ func (a *AnimalFilterParams) GetPagination() *paginator.Pagination {
 	return &a.Pagination
 }
 
+// NewAnimalFilterParams Конструктор фильтра
 func NewAnimalFilterParams(q url.Values) (*AnimalFilterParams, *errorHandler.HttpErr) {
 	params := &AnimalFilterParams{}
 	if q.Get("startDateTime") != "" {
@@ -84,6 +86,7 @@ func NewAnimalFilterParams(q url.Values) (*AnimalFilterParams, *errorHandler.Htt
 	return params, nil
 }
 
+// AnimalFilter Фильтрация
 func AnimalFilter(a *AnimalFilterParams) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if a.StartDateTime != nil {

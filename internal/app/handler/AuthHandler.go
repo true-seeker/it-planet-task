@@ -9,6 +9,7 @@ import (
 	"net/http"
 )
 
+// AuthHandler Обработчик запросов, связанных с аутентификацией
 type AuthHandler struct {
 	service        service.Auth
 	accountService service.Account

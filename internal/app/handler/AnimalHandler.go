@@ -12,6 +12,7 @@ import (
 	"net/http"
 )
 
+// AnimalHandler Обработчик запросов для сущности "Животное"
 type AnimalHandler struct {
 	service               service.Animal
 	animalTypeService     service.AnimalType
@@ -170,7 +171,6 @@ func (a *AnimalHandler) Delete(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	// todo Животное покинуло локацию чипирования, при этом есть другие посещенные точки
 
 	animalResponse, httpErr := a.service.Get(id)
 	if httpErr != nil {

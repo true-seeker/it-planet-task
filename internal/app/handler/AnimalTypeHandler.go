@@ -10,6 +10,7 @@ import (
 	"net/http"
 )
 
+// AnimalTypeHandler Обработчик запросов для сущности "Тип животного"
 type AnimalTypeHandler struct {
 	service       service.AnimalType
 	animalService service.Animal

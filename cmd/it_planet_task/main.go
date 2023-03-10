@@ -8,6 +8,7 @@ import (
 	"log"
 )
 
+// Init Инициализация сервиса
 func Init() {
 	config.Init("development")
 	helpers.GormMigrate(helpers.GetConnectionOrCreateAndGet())
@@ -16,8 +17,8 @@ func Init() {
 func main() {
 	Init()
 	r := gin.Default()
-	a := app.New(r)
 
+	a := app.New(r)
 	err := a.Run()
 	if err != nil {
 		log.Fatal(err)

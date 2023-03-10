@@ -13,6 +13,7 @@ type PaginationInterface interface {
 	GetPagination() *Pagination
 }
 
+// Paginate реализация пагинации
 func Paginate(q PaginationInterface) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		from := q.GetPagination().From

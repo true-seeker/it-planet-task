@@ -10,6 +10,7 @@ import (
 	"net/http"
 )
 
+// LocationHandler Обработчик запросов для сущности "Локация"
 type LocationHandler struct {
 	service       service.Location
 	animalService service.Animal

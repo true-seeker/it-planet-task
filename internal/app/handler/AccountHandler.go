@@ -12,6 +12,7 @@ import (
 	"net/http"
 )
 
+// AccountHandler Обработчик запросов для сущности "Аккаунт"
 type AccountHandler struct {
 	service       service.Account
 	animalService service.Animal

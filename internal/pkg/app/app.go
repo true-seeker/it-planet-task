@@ -11,8 +11,9 @@ type App struct {
 	router *gin.Engine
 }
 
+// New Конструктор приложения
 func New(r *gin.Engine) *App {
-	return &App{router: router.New(r)}
+	return &App{router: router.InitRoutes(r)}
 }
 
 func (a *App) Run() error {

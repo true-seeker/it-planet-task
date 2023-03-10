@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// AccountFilterParams Фильтр поиска по аккаунтам
 type AccountFilterParams struct {
 	FirstName string
 	LastName  string
@@ -18,6 +19,7 @@ type AccountFilterParams struct {
 	Pagination paginator.Pagination
 }
 
+// NewAccountFilterParams Конструктор фильтра
 func NewAccountFilterParams(q url.Values) (*AccountFilterParams, *errorHandler.HttpErr) {
 	params := &AccountFilterParams{}
 	if q.Get("firstName") != "" {
@@ -43,6 +45,7 @@ func (a *AccountFilterParams) GetPagination() *paginator.Pagination {
 	return &a.Pagination
 }
 
+// AccountFilter Фильтрация
 func AccountFilter(params *AccountFilterParams) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if params.FirstName != "" {
