@@ -7,7 +7,6 @@ import (
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/repository"
 	"it-planet-task/internal/app/service"
-	"net/http"
 )
 
 func GetCredentials(c *gin.Context) (string, string, bool) {
@@ -36,26 +35,26 @@ func IsAccountExists(c *gin.Context) (bool, error) {
 // OptionalBasicAuth middleware для методов, в которых не требуется
 // аутентификация, но можно передать авторизационные данные
 func OptionalBasicAuth(c *gin.Context) {
-	isExists, err := IsAccountExists(c)
-	if err != nil {
-		c.Next()
-		return
-	}
-	if !isExists {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		c.Next()
-		return
-	}
+	//isExists, err := IsAccountExists(c)
+	//if err != nil {
+	//	c.Next()
+	//	return
+	//}
+	//if !isExists {
+	//	c.AbortWithStatus(http.StatusUnauthorized)
+	//	c.Next()
+	//	return
+	//}
 	c.Next()
 }
 
 // BasicAuth middleware для basic auth
 func BasicAuth(c *gin.Context) {
-	isExists, err := IsAccountExists(c)
-	if err != nil || !isExists {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		c.Next()
-		return
-	}
+	//isExists, err := IsAccountExists(c)
+	//if err != nil || !isExists {
+	//	c.AbortWithStatus(http.StatusUnauthorized)
+	//	c.Next()
+	//	return
+	//}
 	c.Next()
 }
