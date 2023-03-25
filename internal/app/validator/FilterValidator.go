@@ -7,14 +7,15 @@ import (
 	"it-planet-task/pkg/errorHandler"
 	"it-planet-task/pkg/paginator"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 )
 
-func ValidateAndReturnPagination(from, size string) (*paginator.Pagination, *errorHandler.HttpErr) {
+func ValidateAndReturnPagination(q url.Values) (*paginator.Pagination, *errorHandler.HttpErr) {
 	pagination := &paginator.Pagination{}
-	if from != "" {
-		from, httpErr := ValidateAndReturnIntField(from, "from")
+	if q.Get("from") != "" {
+		from, httpErr := ValidateAndReturnIntField(q.Get("from"), "from")
 		if httpErr != nil {
 			return nil, httpErr
 		}
@@ -26,8 +27,8 @@ func ValidateAndReturnPagination(from, size string) (*paginator.Pagination, *err
 		}
 		pagination.From = from
 	}
-	if size != "" {
-		size, httpErr := ValidateAndReturnIntField(size, "size")
+	if q.Get("size") != "" {
+		size, httpErr := ValidateAndReturnIntField(q.Get("size"), "size")
 		if httpErr != nil {
 			return nil, httpErr
 		}
@@ -38,6 +39,14 @@ func ValidateAndReturnPagination(from, size string) (*paginator.Pagination, *err
 			}
 		}
 		pagination.Size = size
+	}
+
+	if q.Get("orderby") != "" {
+		pagination.OrderBy = q.Get("orderby")
+	}
+
+	if q.Get("orderdir") != "" {
+		pagination.OrderDir = q.Get("orderdir")
 	}
 	return pagination, nil
 }

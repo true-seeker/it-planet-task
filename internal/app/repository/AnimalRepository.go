@@ -48,7 +48,6 @@ func (a *AnimalRepository) Search(params *filter.AnimalFilterParams) (*[]entity.
 	var animals []entity.Animal
 	err := a.Db.
 		Scopes(paginator.Paginate(params), filter.AnimalFilter(params)).
-		Order("id").
 		Preload("AnimalTypes").
 		Find(&animals).Error
 	if err != nil {

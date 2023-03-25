@@ -77,7 +77,7 @@ func NewAnimalFilterParams(q url.Values) (*AnimalFilterParams, *errorHandler.Htt
 		params.Gender = q.Get("gender")
 	}
 
-	pagination, httpErr := validator.ValidateAndReturnPagination(q.Get("from"), q.Get("size"))
+	pagination, httpErr := validator.ValidateAndReturnPagination(q)
 	if httpErr != nil {
 		return nil, httpErr
 	}

@@ -39,7 +39,6 @@ func (a *AccountRepository) Search(params *filter.AccountFilterParams) (*[]entit
 	err := a.Db.
 		Scopes(paginator.Paginate(params),
 			filter.AccountFilter(params)).
-		Order("id").
 		Find(&accounts).Error
 	if err != nil {
 		return nil, err

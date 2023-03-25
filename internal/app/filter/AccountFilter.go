@@ -31,7 +31,7 @@ func NewAccountFilterParams(q url.Values) (*AccountFilterParams, *errorHandler.H
 	if q.Get("email") != "" {
 		params.Email = q.Get("email")
 	}
-	pagination, httpErr := validator.ValidateAndReturnPagination(q.Get("from"), q.Get("size"))
+	pagination, httpErr := validator.ValidateAndReturnPagination(q)
 	if httpErr != nil {
 		return nil, httpErr
 	}
