@@ -19,6 +19,7 @@ import (
 type Animal interface {
 	Get(id int) (*response.Animal, *errorHandler.HttpErr)
 	Search(params *filter.AnimalFilterParams) (*[]response.Animal, error)
+	GetCount(params *filter.AnimalFilterParams) (*int64, error)
 	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByAnimalTypeId(animalTypeId int) (*[]entity.Animal, error)
 	GetAnimalsByLocationId(locationId int) (*[]entity.Animal, error)
@@ -71,6 +72,15 @@ func (a *AnimalService) Search(params *filter.AnimalFilterParams) (*[]response.A
 	animalResponses = mapper.AnimalsToAnimalResponses(animals)
 
 	return animalResponses, nil
+}
+
+func (a *AnimalService) GetCount(params *filter.AnimalFilterParams) (*int64, error) {
+	count, err := a.animalRepo.GetCount(params)
+	if err != nil {
+		return nil, err
+	}
+	return count, nil
+
 }
 
 func (a *AnimalService) GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error) {

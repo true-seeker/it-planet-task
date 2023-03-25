@@ -80,6 +80,7 @@ func (a *AnimalTypeRepository) Search(params *filter.AnimalTypeFilterParams) (*[
 	var animalTypes []entity.AnimalType
 	err := a.Db.
 		Scopes(paginator.Paginate(params), filter.AnimalTypeFilter(params)).
+		Order("id").
 		Find(&animalTypes).Error
 	if err != nil {
 		return nil, err

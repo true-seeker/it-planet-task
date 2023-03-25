@@ -11,6 +11,7 @@ import (
 type Animal interface {
 	Get(id int) (*entity.Animal, error)
 	Search(params *filter.AnimalFilterParams) (*[]entity.Animal, error)
+	GetCount(params *filter.AnimalFilterParams) (*int64, error)
 	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByAnimalTypeId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByLocationId(locationId int) (*[]entity.Animal, error)
@@ -55,6 +56,19 @@ func (a *AnimalRepository) Search(params *filter.AnimalFilterParams) (*[]entity.
 	}
 
 	return &animals, nil
+}
+
+func (a *AnimalRepository) GetCount(params *filter.AnimalFilterParams) (*int64, error) {
+	var count int64
+	err := a.Db.
+		Model(&entity.Animal{}).
+		Scopes(filter.AnimalFilter(params)).
+		Count(&count).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
 }
 
 func (a *AnimalRepository) GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error) {

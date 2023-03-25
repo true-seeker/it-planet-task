@@ -37,9 +37,10 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 		animalGroup.PUT("/:id", middleware.BasicAuth, animalHandler.Update)
 		animalGroup.DELETE("/:id", middleware.BasicAuth, middleware.AdminRequired, animalHandler.Delete)
 
-		animalGroup.POST("/:id/types/:typeId", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalHandler.AddAnimalType)
-		animalGroup.PUT("/:id/types", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalHandler.EditAnimalType)
-		animalGroup.DELETE("/:id/types/:typeId", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalHandler.DeleteAnimalType)
+		animalGroup.POST("/:id/types/:typeId", middleware.BasicAuth, animalHandler.AddAnimalType)
+		animalGroup.PUT("/:id/types", middleware.BasicAuth, animalHandler.EditAnimalType)
+		animalGroup.DELETE("/:id/types/:typeId", middleware.BasicAuth, animalHandler.DeleteAnimalType)
+
 	}
 
 	animalLocationHandler := handler.NewAnimalLocationHandler(animalLocationService, animalService, locationService)
@@ -54,9 +55,10 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 	animalTypeGroup := animalGroup.Group("types")
 	{
 		animalTypeGroup.GET("/:id", middleware.BasicAuth, animalTypeHandler.Get)
-		animalTypeGroup.POST("", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalTypeHandler.Create)
-		animalTypeGroup.PUT("/:id", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalTypeHandler.Update)
-		animalTypeGroup.DELETE("/:id", middleware.BasicAuth, middleware.AdminRequired, animalTypeHandler.Delete)
+		animalTypeGroup.POST("", middleware.BasicAuth, animalTypeHandler.Create)
+		animalTypeGroup.PUT("/:id", middleware.BasicAuth, animalTypeHandler.Update)
+		animalTypeGroup.DELETE("/:id", middleware.BasicAuth, animalTypeHandler.Delete)
+		animalTypeGroup.GET("/search", middleware.BasicAuth, animalTypeHandler.Search)
 	}
 
 	accountHandler := handler.NewAccountHandler(accountService, animalService)

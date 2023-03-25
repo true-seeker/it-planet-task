@@ -26,7 +26,7 @@ func NewAnimalTypeFilterParams(q url.Values) (*AnimalTypeFilterParams, *errorHan
 		params.Type = q.Get("type")
 	}
 
-	pagination, httpErr := validator.ValidateAndReturnPagination(q)
+	pagination, httpErr := validator.ValidateAndReturnPagination(q.Get("from"), q.Get("size"))
 	if httpErr != nil {
 		return nil, httpErr
 	}
