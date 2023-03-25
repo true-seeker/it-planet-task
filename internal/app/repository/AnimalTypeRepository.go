@@ -2,7 +2,9 @@ package repository
 
 import (
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
+	"it-planet-task/pkg/paginator"
 )
 
 type AnimalType interface {
@@ -12,6 +14,7 @@ type AnimalType interface {
 	Delete(animalTypeId int) error
 	GetByType(animalType *entity.AnimalType) *entity.AnimalType
 	GetByIds(ids *[]int) (*[]entity.AnimalType, error)
+	Search(params *filter.AnimalTypeFilterParams) (*[]entity.AnimalType, error)
 }
 
 type AnimalTypeRepository struct {
@@ -71,4 +74,17 @@ func (a *AnimalTypeRepository) GetByIds(ids *[]int) (*[]entity.AnimalType, error
 		return nil, err
 	}
 	return ants, nil
+}
+
+func (a *AnimalTypeRepository) Search(params *filter.AnimalTypeFilterParams) (*[]entity.AnimalType, error) {
+	var animalTypes []entity.AnimalType
+	err := a.Db.
+		Scopes(paginator.Paginate(params), filter.AnimalTypeFilter(params)).
+		Order("id").
+		Find(&animalTypes).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &animalTypes, nil
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/response"
@@ -19,6 +20,7 @@ type AnimalType interface {
 	Delete(animalTypeId int) error
 	GetByType(animalType *entity.AnimalType) *entity.AnimalType
 	GetByIds(ids *[]int) (*[]response.AnimalType, error)
+	Search(params *filter.AnimalTypeFilterParams) (*[]response.AnimalType, error)
 }
 
 type AnimalTypeService struct {
@@ -94,6 +96,18 @@ func (a *AnimalTypeService) GetByIds(ids *[]int) (*[]response.AnimalType, error)
 		return nil, err
 	}
 
+	animalTypeResponses = mapper.AnimalTypesToAnimalTypeResponses(animalTypes)
+
+	return animalTypeResponses, nil
+}
+
+func (a *AnimalTypeService) Search(params *filter.AnimalTypeFilterParams) (*[]response.AnimalType, error) {
+	var animalTypeResponses *[]response.AnimalType
+
+	animalTypes, err := a.animalTypeRepo.Search(params)
+	if err != nil {
+		return nil, err
+	}
 	animalTypeResponses = mapper.AnimalTypesToAnimalTypeResponses(animalTypes)
 
 	return animalTypeResponses, nil

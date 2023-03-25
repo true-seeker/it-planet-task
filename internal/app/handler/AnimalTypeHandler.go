@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
@@ -128,4 +129,19 @@ func (a *AnimalTypeHandler) Delete(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+func (a *AnimalTypeHandler) Search(c *gin.Context) {
+	params, httpErr := filter.NewAnimalTypeFilterParams(c.Request.URL.Query())
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	animalTypes, err := a.animalTypeService.Search(params)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, animalTypes)
 }
