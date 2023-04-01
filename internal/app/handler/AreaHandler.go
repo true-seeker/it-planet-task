@@ -56,7 +56,40 @@ func (a *AreaHandler) Create(c *gin.Context) {
 }
 
 func (a *AreaHandler) Update(c *gin.Context) {
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
 
+	_, httpErr = a.areaService.Get(id)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	newArea := &entity.Area{}
+	err := c.BindJSON(&newArea)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	httpErr = AreaValidator.ValidateArea(newArea)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	newArea.Id = id
+
+	area, err := a.areaService.Update(newArea)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, area)
 }
 
 func (a *AreaHandler) Delete(c *gin.Context) {

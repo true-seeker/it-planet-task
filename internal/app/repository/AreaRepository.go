@@ -40,8 +40,12 @@ func (a *AreaRepository) Create(area *entity.Area) (*entity.Area, error) {
 }
 
 func (a *AreaRepository) Update(area *entity.Area) (*entity.Area, error) {
-	//TODO implement me
-	panic("implement me")
+	err := a.Db.Save(&area).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return area, nil
 }
 
 func (a *AreaRepository) Delete(id int) error {

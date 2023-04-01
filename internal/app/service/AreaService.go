@@ -64,8 +64,16 @@ func (a *AreaService) Create(area *entity.Area) (*response.Area, error) {
 }
 
 func (a *AreaService) Update(area *entity.Area) (*response.Area, error) {
-	//TODO implement me
-	panic("implement me")
+	areaResponse := &response.Area{}
+
+	area, err := a.areaRepo.Update(area)
+	if err != nil {
+		return nil, err
+	}
+
+	areaResponse = mapper.AreaToAreaResponse(area)
+
+	return areaResponse, nil
 }
 
 func (a *AreaService) Delete(id int) error {
