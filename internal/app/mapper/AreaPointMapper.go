@@ -7,7 +7,6 @@ import (
 
 func AreaPointToAreaPointResponse(areaPoint *entity.AreaPoint) *response.AreaPoint {
 	r := response.AreaPoint{
-		Id:        areaPoint.Id,
 		Latitude:  areaPoint.Latitude,
 		Longitude: areaPoint.Longitude,
 	}
