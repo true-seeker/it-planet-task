@@ -28,12 +28,12 @@ func (a *AccountHandler) Get(c *gin.Context) {
 		return
 	}
 
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(*entity.Account)
-	if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Cant get another's account")
-		return
-	}
+	//authorizedAccountAny, _ := c.Get("account")
+	//authorizedAccount := authorizedAccountAny.(*entity.Account)
+	//if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
+	//	c.AbortWithStatusJSON(http.StatusForbidden, "Cant get another's account")
+	//	return
+	//}
 
 	account, httpErr := a.accountService.Get(id)
 	if httpErr != nil {
@@ -71,12 +71,12 @@ func (a *AccountHandler) Update(c *gin.Context) {
 	//	c.AbortWithStatusJSON(http.StatusForbidden, "Cant edit another's account")
 	//	return
 	//}
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(*entity.Account)
-	if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Cant edit another's account")
-		return
-	}
+	//authorizedAccountAny, _ := c.Get("account")
+	//authorizedAccount := authorizedAccountAny.(*entity.Account)
+	//if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
+	//	c.AbortWithStatusJSON(http.StatusForbidden, "Cant edit another's account")
+	//	return
+	//}
 
 	newAccount := &entity.Account{}
 	err := c.BindJSON(&newAccount)
@@ -115,12 +115,12 @@ func (a *AccountHandler) Delete(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(*entity.Account)
-	if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Cant delete another's account")
-		return
-	}
+	//authorizedAccountAny, _ := c.Get("account")
+	//authorizedAccount := authorizedAccountAny.(*entity.Account)
+	//if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
+	//	c.AbortWithStatusJSON(http.StatusForbidden, "Cant delete another's account")
+	//	return
+	//}
 
 	animals, _ := a.animalService.GetAnimalsByAccountId(id)
 	if len(*animals) != 0 {
