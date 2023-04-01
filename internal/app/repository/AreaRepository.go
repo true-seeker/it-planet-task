@@ -22,7 +22,9 @@ func NewAreaRepository(db *gorm.DB) Area {
 
 func (a *AreaRepository) Get(id int) (*entity.Area, error) {
 	var area entity.Area
-	err := a.Db.First(&area, id).Error
+	err := a.Db.
+		Preload("AreaPoints").
+		First(&area, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -40,6 +42,7 @@ func (a *AreaRepository) Create(area *entity.Area) (*entity.Area, error) {
 }
 
 func (a *AreaRepository) Update(area *entity.Area) (*entity.Area, error) {
+	a.Db.Exec("DELETE FROM area_points WHERE area_id = ?", area.Id)
 	err := a.Db.Save(&area).Error
 	if err != nil {
 		return nil, err
