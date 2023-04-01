@@ -39,7 +39,7 @@ func NewAnimalLocationFilterParams(q url.Values) (*AnimalLocationFilterParams, *
 		params.EndDateTime = endDateTime
 	}
 
-	pagination, httpErr := validator.ValidateAndReturnPagination(q.Get("from"), q.Get("size"))
+	pagination, httpErr := validator.ValidateAndReturnPagination(q)
 	if httpErr != nil {
 		return nil, httpErr
 	}
