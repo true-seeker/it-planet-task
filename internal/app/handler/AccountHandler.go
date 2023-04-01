@@ -8,7 +8,6 @@ import (
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
 	"it-planet-task/internal/app/validator/AccountValidator"
-	"it-planet-task/internal/pkg/middleware"
 	"net/http"
 )
 
@@ -29,11 +28,19 @@ func (a *AccountHandler) Get(c *gin.Context) {
 		return
 	}
 
+	authorizedAccountAny, _ := c.Get("account")
+	authorizedAccount := authorizedAccountAny.(*entity.Account)
+	if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
+		c.AbortWithStatusJSON(http.StatusForbidden, "Cant get another's account")
+		return
+	}
+
 	account, httpErr := a.accountService.Get(id)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
-	}
+	} // TODO мб сделать проверку на админа АПИ 2.1 Для аккаунтов с ролями "ADMIN": Аккаунт с таким accountId не найден
+
 	c.JSON(http.StatusOK, account)
 }
 
@@ -43,6 +50,7 @@ func (a *AccountHandler) Search(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
+
 	accounts, err := a.accountService.Search(params)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
@@ -57,15 +65,21 @@ func (a *AccountHandler) Update(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	authenticatedAccountEmail, _, _ := middleware.GetCredentials(c)
-	authenticatedAccount, err := a.accountService.GetByEmail(&entity.Account{Email: authenticatedAccountEmail})
-	if authenticatedAccount.Id != id {
+	//authenticatedAccountEmail, _, _ := middleware.GetCredentials(c)
+	//authenticatedAccount, err := a.accountService.GetByEmail(&entity.Account{Email: authenticatedAccountEmail})
+	//if authenticatedAccount.Id != id {
+	//	c.AbortWithStatusJSON(http.StatusForbidden, "Cant edit another's account")
+	//	return
+	//}
+	authorizedAccountAny, _ := c.Get("account")
+	authorizedAccount := authorizedAccountAny.(*entity.Account)
+	if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
 		c.AbortWithStatusJSON(http.StatusForbidden, "Cant edit another's account")
 		return
 	}
 
 	newAccount := &entity.Account{}
-	err = c.BindJSON(&newAccount)
+	err := c.BindJSON(&newAccount)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -79,13 +93,13 @@ func (a *AccountHandler) Update(c *gin.Context) {
 
 	duplicateAccount, err := a.accountService.GetByEmail(newAccount)
 	if duplicateAccount.Id != 0 {
-		if duplicateAccount.Id != authenticatedAccount.Id {
+		if duplicateAccount.Id != id {
 			c.AbortWithStatusJSON(http.StatusConflict, fmt.Sprintf("Account with email %s already exists", newAccount.Email))
 			return
 		}
 	}
 
-	newAccount.Id = authenticatedAccount.Id
+	newAccount.Id = id
 	account, err := a.accountService.Update(newAccount)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
@@ -101,14 +115,14 @@ func (a *AccountHandler) Delete(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	authenticatedAccountEmail, _, _ := middleware.GetCredentials(c)
-	authenticatedAccount, _ := a.accountService.GetByEmail(&entity.Account{Email: authenticatedAccountEmail})
-	if authenticatedAccount.Id != id {
+	authorizedAccountAny, _ := c.Get("account")
+	authorizedAccount := authorizedAccountAny.(*entity.Account)
+	if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
 		c.AbortWithStatusJSON(http.StatusForbidden, "Cant delete another's account")
 		return
 	}
 
-	animals, _ := a.animalService.GetAnimalsByAccountId(authenticatedAccount.Id)
+	animals, _ := a.animalService.GetAnimalsByAccountId(id)
 	if len(*animals) != 0 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "Account has animals attached")
 		return
@@ -121,4 +135,33 @@ func (a *AccountHandler) Delete(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+func (a *AccountHandler) Create(c *gin.Context) {
+	newAccount := &entity.Account{}
+	err := c.BindJSON(&newAccount)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	httpErr := AccountValidator.ValidateAccount(newAccount)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
+		return
+	}
+
+	duplicateAccount, err := a.accountService.GetByEmail(newAccount)
+	if duplicateAccount.Id != 0 {
+		c.AbortWithStatusJSON(http.StatusConflict, fmt.Sprintf("Account with email %s already exists", newAccount.Email))
+		return
+	}
+
+	account, err := a.accountService.Create(newAccount)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusCreated, account)
 }

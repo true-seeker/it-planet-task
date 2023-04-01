@@ -2,6 +2,7 @@ package AccountValidator
 
 import (
 	"errors"
+	"fmt"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/validator"
 	"it-planet-task/pkg/errorHandler"
@@ -9,7 +10,7 @@ import (
 	"net/mail"
 )
 
-func ValidateAccount(account *entity.Account) *errorHandler.HttpErr {
+func ValidateAccountRegistration(account *entity.Account) *errorHandler.HttpErr {
 	if validator.IsStringEmpty(account.FirstName) {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("firstName is empty"),
@@ -41,6 +42,21 @@ func ValidateAccount(account *entity.Account) *errorHandler.HttpErr {
 	if validator.IsStringEmpty(account.Password) {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("password is empty"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	return nil
+}
+
+func ValidateAccount(account *entity.Account) *errorHandler.HttpErr {
+	httpErr := ValidateAccountRegistration(account)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	if account.Role != entity.AdminRole && account.Role != entity.ChipperRole && account.Role != entity.UserRole {
+		return &errorHandler.HttpErr{
+			Err:        errors.New(fmt.Sprintf("role must be in [%s, %s, %s]", entity.AdminRole, entity.ChipperRole, entity.UserRole)),
 			StatusCode: http.StatusBadRequest,
 		}
 	}

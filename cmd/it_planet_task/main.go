@@ -12,6 +12,7 @@ import (
 func Init() {
 	config.Init("development")
 	helpers.GormMigrate(helpers.GetConnectionOrCreateAndGet())
+	helpers.InitAccounts(helpers.GetConnectionOrCreateAndGet())
 }
 
 func main() {

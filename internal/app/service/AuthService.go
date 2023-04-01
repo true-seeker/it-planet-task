@@ -22,6 +22,7 @@ func NewAuthService(authRepo repository.Auth) Auth {
 func (a *AuthService) Register(newAccount *entity.Account) (*response.Account, error) {
 	accountResponse := &response.Account{}
 
+	newAccount.Role = entity.UserRole
 	account, err := a.authRepo.Register(newAccount)
 	if err != nil {
 		return nil, err

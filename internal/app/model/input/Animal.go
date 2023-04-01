@@ -20,3 +20,5 @@ type AnimalLocationPointUpdate struct {
 	VisitedLocationPointId *int `json:"visitedLocationPointId"`
 	LocationPointId        *int `json:"locationPointId"`
 }
+
+//TODO сделать инпуты на все сущности
