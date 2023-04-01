@@ -3,11 +3,13 @@ package repository
 import (
 	"fmt"
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
+	"it-planet-task/pkg/paginator"
 )
 
 type AnimalLocation interface {
-	GetAnimalLocations(animalId int) (*[]entity.AnimalLocation, error)
+	GetAnimalLocations(animalId int, params *filter.AnimalLocationFilterParams) (*[]entity.AnimalLocation, error)
 	AddAnimalLocationPoint(newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error)
 	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*entity.AnimalLocation, error)
 	DeleteAnimalLocationPoint(id int) error
@@ -22,19 +24,19 @@ func NewAnimalLocationRepository(db *gorm.DB) AnimalLocation {
 	return &AnimalLocationRepository{Db: db}
 }
 
-func (a *AnimalLocationRepository) GetAnimalLocations(animalId int) (*[]entity.AnimalLocation, error) {
-	var animal entity.Animal
+func (a *AnimalLocationRepository) GetAnimalLocations(animalId int, params *filter.AnimalLocationFilterParams) (*[]entity.AnimalLocation, error) {
+	var animalLocations []entity.AnimalLocation
 
-	err := a.Db.
-		Preload("VisitedLocations").
-		Select("Id").
-		First(&animal, animalId).Error
+	err := a.Db.Where("animal_id = ?", animalId).
+		Scopes(paginator.Paginate(params),
+			filter.AnimalLocationFilter(params)).
+		Find(&animalLocations).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &animal.VisitedLocations, nil
+	return &animalLocations, nil
 }
 
 func (a *AnimalLocationRepository) AddAnimalLocationPoint(newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error) {

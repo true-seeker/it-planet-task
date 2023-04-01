@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/input"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
@@ -28,7 +29,13 @@ func (a *AnimalLocationHandler) GetAnimalLocations(c *gin.Context) {
 		return
 	}
 
-	animal, httpErr := a.animalLocationService.GetAnimalLocations(animalId)
+	params, httpErr := filter.NewAnimalLocationFilterParams(c.Request.URL.Query())
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	animal, httpErr := a.animalLocationService.GetAnimalLocations(animalId, params)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -78,7 +85,12 @@ func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
 		}
 	}
 
-	visitedLocations, httpErr := a.animalLocationService.GetAnimalLocations(animalId)
+	params, httpErr := filter.NewAnimalLocationFilterParams(c.Request.URL.Query())
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	visitedLocations, httpErr := a.animalLocationService.GetAnimalLocations(animalId, params)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -139,7 +151,12 @@ func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
 		return
 	}
 
-	visitedLocations, httpErr := a.animalLocationService.GetAnimalLocations(animalId)
+	params, httpErr := filter.NewAnimalLocationFilterParams(c.Request.URL.Query())
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	visitedLocations, httpErr := a.animalLocationService.GetAnimalLocations(animalId, params)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
@@ -212,7 +229,12 @@ func (a *AnimalLocationHandler) DeleteAnimalLocationPoint(c *gin.Context) {
 		return
 	}
 
-	visitedLocations, httpErr := a.animalLocationService.GetAnimalLocations(animalId)
+	params, httpErr := filter.NewAnimalLocationFilterParams(c.Request.URL.Query())
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	visitedLocations, httpErr := a.animalLocationService.GetAnimalLocations(animalId, params)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/response"
@@ -15,7 +16,7 @@ import (
 
 type AnimalLocation interface {
 	Get(id int) (*response.AnimalLocation, *errorHandler.HttpErr)
-	GetAnimalLocations(animalId int) (*[]response.AnimalLocation, *errorHandler.HttpErr)
+	GetAnimalLocations(animalId int, params *filter.AnimalLocationFilterParams) (*[]response.AnimalLocation, *errorHandler.HttpErr)
 	AddAnimalLocationPoint(animalId int, pointId int) (*response.AnimalLocation, error)
 	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*response.AnimalLocation, error)
 	DeleteAnimalLocationPoint(visitedPointId int) error
@@ -29,14 +30,14 @@ func NewAnimalLocationService(animalLocationRepo repository.AnimalLocation) Anim
 	return &AnimalLocationService{animalLocationRepo: animalLocationRepo}
 }
 
-func (a *AnimalLocationService) GetAnimalLocations(animalId int) (*[]response.AnimalLocation, *errorHandler.HttpErr) {
+func (a *AnimalLocationService) GetAnimalLocations(animalId int, params *filter.AnimalLocationFilterParams) (*[]response.AnimalLocation, *errorHandler.HttpErr) {
 	var animalLocationsResponse *[]response.AnimalLocation
 
-	animalLocations, err := a.animalLocationRepo.GetAnimalLocations(animalId)
+	animalLocations, err := a.animalLocationRepo.GetAnimalLocations(animalId, params)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("Animal location with id %d does not exists", animalId)),
+				Err:        errors.New(fmt.Sprintf("Animal with id %d does not exists", animalId)),
 				StatusCode: http.StatusNotFound,
 			}
 		} else {
