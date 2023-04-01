@@ -16,7 +16,7 @@ type Area interface {
 	Get(id int) (*response.Area, *errorHandler.HttpErr)
 	Create(area *entity.Area) (*response.Area, error)
 	Update(area *entity.Area) (*response.Area, error)
-	Delete(area *entity.Area) error
+	Delete(id int) error
 }
 
 type AreaService struct {
@@ -60,7 +60,6 @@ func (a *AreaService) Update(area *entity.Area) (*response.Area, error) {
 	panic("implement me")
 }
 
-func (a *AreaService) Delete(area *entity.Area) error {
-	//TODO implement me
-	panic("implement me")
+func (a *AreaService) Delete(id int) error {
+	return a.areaRepo.Delete(id)
 }

@@ -9,7 +9,7 @@ type Area interface {
 	Get(id int) (*entity.Area, error)
 	Create(area *entity.Area) (*entity.Area, error)
 	Update(area *entity.Area) (*entity.Area, error)
-	Delete(area *entity.Area) error
+	Delete(id int) error
 }
 
 type AreaRepository struct {
@@ -40,7 +40,10 @@ func (a *AreaRepository) Update(area *entity.Area) (*entity.Area, error) {
 	panic("implement me")
 }
 
-func (a *AreaRepository) Delete(area *entity.Area) error {
-	//TODO implement me
-	panic("implement me")
+func (a *AreaRepository) Delete(id int) error {
+	err := a.Db.Delete(&entity.Area{}, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

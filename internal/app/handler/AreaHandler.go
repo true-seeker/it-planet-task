@@ -40,5 +40,17 @@ func (a *AreaHandler) Update(c *gin.Context) {
 }
 
 func (a *AreaHandler) Delete(c *gin.Context) {
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
 
+	err := a.areaService.Delete(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
