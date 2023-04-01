@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/mapper"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/response"
@@ -17,6 +18,7 @@ type Area interface {
 	Create(area *entity.Area) (*response.Area, error)
 	Update(area *entity.Area) (*response.Area, error)
 	Delete(id int) error
+	Search(params *filter.AreaFilterParams) (*[]response.Area, *errorHandler.HttpErr)
 }
 
 type AreaService struct {
@@ -78,4 +80,20 @@ func (a *AreaService) Update(area *entity.Area) (*response.Area, error) {
 
 func (a *AreaService) Delete(id int) error {
 	return a.areaRepo.Delete(id)
+}
+
+func (a *AreaService) Search(params *filter.AreaFilterParams) (*[]response.Area, *errorHandler.HttpErr) {
+	areaResponses := &[]response.Area{}
+
+	areas, err := a.areaRepo.Search(params)
+	if err != nil {
+		return nil, &errorHandler.HttpErr{
+			Err:        err,
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	areaResponses = mapper.AreasToAreaResponses(areas)
+
+	return areaResponses, nil
 }

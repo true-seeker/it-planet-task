@@ -2,7 +2,9 @@ package AreaValidator
 
 import (
 	"errors"
+	"fmt"
 	"it-planet-task/internal/app/model/entity"
+	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
 	"it-planet-task/internal/app/validator/AreaPointValidator"
 	"it-planet-task/pkg/errorHandler"
@@ -35,6 +37,28 @@ func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
 		httpErr := AreaPointValidator.ValidateAreaPoint(&areaPoint)
 		if httpErr != nil {
 			return httpErr
+		}
+	}
+
+	polygonCandidate := service.NewPolygon(&area.AreaPoints)
+
+	if !polygonCandidate.IsConvex() {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("area must be convex"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	return nil
+}
+
+func ValidateIntersection(area *entity.Area, existingArea *entity.Area) *errorHandler.HttpErr {
+	polygonCandidate := service.NewPolygon(&area.AreaPoints)
+	existingPolygon := service.NewPolygon(&existingArea.AreaPoints)
+	if polygonCandidate.IsIntersect(existingPolygon) {
+		return &errorHandler.HttpErr{
+			Err:        errors.New(fmt.Sprintf("area intersect with existing area with id %d", existingArea.Id)),
+			StatusCode: http.StatusBadRequest,
 		}
 	}
 

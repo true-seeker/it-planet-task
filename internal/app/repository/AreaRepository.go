@@ -2,7 +2,9 @@ package repository
 
 import (
 	"gorm.io/gorm"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
+	"it-planet-task/pkg/paginator"
 )
 
 type Area interface {
@@ -10,6 +12,7 @@ type Area interface {
 	Create(area *entity.Area) (*entity.Area, error)
 	Update(area *entity.Area) (*entity.Area, error)
 	Delete(id int) error
+	Search(params *filter.AreaFilterParams) (*[]entity.Area, error)
 }
 
 type AreaRepository struct {
@@ -57,4 +60,17 @@ func (a *AreaRepository) Delete(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AreaRepository) Search(params *filter.AreaFilterParams) (*[]entity.Area, error) {
+	var areas []entity.Area
+	err := a.Db.
+		Scopes(paginator.Paginate(params)).
+		Order("id").
+		Find(&areas).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &areas, nil
 }

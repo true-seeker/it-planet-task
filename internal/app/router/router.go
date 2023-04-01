@@ -88,7 +88,7 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 		r.POST("api/registration", authHandler.Register)
 	}
 
-	areaHandler := handler.NewAreaHandler(areaService)
+	areaHandler := handler.NewAreaHandler(areaService, areaRepo)
 	areaGroup := api.Group("areas")
 	{
 		areaGroup.GET("/:id", middleware.BasicAuth, areaHandler.Get)

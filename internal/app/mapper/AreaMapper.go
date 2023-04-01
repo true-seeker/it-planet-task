@@ -14,3 +14,13 @@ func AreaToAreaResponse(area *entity.Area) *response.Area {
 
 	return &r
 }
+
+func AreasToAreaResponses(areas *[]entity.Area) *[]response.Area {
+	rs := make([]response.Area, 0)
+
+	for _, area := range *areas {
+		rs = append(rs, *AreaToAreaResponse(&area))
+	}
+
+	return &rs
+}
