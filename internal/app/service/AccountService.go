@@ -19,7 +19,7 @@ type Account interface {
 	Update(account *entity.Account) (*response.Account, error)
 	Search(params *filter.AccountFilterParams) (*[]response.Account, error)
 	IsAlreadyExists(account *entity.Account) bool
-	CheckCredentials(account *entity.Account) *entity.Account
+	GetByCreds(account *entity.Account) *entity.Account
 	Delete(id int) error
 	Create(account *entity.Account) (*response.Account, error)
 }
@@ -72,8 +72,8 @@ func (a *AccountService) IsAlreadyExists(account *entity.Account) bool {
 	return a.accountRepo.GetByEmail(account).Id != 0
 }
 
-func (a *AccountService) CheckCredentials(account *entity.Account) *entity.Account {
-	return a.accountRepo.CheckCredentials(account)
+func (a *AccountService) GetByCreds(account *entity.Account) *entity.Account {
+	return a.accountRepo.GetByCreds(account)
 }
 
 func (a *AccountService) Update(account *entity.Account) (*response.Account, error) {

@@ -8,7 +8,7 @@ import (
 
 func AdminRequired(c *gin.Context) {
 	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
+	authorizedAccount := authorizedAccountAny.(*entity.Account)
 	if authorizedAccount.Role != entity.AdminRole {
 		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin can access this endpoint")
 		return
@@ -19,7 +19,7 @@ func AdminRequired(c *gin.Context) {
 
 func AdminOrChipperRequired(c *gin.Context) {
 	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
+	authorizedAccount := authorizedAccountAny.(*entity.Account)
 	if authorizedAccount.Role != entity.AdminRole && authorizedAccount.Role != entity.ChipperRole {
 		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin or chipper can access this endpoint")
 		return

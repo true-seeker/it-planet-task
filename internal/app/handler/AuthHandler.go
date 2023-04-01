@@ -32,7 +32,7 @@ func (a *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	httpErr := AccountValidator.ValidateAccount(newAccount)
+	httpErr := AccountValidator.ValidateAccountRegistration(newAccount)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, httpErr.Err.Error())
 		return

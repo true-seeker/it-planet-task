@@ -17,7 +17,6 @@ func GormMigrate(db *gorm.DB) {
 // InitAccounts Инициализация начальных аккаунтов
 func InitAccounts(db *gorm.DB) {
 	adminAccount := &entity.Account{
-		Id:        1,
 		FirstName: "adminFirstName",
 		LastName:  "adminLastName",
 		Email:     "admin@simbirsoft.com",
@@ -26,7 +25,6 @@ func InitAccounts(db *gorm.DB) {
 	}
 
 	chipperAccount := &entity.Account{
-		Id:        2,
 		FirstName: "chipperFirstName",
 		LastName:  "chipperLastName",
 		Email:     "chipper@simbirsoft.com",
@@ -35,7 +33,6 @@ func InitAccounts(db *gorm.DB) {
 	}
 
 	userAccount := &entity.Account{
-		Id:        3,
 		FirstName: "userFirstName",
 		LastName:  "userLastName",
 		Email:     "user@simbirsoft.com",
@@ -43,7 +40,7 @@ func InitAccounts(db *gorm.DB) {
 		Role:      "USER",
 	}
 
-	db.Save(adminAccount)
-	db.Save(chipperAccount)
-	db.Save(userAccount)
+	db.Create(adminAccount)
+	db.Create(chipperAccount)
+	db.Create(userAccount)
 }

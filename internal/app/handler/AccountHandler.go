@@ -29,7 +29,7 @@ func (a *AccountHandler) Get(c *gin.Context) {
 	}
 
 	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
+	authorizedAccount := authorizedAccountAny.(*entity.Account)
 	if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
 		c.AbortWithStatusJSON(http.StatusForbidden, "Cant get another's account")
 		return
@@ -72,7 +72,7 @@ func (a *AccountHandler) Update(c *gin.Context) {
 	//	return
 	//}
 	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
+	authorizedAccount := authorizedAccountAny.(*entity.Account)
 	if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
 		c.AbortWithStatusJSON(http.StatusForbidden, "Cant edit another's account")
 		return
@@ -93,13 +93,13 @@ func (a *AccountHandler) Update(c *gin.Context) {
 
 	duplicateAccount, err := a.accountService.GetByEmail(newAccount)
 	if duplicateAccount.Id != 0 {
-		if duplicateAccount.Id != authorizedAccount.Id {
+		if duplicateAccount.Id != id {
 			c.AbortWithStatusJSON(http.StatusConflict, fmt.Sprintf("Account with email %s already exists", newAccount.Email))
 			return
 		}
 	}
 
-	newAccount.Id = authorizedAccount.Id
+	newAccount.Id = id
 	account, err := a.accountService.Update(newAccount)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
@@ -116,19 +116,19 @@ func (a *AccountHandler) Delete(c *gin.Context) {
 		return
 	}
 	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
+	authorizedAccount := authorizedAccountAny.(*entity.Account)
 	if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
 		c.AbortWithStatusJSON(http.StatusForbidden, "Cant delete another's account")
 		return
 	}
 
-	animals, _ := a.animalService.GetAnimalsByAccountId(authorizedAccount.Id)
+	animals, _ := a.animalService.GetAnimalsByAccountId(id)
 	if len(*animals) != 0 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "Account has animals attached")
 		return
 	}
 
-	err := a.accountService.Delete(authorizedAccount.Id)
+	err := a.accountService.Delete(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return

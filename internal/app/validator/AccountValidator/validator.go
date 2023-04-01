@@ -10,7 +10,7 @@ import (
 	"net/mail"
 )
 
-func ValidateAccount(account *entity.Account) *errorHandler.HttpErr {
+func ValidateAccountRegistration(account *entity.Account) *errorHandler.HttpErr {
 	if validator.IsStringEmpty(account.FirstName) {
 		return &errorHandler.HttpErr{
 			Err:        errors.New("firstName is empty"),
@@ -44,6 +44,14 @@ func ValidateAccount(account *entity.Account) *errorHandler.HttpErr {
 			Err:        errors.New("password is empty"),
 			StatusCode: http.StatusBadRequest,
 		}
+	}
+	return nil
+}
+
+func ValidateAccount(account *entity.Account) *errorHandler.HttpErr {
+	httpErr := ValidateAccountRegistration(account)
+	if httpErr != nil {
+		return httpErr
 	}
 
 	if account.Role != entity.AdminRole && account.Role != entity.ChipperRole && account.Role != entity.UserRole {

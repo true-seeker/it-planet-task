@@ -10,13 +10,13 @@ import (
 	"net/http"
 )
 
-func GetCredentials(c *gin.Context) (string, string, bool) {
+func DecodeCredentials(c *gin.Context) (string, string, bool) {
 	r := c.Request
 	return r.BasicAuth()
 }
 
-func IsAccountExists(c *gin.Context) (*entity.Account, error) {
-	login, password, ok := GetCredentials(c)
+func GetAccountByCreds(c *gin.Context) (*entity.Account, error) {
+	login, password, ok := DecodeCredentials(c)
 	if !ok {
 		return nil, errors.New("")
 	}
@@ -29,13 +29,14 @@ func IsAccountExists(c *gin.Context) (*entity.Account, error) {
 	accountRepo := repository.NewAccountRepository(helpers.GetConnectionOrCreateAndGet())
 	accountService := service.NewAccountService(accountRepo)
 
-	return accountService.CheckCredentials(account), nil
+	return accountService.GetByCreds(account), nil
 
 }
 
 // BasicAuth middleware для basic auth
 func BasicAuth(c *gin.Context) {
-	acc, err := IsAccountExists(c)
+	acc, err := GetAccountByCreds(c)
+
 	if err != nil || acc.Id == 0 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		c.Next()
