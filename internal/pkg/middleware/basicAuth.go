@@ -33,25 +33,6 @@ func IsAccountExists(c *gin.Context) (*entity.Account, error) {
 
 }
 
-// OptionalBasicAuth middleware для методов, в которых не требуется
-// аутентификация, но можно передать авторизационные данные
-func OptionalBasicAuth(c *gin.Context) {
-	c.Set("account", nil)
-	acc, err := IsAccountExists(c)
-	if err != nil {
-		c.Next()
-		return
-	}
-	if acc.Id == 0 {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		c.Next()
-		return
-	}
-
-	c.Set("account", acc)
-	c.Next()
-}
-
 // BasicAuth middleware для basic auth
 func BasicAuth(c *gin.Context) {
 	acc, err := IsAccountExists(c)

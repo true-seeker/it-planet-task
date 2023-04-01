@@ -31,8 +31,8 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 	animalHandler := handler.NewAnimalHandler(animalService, animalTypeService, accountService, locationService, animalLocationService)
 	animalGroup := api.Group("animals")
 	{
-		animalGroup.GET("/:id", middleware.OptionalBasicAuth, animalHandler.Get)
-		animalGroup.GET("/search", middleware.OptionalBasicAuth, animalHandler.Search)
+		animalGroup.GET("/:id", middleware.BasicAuth, animalHandler.Get)
+		animalGroup.GET("/search", middleware.BasicAuth, animalHandler.Search)
 		animalGroup.POST("", middleware.BasicAuth, animalHandler.Create)
 		animalGroup.PUT("/:id", middleware.BasicAuth, animalHandler.Update)
 		animalGroup.DELETE("/:id", middleware.BasicAuth, animalHandler.Delete)
@@ -44,7 +44,7 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 
 	animalLocationHandler := handler.NewAnimalLocationHandler(animalLocationService, animalService, locationService)
 	{
-		animalGroup.GET("/:id/locations", middleware.OptionalBasicAuth, animalLocationHandler.GetAnimalLocations)
+		animalGroup.GET("/:id/locations", middleware.BasicAuth, animalLocationHandler.GetAnimalLocations)
 		animalGroup.POST("/:id/locations/:pointId", middleware.BasicAuth, animalLocationHandler.AddAnimalLocationPoint)
 		animalGroup.PUT("/:id/locations", middleware.BasicAuth, animalLocationHandler.EditAnimalLocationPoint)
 		animalGroup.DELETE("/:id/locations/:visitedPointId", middleware.BasicAuth, animalLocationHandler.DeleteAnimalLocationPoint)
@@ -53,7 +53,7 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 	animalTypeHandler := handler.NewAnimalTypeHandler(animalTypeService, animalService)
 	animalTypeGroup := animalGroup.Group("types")
 	{
-		animalTypeGroup.GET("/:id", middleware.OptionalBasicAuth, animalTypeHandler.Get)
+		animalTypeGroup.GET("/:id", middleware.BasicAuth, animalTypeHandler.Get)
 		animalTypeGroup.POST("", middleware.BasicAuth, animalTypeHandler.Create)
 		animalTypeGroup.PUT("/:id", middleware.BasicAuth, animalTypeHandler.Update)
 		animalTypeGroup.DELETE("/:id", middleware.BasicAuth, animalTypeHandler.Delete)
