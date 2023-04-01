@@ -11,6 +11,7 @@ func AccountToAccountResponse(account *entity.Account) *response.Account {
 		FirstName: account.FirstName,
 		LastName:  account.LastName,
 		Email:     account.Email,
+		Role:      account.Role,
 	}
 
 	return r
