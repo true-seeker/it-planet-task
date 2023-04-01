@@ -147,7 +147,7 @@ func (a *AccountHandler) Delete(c *gin.Context) {
 func (a *AccountHandler) Create(c *gin.Context) {
 	authorizedAccountAny, _ := c.Get("account")
 	authorizedAccount := authorizedAccountAny.(entity.Account)
-	if authorizedAccount.Role == entity.AdminRole {
+	if authorizedAccount.Role != entity.AdminRole {
 		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin can add account")
 		return
 	}

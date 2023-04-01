@@ -37,6 +37,13 @@ func (l *LocationHandler) Get(c *gin.Context) {
 }
 
 func (l *LocationHandler) Create(c *gin.Context) {
+	authorizedAccountAny, _ := c.Get("account")
+	authorizedAccount := authorizedAccountAny.(entity.Account)
+	if authorizedAccount.Role != entity.AdminRole && authorizedAccount.Role != entity.ChipperRole {
+		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin or chipper can add locations")
+		return
+	}
+
 	newLocation := &entity.Location{}
 	err := c.BindJSON(&newLocation)
 	if err != nil {
@@ -70,6 +77,13 @@ func (l *LocationHandler) Create(c *gin.Context) {
 }
 
 func (l *LocationHandler) Update(c *gin.Context) {
+	authorizedAccountAny, _ := c.Get("account")
+	authorizedAccount := authorizedAccountAny.(entity.Account)
+	if authorizedAccount.Role != entity.AdminRole && authorizedAccount.Role != entity.ChipperRole {
+		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin or chipper can update locations")
+		return
+	}
+
 	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
@@ -115,6 +129,13 @@ func (l *LocationHandler) Update(c *gin.Context) {
 }
 
 func (l *LocationHandler) Delete(c *gin.Context) {
+	authorizedAccountAny, _ := c.Get("account")
+	authorizedAccount := authorizedAccountAny.(entity.Account)
+	if authorizedAccount.Role != entity.AdminRole {
+		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin can delete locations")
+		return
+	}
+
 	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
