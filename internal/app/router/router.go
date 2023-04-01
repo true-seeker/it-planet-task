@@ -28,6 +28,9 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 	animalLocationRepo := repository.NewAnimalLocationRepository(helpers.GetConnectionOrCreateAndGet())
 	animalLocationService := service.NewAnimalLocationService(animalLocationRepo)
 
+	areaRepo := repository.NewAreaRepository(helpers.GetConnectionOrCreateAndGet())
+	areaService := service.NewAreaService(areaRepo)
+
 	animalHandler := handler.NewAnimalHandler(animalService, animalTypeService, accountService, locationService, animalLocationService)
 	animalGroup := api.Group("animals")
 	{
@@ -83,6 +86,15 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 	authHandler := handler.NewAuthHandler(authService, accountService)
 	{
 		r.POST("api/registration", authHandler.Register)
+	}
+
+	areaHandler := handler.NewAreaHandler(areaService)
+	areaGroup := api.Group("areas")
+	{
+		areaGroup.GET("/:id", middleware.BasicAuth, areaHandler.Get)
+		areaGroup.POST("", middleware.BasicAuth, middleware.AdminRequired, areaHandler.Create)
+		areaGroup.PUT("/:id", middleware.BasicAuth, middleware.AdminRequired, areaHandler.Update)
+		areaGroup.DELETE("/:id", middleware.BasicAuth, middleware.AdminRequired, areaHandler.Delete)
 	}
 
 	return r
