@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"it-planet-task/helpers"
 	"it-planet-task/internal/pkg/app"
@@ -18,6 +19,9 @@ func Init() {
 func main() {
 	Init()
 	r := gin.Default()
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	r.Use(cors.New(config))
 
 	a := app.New(r)
 	err := a.Run()
