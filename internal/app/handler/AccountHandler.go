@@ -51,13 +51,6 @@ func (a *AccountHandler) Search(c *gin.Context) {
 		return
 	}
 
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
-	if authorizedAccount.Role != entity.AdminRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Only ADMIN can search")
-		return
-	}
-
 	accounts, err := a.accountService.Search(params)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
@@ -145,13 +138,6 @@ func (a *AccountHandler) Delete(c *gin.Context) {
 }
 
 func (a *AccountHandler) Create(c *gin.Context) {
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
-	if authorizedAccount.Role != entity.AdminRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin can add account")
-		return
-	}
-
 	newAccount := &entity.Account{}
 	err := c.BindJSON(&newAccount)
 	if err != nil {

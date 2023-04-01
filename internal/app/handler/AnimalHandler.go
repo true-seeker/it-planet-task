@@ -183,13 +183,6 @@ func (a *AnimalHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
-	if authorizedAccount.Role != entity.AdminRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin can delete animals")
-		return
-	}
-
 	animalResponse, httpErr := a.animalService.Get(id)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
@@ -211,13 +204,6 @@ func (a *AnimalHandler) Delete(c *gin.Context) {
 }
 
 func (a *AnimalHandler) AddAnimalType(c *gin.Context) {
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
-	if authorizedAccount.Role != entity.AdminRole && authorizedAccount.Role != entity.ChipperRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin or chipper can add animal type to animals")
-		return
-	}
-
 	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
@@ -258,13 +244,6 @@ func (a *AnimalHandler) AddAnimalType(c *gin.Context) {
 }
 
 func (a *AnimalHandler) EditAnimalType(c *gin.Context) {
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
-	if authorizedAccount.Role != entity.AdminRole && authorizedAccount.Role != entity.ChipperRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin or chipper can edit animal's animal type")
-		return
-	}
-
 	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
@@ -324,13 +303,6 @@ func (a *AnimalHandler) EditAnimalType(c *gin.Context) {
 }
 
 func (a *AnimalHandler) DeleteAnimalType(c *gin.Context) {
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
-	if authorizedAccount.Role != entity.AdminRole && authorizedAccount.Role != entity.ChipperRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin or chipper can delete animal's animal type")
-		return
-	}
-
 	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())

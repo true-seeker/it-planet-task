@@ -3,7 +3,6 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/input"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
@@ -38,13 +37,6 @@ func (a *AnimalLocationHandler) GetAnimalLocations(c *gin.Context) {
 }
 
 func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
-	if authorizedAccount.Role != entity.AdminRole && authorizedAccount.Role != entity.ChipperRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin or chipper can add animal location points")
-		return
-	}
-
 	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
@@ -107,13 +99,6 @@ func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
 }
 
 func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
-	if authorizedAccount.Role != entity.AdminRole && authorizedAccount.Role != entity.ChipperRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin or chipper can edit animal location points")
-		return
-	}
-
 	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
@@ -200,13 +185,6 @@ func (a *AnimalLocationHandler) EditAnimalLocationPoint(c *gin.Context) {
 }
 
 func (a *AnimalLocationHandler) DeleteAnimalLocationPoint(c *gin.Context) {
-	authorizedAccountAny, _ := c.Get("account")
-	authorizedAccount := authorizedAccountAny.(entity.Account)
-	if authorizedAccount.Role != entity.AdminRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin can delete animal location points")
-		return
-	}
-
 	animalId, httpErr := validator.ValidateAndReturnId(c.Param("id"), "animalId")
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())

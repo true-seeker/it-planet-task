@@ -35,47 +35,47 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 		animalGroup.GET("/search", middleware.BasicAuth, animalHandler.Search)
 		animalGroup.POST("", middleware.BasicAuth, animalHandler.Create)
 		animalGroup.PUT("/:id", middleware.BasicAuth, animalHandler.Update)
-		animalGroup.DELETE("/:id", middleware.BasicAuth, animalHandler.Delete)
+		animalGroup.DELETE("/:id", middleware.BasicAuth, middleware.AdminRequired, animalHandler.Delete)
 
-		animalGroup.POST("/:id/types/:typeId", middleware.BasicAuth, animalHandler.AddAnimalType)
-		animalGroup.PUT("/:id/types", middleware.BasicAuth, animalHandler.EditAnimalType)
-		animalGroup.DELETE("/:id/types/:typeId", middleware.BasicAuth, animalHandler.DeleteAnimalType)
+		animalGroup.POST("/:id/types/:typeId", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalHandler.AddAnimalType)
+		animalGroup.PUT("/:id/types", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalHandler.EditAnimalType)
+		animalGroup.DELETE("/:id/types/:typeId", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalHandler.DeleteAnimalType)
 	}
 
 	animalLocationHandler := handler.NewAnimalLocationHandler(animalLocationService, animalService, locationService)
 	{
 		animalGroup.GET("/:id/locations", middleware.BasicAuth, animalLocationHandler.GetAnimalLocations)
-		animalGroup.POST("/:id/locations/:pointId", middleware.BasicAuth, animalLocationHandler.AddAnimalLocationPoint)
-		animalGroup.PUT("/:id/locations", middleware.BasicAuth, animalLocationHandler.EditAnimalLocationPoint)
-		animalGroup.DELETE("/:id/locations/:visitedPointId", middleware.BasicAuth, animalLocationHandler.DeleteAnimalLocationPoint)
+		animalGroup.POST("/:id/locations/:pointId", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalLocationHandler.AddAnimalLocationPoint)
+		animalGroup.PUT("/:id/locations", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalLocationHandler.EditAnimalLocationPoint)
+		animalGroup.DELETE("/:id/locations/:visitedPointId", middleware.BasicAuth, middleware.AdminRequired, animalLocationHandler.DeleteAnimalLocationPoint)
 	}
 
 	animalTypeHandler := handler.NewAnimalTypeHandler(animalTypeService, animalService)
 	animalTypeGroup := animalGroup.Group("types")
 	{
 		animalTypeGroup.GET("/:id", middleware.BasicAuth, animalTypeHandler.Get)
-		animalTypeGroup.POST("", middleware.BasicAuth, animalTypeHandler.Create)
-		animalTypeGroup.PUT("/:id", middleware.BasicAuth, animalTypeHandler.Update)
-		animalTypeGroup.DELETE("/:id", middleware.BasicAuth, animalTypeHandler.Delete)
+		animalTypeGroup.POST("", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalTypeHandler.Create)
+		animalTypeGroup.PUT("/:id", middleware.BasicAuth, middleware.AdminOrChipperRequired, animalTypeHandler.Update)
+		animalTypeGroup.DELETE("/:id", middleware.BasicAuth, middleware.AdminRequired, animalTypeHandler.Delete)
 	}
 
 	accountHandler := handler.NewAccountHandler(accountService, animalService)
 	accountGroup := api.Group("accounts")
 	{
 		accountGroup.GET("/:id", middleware.BasicAuth, accountHandler.Get)
-		accountGroup.GET("/search", middleware.BasicAuth, accountHandler.Search)
+		accountGroup.GET("/search", middleware.BasicAuth, middleware.AdminRequired, accountHandler.Search)
 		accountGroup.PUT("/:id", middleware.BasicAuth, accountHandler.Update)
 		accountGroup.DELETE("/:id", middleware.BasicAuth, accountHandler.Delete)
-		accountGroup.POST("", middleware.BasicAuth, accountHandler.Create)
+		accountGroup.POST("", middleware.BasicAuth, middleware.AdminRequired, accountHandler.Create)
 	}
 
 	locationHandler := handler.NewLocationHandler(locationService, animalService)
 	locationGroup := api.Group("locations")
 	{
 		locationGroup.GET("/:id", middleware.BasicAuth, locationHandler.Get)
-		locationGroup.POST("", middleware.BasicAuth, locationHandler.Create)
-		locationGroup.PUT("/:id", middleware.BasicAuth, locationHandler.Update)
-		locationGroup.DELETE("/:id", middleware.BasicAuth, locationHandler.Delete)
+		locationGroup.POST("", middleware.BasicAuth, middleware.AdminOrChipperRequired, locationHandler.Create)
+		locationGroup.PUT("/:id", middleware.BasicAuth, middleware.AdminOrChipperRequired, locationHandler.Update)
+		locationGroup.DELETE("/:id", middleware.BasicAuth, middleware.AdminRequired, locationHandler.Delete)
 	}
 
 	authRepo := repository.NewAuthRepository(helpers.GetConnectionOrCreateAndGet())
