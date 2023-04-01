@@ -12,8 +12,9 @@ type Account interface {
 	Update(account *entity.Account) (*entity.Account, error)
 	Search(params *filter.AccountFilterParams) (*[]entity.Account, error)
 	GetByEmail(account *entity.Account) *entity.Account
-	CheckCredentials(account *entity.Account) bool
+	CheckCredentials(account *entity.Account) *entity.Account
 	Delete(id int) error
+	Create(account *entity.Account) (*entity.Account, error)
 }
 
 type AccountRepository struct {
@@ -54,10 +55,10 @@ func (a *AccountRepository) GetByEmail(account *entity.Account) *entity.Account 
 	return ac
 }
 
-func (a *AccountRepository) CheckCredentials(account *entity.Account) bool {
+func (a *AccountRepository) CheckCredentials(account *entity.Account) *entity.Account {
 	var acc entity.Account
 	a.Db.Where("email = ? AND password = ?", account.Email, account.Password).First(&acc)
-	return acc.Id != 0
+	return &acc
 }
 
 func (a *AccountRepository) Update(account *entity.Account) (*entity.Account, error) {
@@ -75,4 +76,13 @@ func (a *AccountRepository) Delete(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AccountRepository) Create(account *entity.Account) (*entity.Account, error) {
+	err := a.Db.Save(&account).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return account, nil
 }

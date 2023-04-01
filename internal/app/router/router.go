@@ -62,10 +62,11 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 	accountHandler := handler.NewAccountHandler(accountService, animalService)
 	accountGroup := api.Group("accounts")
 	{
-		accountGroup.GET("/:id", middleware.OptionalBasicAuth, accountHandler.Get)
-		accountGroup.GET("/search", middleware.OptionalBasicAuth, accountHandler.Search)
+		accountGroup.GET("/:id", middleware.BasicAuth, accountHandler.Get)
+		accountGroup.GET("/search", middleware.BasicAuth, accountHandler.Search)
 		accountGroup.PUT("/:id", middleware.BasicAuth, accountHandler.Update)
 		accountGroup.DELETE("/:id", middleware.BasicAuth, accountHandler.Delete)
+		accountGroup.POST("", middleware.BasicAuth, accountHandler.Create)
 	}
 
 	locationHandler := handler.NewLocationHandler(locationService, animalService)

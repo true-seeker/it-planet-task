@@ -15,10 +15,10 @@ func GetCredentials(c *gin.Context) (string, string, bool) {
 	return r.BasicAuth()
 }
 
-func IsAccountExists(c *gin.Context) (bool, error) {
+func IsAccountExists(c *gin.Context) (*entity.Account, error) {
 	login, password, ok := GetCredentials(c)
 	if !ok {
-		return false, errors.New("")
+		return nil, errors.New("")
 	}
 
 	account := &entity.Account{
@@ -36,26 +36,31 @@ func IsAccountExists(c *gin.Context) (bool, error) {
 // OptionalBasicAuth middleware для методов, в которых не требуется
 // аутентификация, но можно передать авторизационные данные
 func OptionalBasicAuth(c *gin.Context) {
-	isExists, err := IsAccountExists(c)
+	c.Set("account", nil)
+	acc, err := IsAccountExists(c)
 	if err != nil {
 		c.Next()
 		return
 	}
-	if !isExists {
+	if acc.Id == 0 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		c.Next()
 		return
 	}
+
+	c.Set("account", acc)
 	c.Next()
 }
 
 // BasicAuth middleware для basic auth
 func BasicAuth(c *gin.Context) {
-	isExists, err := IsAccountExists(c)
-	if err != nil || !isExists {
+	acc, err := IsAccountExists(c)
+	if err != nil || acc.Id == 0 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		c.Next()
 		return
 	}
+
+	c.Set("account", acc)
 	c.Next()
 }

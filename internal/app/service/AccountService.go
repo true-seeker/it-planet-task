@@ -19,8 +19,9 @@ type Account interface {
 	Update(account *entity.Account) (*response.Account, error)
 	Search(params *filter.AccountFilterParams) (*[]response.Account, error)
 	IsAlreadyExists(account *entity.Account) bool
-	CheckCredentials(account *entity.Account) bool
+	CheckCredentials(account *entity.Account) *entity.Account
 	Delete(id int) error
+	Create(account *entity.Account) (*response.Account, error)
 }
 
 type AccountService struct {
@@ -71,7 +72,7 @@ func (a *AccountService) IsAlreadyExists(account *entity.Account) bool {
 	return a.accountRepo.GetByEmail(account).Id != 0
 }
 
-func (a *AccountService) CheckCredentials(account *entity.Account) bool {
+func (a *AccountService) CheckCredentials(account *entity.Account) *entity.Account {
 	return a.accountRepo.CheckCredentials(account)
 }
 
@@ -97,4 +98,17 @@ func (a *AccountService) GetByEmail(account *entity.Account) (*response.Account,
 
 func (a *AccountService) Delete(id int) error {
 	return a.accountRepo.Delete(id)
+}
+
+func (a *AccountService) Create(account *entity.Account) (*response.Account, error) {
+	accountResponse := &response.Account{}
+
+	account, err := a.accountRepo.Create(account)
+	if err != nil {
+		return nil, err
+	}
+
+	accountResponse = mapper.AccountToAccountResponse(account)
+
+	return accountResponse, nil
 }

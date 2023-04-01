@@ -5,7 +5,6 @@ import (
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator/AccountValidator"
-	"it-planet-task/internal/pkg/middleware"
 	"net/http"
 )
 
@@ -20,8 +19,8 @@ func NewAuthHandler(authService service.Auth, accountService service.Account) *A
 }
 
 func (a *AuthHandler) Register(c *gin.Context) {
-	isAuthenticated, _ := middleware.IsAccountExists(c)
-	if isAuthenticated {
+	authenticatedAccount, _ := c.Get("account")
+	if authenticatedAccount != nil {
 		c.AbortWithStatusJSON(http.StatusForbidden, "Already authenticated")
 		return
 	}
