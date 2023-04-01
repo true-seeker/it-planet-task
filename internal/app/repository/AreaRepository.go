@@ -20,22 +20,27 @@ func NewAreaRepository(db *gorm.DB) Area {
 	return &AreaRepository{Db: db}
 }
 
-func (a AreaRepository) Get(id int) (*entity.Area, error) {
+func (a *AreaRepository) Get(id int) (*entity.Area, error) {
+	var area entity.Area
+	err := a.Db.First(&area, id).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &area, nil
+}
+
+func (a *AreaRepository) Create(area *entity.Area) (*entity.Area, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (a AreaRepository) Create(area *entity.Area) (*entity.Area, error) {
+func (a *AreaRepository) Update(area *entity.Area) (*entity.Area, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (a AreaRepository) Update(area *entity.Area) (*entity.Area, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (a AreaRepository) Delete(area *entity.Area) error {
+func (a *AreaRepository) Delete(area *entity.Area) error {
 	//TODO implement me
 	panic("implement me")
 }
