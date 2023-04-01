@@ -46,4 +46,5 @@
     * Создание/изменение/удаление точки локации у животного
 
 Более подробное ТЗ можно
-посмотреть [по ссылке](https://docs.google.com/document/d/1Y_hsu093Rc5vovsCevkqYwtdT3LQrU-SSJiX86kHS1g/edit?usp=sharing)
+посмотреть [тут (этап 1)](https://docs.google.com/document/d/1Y_hsu093Rc5vovsCevkqYwtdT3LQrU-SSJiX86kHS1g/edit?usp=sharing)
+и [тут (этап 2)](https://docs.google.com/document/d/1XEVyu6z502vm9s7WbxU6TFSbHu8FHJSvd-QIIACcYao/edit?usp=sharing)
