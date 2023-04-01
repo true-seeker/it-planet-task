@@ -36,6 +36,13 @@ func (a *AnimalTypeHandler) Get(c *gin.Context) {
 }
 
 func (a *AnimalTypeHandler) Create(c *gin.Context) {
+	authorizedAccountAny, _ := c.Get("account")
+	authorizedAccount := authorizedAccountAny.(entity.Account)
+	if authorizedAccount.Role != entity.AdminRole && authorizedAccount.Role != entity.ChipperRole {
+		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin or chipper can add animal types")
+		return
+	}
+
 	newAnimalType := &entity.AnimalType{}
 	err := c.BindJSON(&newAnimalType)
 	if err != nil {
@@ -65,6 +72,13 @@ func (a *AnimalTypeHandler) Create(c *gin.Context) {
 }
 
 func (a *AnimalTypeHandler) Update(c *gin.Context) {
+	authorizedAccountAny, _ := c.Get("account")
+	authorizedAccount := authorizedAccountAny.(entity.Account)
+	if authorizedAccount.Role != entity.AdminRole && authorizedAccount.Role != entity.ChipperRole {
+		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin or chipper can edit animal types")
+		return
+	}
+
 	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
@@ -104,6 +118,13 @@ func (a *AnimalTypeHandler) Update(c *gin.Context) {
 }
 
 func (a *AnimalTypeHandler) Delete(c *gin.Context) {
+	authorizedAccountAny, _ := c.Get("account")
+	authorizedAccount := authorizedAccountAny.(entity.Account)
+	if authorizedAccount.Role != entity.AdminRole {
+		c.AbortWithStatusJSON(http.StatusForbidden, "Only admin can delete animal types")
+		return
+	}
+
 	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
