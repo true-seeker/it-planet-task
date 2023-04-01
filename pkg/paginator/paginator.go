@@ -39,7 +39,6 @@ func Paginate(q PaginationInterface) func(db *gorm.DB) *gorm.DB {
 				order = q.GetPagination().OrderBy
 			}
 		}
-		fmt.Println(order)
 		return db.Offset(from).Limit(size).Order(order)
 	}
 }

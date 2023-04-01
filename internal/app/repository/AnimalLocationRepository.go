@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"gorm.io/gorm"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
@@ -46,7 +45,6 @@ func (a *AnimalLocationRepository) AddAnimalLocationPoint(newAnimalLocation *ent
 }
 
 func (a *AnimalLocationRepository) EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*entity.AnimalLocation, error) {
-	fmt.Println(locationPointId, visitedLocationPointId)
 	a.Db.Exec("UPDATE animal_locations SET location_point_id = ? WHERE id = ?", locationPointId, visitedLocationPointId)
 
 	return a.Get(visitedLocationPointId)

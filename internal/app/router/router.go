@@ -85,5 +85,8 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 		r.POST("api/registration", authHandler.Register)
 	}
 
+	mockHandler := handler.NewMockHandler(helpers.GetConnectionOrCreateAndGet())
+	r.GET("api/generate_data", mockHandler.GenerateRandomData)
+
 	return r
 }
