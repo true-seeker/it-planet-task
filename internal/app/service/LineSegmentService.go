@@ -6,12 +6,12 @@ import (
 )
 
 type LineSegment struct {
-	p entity.AreaPoint
-	q entity.AreaPoint
+	P entity.AreaPoint
+	Q entity.AreaPoint
 }
 
 func NewLineSegment(p entity.AreaPoint, q entity.AreaPoint) *LineSegment {
-	return &LineSegment{p: p, q: q}
+	return &LineSegment{P: p, Q: q}
 }
 
 func onSegment(p entity.AreaPoint, q entity.AreaPoint, r entity.AreaPoint) bool {
@@ -36,18 +36,18 @@ func orientation(p entity.AreaPoint, q entity.AreaPoint, r entity.AreaPoint) int
 
 // IsIntersects https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 func (l *LineSegment) IsIntersects(l2 *LineSegment) bool {
-	if (l.p.IsEqual(&l2.p) && !l.q.IsEqual(&l2.q)) ||
-		(l.q.IsEqual(&l2.q) && !l.p.IsEqual(&l2.p)) ||
-		(l.q.IsEqual(&l2.p) && !l.p.IsEqual(&l2.q)) ||
-		(l.p.IsEqual(&l2.q) && !l.q.IsEqual(&l2.q)) {
+	if (l.P.IsEqual(&l2.P) && !l.Q.IsEqual(&l2.Q)) ||
+		(l.Q.IsEqual(&l2.Q) && !l.P.IsEqual(&l2.P)) ||
+		(l.Q.IsEqual(&l2.P) && !l.P.IsEqual(&l2.Q)) ||
+		(l.P.IsEqual(&l2.Q) && !l.Q.IsEqual(&l2.Q)) {
 		return false
 	}
 	// Find the four orientations needed for general and
 	// special cases
-	o1 := orientation(l.p, l.q, l2.p)
-	o2 := orientation(l.p, l.q, l2.q)
-	o3 := orientation(l2.p, l2.q, l.p)
-	o4 := orientation(l2.p, l2.q, l.q)
+	o1 := orientation(l.P, l.Q, l2.P)
+	o2 := orientation(l.P, l.Q, l2.Q)
+	o3 := orientation(l2.P, l2.Q, l.P)
+	o4 := orientation(l2.P, l2.Q, l.Q)
 
 	// General case
 	if o1 != o2 && o3 != o4 {
@@ -56,22 +56,22 @@ func (l *LineSegment) IsIntersects(l2 *LineSegment) bool {
 
 	// Special Cases
 	// p1, q1 and p2 are collinear and p2 lies on segment p1q1
-	if o1 == 0 && onSegment(l.p, l2.p, l.q) {
+	if o1 == 0 && onSegment(l.P, l2.P, l.Q) {
 		return true
 	}
 
 	// p1, q1 and q2 are collinear and q2 lies on segment p1q1
-	if o2 == 0 && onSegment(l.p, l2.q, l.q) {
+	if o2 == 0 && onSegment(l.P, l2.Q, l.Q) {
 		return true
 	}
 
 	// p2, q2 and p1 are collinear and p1 lies on segment p2q2
-	if o3 == 0 && onSegment(l2.p, l.p, l2.q) {
+	if o3 == 0 && onSegment(l2.P, l.P, l2.Q) {
 		return true
 	}
 
 	// p2, q2 and q1 are collinear and q1 lies on segment p2q2
-	if o4 == 0 && onSegment(l2.p, l.q, l2.q) {
+	if o4 == 0 && onSegment(l2.P, l.Q, l2.Q) {
 		return true
 	}
 
@@ -90,10 +90,10 @@ func IsPointInsideArea(point *entity.AreaPoint, lineSegments *[]LineSegment) (i 
 // https://rosettacode.org/wiki/Ray-casting_algorithm#Go
 func rayIntersectsSegment(p entity.AreaPoint, s *LineSegment) bool {
 	var a, b entity.AreaPoint
-	if *s.p.Longitude < *s.q.Longitude {
-		a, b = s.p, s.q
+	if *s.P.Longitude < *s.Q.Longitude {
+		a, b = s.P, s.Q
 	} else {
-		a, b = s.q, s.p
+		a, b = s.Q, s.P
 	}
 	for p.Longitude == a.Longitude || p.Longitude == b.Longitude {
 		longitude := math.Nextafter(*p.Longitude, math.Inf(1))

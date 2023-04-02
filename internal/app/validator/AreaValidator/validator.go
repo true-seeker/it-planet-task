@@ -47,7 +47,7 @@ func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
 	lineSegments = append(lineSegments, *service.NewLineSegment(area.AreaPoints[0], area.AreaPoints[len(area.AreaPoints)-1]))
 
 	for i := 0; i < len(lineSegments); i++ {
-		for j := i; j < len(lineSegments); j++ {
+		for j := i + 1; j < len(lineSegments); j++ {
 			if lineSegments[i].IsIntersects(&lineSegments[j]) {
 				return &errorHandler.HttpErr{
 					Err:        errors.New("area must be non self-intersecting"),
