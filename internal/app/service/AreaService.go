@@ -9,14 +9,16 @@ import (
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
+	"it-planet-task/internal/app/validator/AreaValidator"
 	"it-planet-task/pkg/errorHandler"
 	"net/http"
+	"net/url"
 )
 
 type Area interface {
 	Get(id int) (*response.Area, *errorHandler.HttpErr)
-	Create(area *entity.Area) (*response.Area, error)
-	Update(area *entity.Area) (*response.Area, error)
+	Create(area *entity.Area) (*response.Area, *errorHandler.HttpErr)
+	Update(area *entity.Area) (*response.Area, *errorHandler.HttpErr)
 	Delete(id int) error
 	Search(params *filter.AreaFilterParams) (*[]response.Area, *errorHandler.HttpErr)
 }
@@ -52,12 +54,41 @@ func (a *AreaService) Get(id int) (*response.Area, *errorHandler.HttpErr) {
 	return areaResponse, nil
 }
 
-func (a *AreaService) Create(area *entity.Area) (*response.Area, error) {
+func (a *AreaService) Create(area *entity.Area) (*response.Area, *errorHandler.HttpErr) {
+	from := 0
+	size := 10
+	for {
+		query := fmt.Sprintf("size=%d&from=%d", size, from)
+		values, _ := url.ParseQuery(query)
+		params, _ := filter.NewAreaFilterParams(values)
+		existingAreas, err := a.areaRepo.Search(params)
+
+		if err != nil {
+			return nil, &errorHandler.HttpErr{
+				Err:        err,
+				StatusCode: http.StatusBadRequest,
+			}
+		}
+		if len(*existingAreas) == 0 {
+			break
+		}
+		for _, existingArea := range *existingAreas {
+			httpErr := AreaValidator.ValidateIntersectionAndAreaRepeats(area, &existingArea)
+			if httpErr != nil {
+				return nil, httpErr
+			}
+		}
+		from += size
+	}
+
 	areaResponse := &response.Area{}
 
 	area, err := a.areaRepo.Create(area)
 	if err != nil {
-		return nil, err
+		return nil, &errorHandler.HttpErr{
+			Err:        err,
+			StatusCode: http.StatusBadRequest,
+		}
 	}
 
 	areaResponse = mapper.AreaToAreaResponse(area)
@@ -65,12 +96,45 @@ func (a *AreaService) Create(area *entity.Area) (*response.Area, error) {
 	return areaResponse, nil
 }
 
-func (a *AreaService) Update(area *entity.Area) (*response.Area, error) {
+func (a *AreaService) Update(area *entity.Area) (*response.Area, *errorHandler.HttpErr) {
+	from := 0
+	size := 10
+	for {
+		query := fmt.Sprintf("size=%d&from=%d", size, from)
+		values, _ := url.ParseQuery(query)
+		params, _ := filter.NewAreaFilterParams(values)
+		existingAreas, err := a.areaRepo.Search(params)
+
+		if err != nil {
+			return nil, &errorHandler.HttpErr{
+				Err:        err,
+				StatusCode: http.StatusBadRequest,
+			}
+		}
+		if len(*existingAreas) == 0 {
+			break
+		}
+		for _, existingArea := range *existingAreas {
+			if existingArea.Id == area.Id {
+				continue
+			}
+
+			httpErr := AreaValidator.ValidateIntersectionAndAreaRepeats(area, &existingArea)
+			if httpErr != nil {
+				return nil, httpErr
+			}
+		}
+		from += size
+	}
+
 	areaResponse := &response.Area{}
 
 	area, err := a.areaRepo.Update(area)
 	if err != nil {
-		return nil, err
+		return nil, &errorHandler.HttpErr{
+			Err:        err,
+			StatusCode: http.StatusBadRequest,
+		}
 	}
 
 	areaResponse = mapper.AreaToAreaResponse(area)
