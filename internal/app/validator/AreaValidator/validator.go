@@ -47,6 +47,17 @@ func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
 		}
 	}
 
+	for i := 0; i < len(area.AreaPoints); i++ {
+		for j := i + 1; j < len(area.AreaPoints); j++ {
+			if area.AreaPoints[i].IsEqual(&area.AreaPoints[j]) {
+				return &errorHandler.HttpErr{
+					Err:        errors.New("area contains duplicate points"),
+					StatusCode: http.StatusBadRequest,
+				}
+			}
+		}
+	}
+
 	lineSegments := make([]service.LineSegment, 0)
 	for i := 0; i < len(area.AreaPoints)-1; i++ {
 		lineSegments = append(lineSegments, *service.NewLineSegment(area.AreaPoints[i], area.AreaPoints[i+1]))
