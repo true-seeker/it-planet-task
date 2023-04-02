@@ -54,6 +54,7 @@ func (a *AreaHandler) Create(c *gin.Context) {
 
 	from := 0
 	size := 10
+	// TODO разобраться
 	for {
 		query := fmt.Sprintf("size=%d&from=%d", size, from)
 		values, _ := url.ParseQuery(query)
