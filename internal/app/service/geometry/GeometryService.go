@@ -61,7 +61,7 @@ func (g *GeometryService) IsPointOnLineSegment(l *LineSegment, c *entity.AreaPoi
 }
 
 func (g *GeometryService) IsIntersects(l *LineSegment, l2 *LineSegment) bool {
-	if g.IsPointOnLineSegment(l, &l2.P) || g.IsPointOnLineSegment(l, &l2.Q) || g.IsPointOnLineSegment(l, &l.P) || g.IsPointOnLineSegment(l, &l.Q) {
+	if g.IsPointOnLineSegment(l, &l2.P) || g.IsPointOnLineSegment(l, &l2.Q) || g.IsPointOnLineSegment(l2, &l.P) || g.IsPointOnLineSegment(l2, &l.Q) {
 		return false
 	}
 
