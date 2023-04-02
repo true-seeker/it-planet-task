@@ -92,7 +92,7 @@ func ValidateIntersection(area *entity.Area, existingArea *entity.Area) *errorHa
 	}
 
 	for _, point := range area.AreaPoints {
-		if service.IsPointInsideArea(&point, &existingLineSegments) {
+		if service.IsPointInsideArea(&point, existingArea) {
 			return &errorHandler.HttpErr{
 				Err:        errors.New(fmt.Sprintf("area lays inside area with id %d", existingArea.Id)),
 				StatusCode: http.StatusBadRequest,
@@ -101,7 +101,7 @@ func ValidateIntersection(area *entity.Area, existingArea *entity.Area) *errorHa
 	}
 
 	for _, point := range existingArea.AreaPoints {
-		if service.IsPointInsideArea(&point, &areaLineSegments) {
+		if service.IsPointInsideArea(&point, area) {
 			return &errorHandler.HttpErr{
 				Err:        errors.New(fmt.Sprintf("area contains area with id %d", existingArea.Id)),
 				StatusCode: http.StatusBadRequest,

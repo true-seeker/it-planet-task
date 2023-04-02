@@ -101,46 +101,25 @@ func (l *LineSegment) IsIntersects(l2 *LineSegment) bool {
 	return false
 }
 
-func IsPointInsideArea(point *entity.AreaPoint, lineSegments *[]LineSegment) (i bool) {
-	for _, side := range *lineSegments {
-		if rayIntersectsSegment(*point, &side) {
-			i = !i
+func IsPointInsideArea(pt *entity.AreaPoint, pg *entity.Area) bool {
+	in := rayIntersectsSegment(*pt, pg.AreaPoints[len(pg.AreaPoints)-1], pg.AreaPoints[0])
+	for i := 1; i < len(pg.AreaPoints); i++ {
+		ls := NewLineSegment(pg.AreaPoints[i-1], pg.AreaPoints[i])
+		if ls.IsPointOnLineSegment(pt) {
+			return false
+		}
+		if rayIntersectsSegment(*pt, pg.AreaPoints[i-1], pg.AreaPoints[i]) {
+			in = !in
 		}
 	}
-	return i
+	return in
+
 }
 
 // https://rosettacode.org/wiki/Ray-casting_algorithm#Go
-func rayIntersectsSegment(p entity.AreaPoint, s *LineSegment) bool {
-	var a, b entity.AreaPoint
-	if *s.P.Longitude < *s.Q.Longitude {
-		a, b = s.P, s.Q
-	} else {
-		a, b = s.Q, s.P
-	}
-	for p.Longitude == a.Longitude || p.Longitude == b.Longitude {
-		longitude := math.Nextafter(*p.Longitude, math.Inf(1))
-		p.Longitude = &longitude
-	}
-	if *p.Longitude < *a.Longitude || *p.Longitude > *b.Longitude {
-		return false
-	}
-	if *a.Latitude >= *b.Latitude {
-		if *p.Latitude > *a.Latitude {
-			return false
-		}
-		if *p.Latitude <= *b.Latitude {
-			return true
-		}
-	} else {
-		if *p.Latitude > *b.Latitude {
-			return false
-		}
-		if *p.Latitude <= *a.Latitude {
-			return true
-		}
-	}
-	return (*p.Longitude-*a.Longitude)/(*p.Latitude-*a.Latitude) >= (*b.Longitude-*a.Longitude)/(*b.Latitude-*a.Latitude)
+func rayIntersectsSegment(p, a, b entity.AreaPoint) bool {
+	return (*a.Longitude > *p.Longitude) != (*b.Longitude > *p.Longitude) &&
+		*p.Latitude < (*b.Latitude-*a.Latitude)*(*p.Longitude-*a.Longitude)/(*b.Longitude-*a.Longitude)+*a.Latitude
 }
 
 func IsAllPointsOnOneLine(points *[]entity.AreaPoint) bool {
