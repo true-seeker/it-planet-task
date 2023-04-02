@@ -34,14 +34,37 @@ func orientation(p entity.AreaPoint, q entity.AreaPoint, r entity.AreaPoint) int
 	}
 }
 
-// IsIntersects https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
-func (l *LineSegment) IsIntersects(l2 *LineSegment) bool {
-	if (l.P.IsEqual(&l2.P) && !l.Q.IsEqual(&l2.Q)) ||
-		(l.Q.IsEqual(&l2.Q) && !l.P.IsEqual(&l2.P)) ||
-		(l.Q.IsEqual(&l2.P) && !l.P.IsEqual(&l2.Q)) ||
-		(l.P.IsEqual(&l2.Q) && !l.Q.IsEqual(&l2.Q)) {
+func (l *LineSegment) IsPointOnLineSegment(c *entity.AreaPoint) bool {
+	crossProduct := (*c.Longitude-*l.P.Longitude)*(*l.Q.Latitude-*l.P.Latitude) - (*c.Latitude-*l.P.Latitude)*(*l.Q.Longitude-*l.P.Longitude)
+	if math.Abs(crossProduct) > 0 {
 		return false
 	}
+
+	dotProduct := (*c.Latitude-*l.P.Latitude)*(*l.Q.Latitude-*l.P.Latitude) + (*c.Longitude-*l.P.Longitude)*(*l.Q.Longitude-*l.P.Longitude)
+	if dotProduct < 0 {
+		return false
+	}
+
+	squaredLength := (*l.Q.Latitude-*l.P.Latitude)*(*l.Q.Latitude-*l.P.Latitude) + (*l.Q.Longitude-*l.P.Longitude)*(*l.Q.Longitude-*l.P.Longitude)
+	if dotProduct > squaredLength {
+		return false
+	}
+
+	return true
+}
+
+// IsIntersects https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+func (l *LineSegment) IsIntersects(l2 *LineSegment) bool {
+	if l.IsPointOnLineSegment(&l2.P) || l.IsPointOnLineSegment(&l2.Q) || l2.IsPointOnLineSegment(&l.P) || l2.IsPointOnLineSegment(&l.Q) {
+		return false
+	}
+
+	//if (l.P.IsEqual(&l2.P) && !l.Q.IsEqual(&l2.Q)) ||
+	//	(l.Q.IsEqual(&l2.Q) && !l.P.IsEqual(&l2.P)) ||
+	//	(l.Q.IsEqual(&l2.P) && !l.P.IsEqual(&l2.Q)) ||
+	//	(l.P.IsEqual(&l2.Q) && !l.Q.IsEqual(&l2.Q)) {
+	//	return false
+	//}
 	// Find the four orientations needed for general and
 	// special cases
 	o1 := orientation(l.P, l.Q, l2.P)
@@ -54,28 +77,28 @@ func (l *LineSegment) IsIntersects(l2 *LineSegment) bool {
 		return true
 	}
 
-	// Special Cases
-	// p1, q1 and p2 are collinear and p2 lies on segment p1q1
-	if o1 == 0 && onSegment(l.P, l2.P, l.Q) {
-		return true
-	}
+	//// Special Cases
+	//// p1, q1 and p2 are collinear and p2 lies on segment p1q1
+	//if o1 == 0 && onSegment(l.P, l2.P, l.Q) {
+	//	return true
+	//}
+	//
+	//// p1, q1 and q2 are collinear and q2 lies on segment p1q1
+	//if o2 == 0 && onSegment(l.P, l2.Q, l.Q) {
+	//	return true
+	//}
+	//
+	//// p2, q2 and p1 are collinear and p1 lies on segment p2q2
+	//if o3 == 0 && onSegment(l2.P, l.P, l2.Q) {
+	//	return true
+	//}
+	//
+	//// p2, q2 and q1 are collinear and q1 lies on segment p2q2
+	//if o4 == 0 && onSegment(l2.P, l.Q, l2.Q) {
+	//	return true
+	//}
 
-	// p1, q1 and q2 are collinear and q2 lies on segment p1q1
-	if o2 == 0 && onSegment(l.P, l2.Q, l.Q) {
-		return true
-	}
-
-	// p2, q2 and p1 are collinear and p1 lies on segment p2q2
-	if o3 == 0 && onSegment(l2.P, l.P, l2.Q) {
-		return true
-	}
-
-	// p2, q2 and q1 are collinear and q1 lies on segment p2q2
-	if o4 == 0 && onSegment(l2.P, l.Q, l2.Q) {
-		return true
-	}
-
-	return false // Doesn't fall in any of the above cases
+	return false
 }
 
 func IsPointInsideArea(point *entity.AreaPoint, lineSegments *[]LineSegment) (i bool) {

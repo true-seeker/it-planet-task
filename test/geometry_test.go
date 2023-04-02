@@ -103,29 +103,58 @@ func TestNonIntersectingLineSegments(t *testing.T) {
 	}
 }
 
-func TestParallelIntersectingLineSegments(t *testing.T) {
+func TestTouchingMiddleIntersectingLineSegments(t *testing.T) {
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(0),
-		Longitude: makeFloatPtr(1.5),
+		Longitude: makeFloatPtr(0),
 	}
 	q1 := entity.AreaPoint{
-		Latitude:  makeFloatPtr(1.5),
-		Longitude: makeFloatPtr(2.5),
+		Latitude:  makeFloatPtr(0),
+		Longitude: makeFloatPtr(2),
 	}
 	p2 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(0),
-		Longitude: makeFloatPtr(1.5),
+		Longitude: makeFloatPtr(1),
 	}
 	q2 := entity.AreaPoint{
-		Latitude:  makeFloatPtr(1.5),
-		Longitude: makeFloatPtr(2.5),
+		Latitude:  makeFloatPtr(1),
+		Longitude: makeFloatPtr(1),
 	}
 
 	ls1 := service.NewLineSegment(p1, q1)
 	ls2 := service.NewLineSegment(p2, q2)
 
 	got := ls1.IsIntersects(ls2)
-	want := true
+	want := false
+
+	if got != want {
+		t.Errorf("got %t, wanted %t", got, want)
+	}
+}
+
+func TestContainingLineSegments(t *testing.T) {
+	p1 := entity.AreaPoint{
+		Latitude:  makeFloatPtr(0),
+		Longitude: makeFloatPtr(0),
+	}
+	q1 := entity.AreaPoint{
+		Latitude:  makeFloatPtr(0),
+		Longitude: makeFloatPtr(5),
+	}
+	p2 := entity.AreaPoint{
+		Latitude:  makeFloatPtr(0),
+		Longitude: makeFloatPtr(1),
+	}
+	q2 := entity.AreaPoint{
+		Latitude:  makeFloatPtr(0),
+		Longitude: makeFloatPtr(4),
+	}
+
+	ls1 := service.NewLineSegment(p1, q1)
+	ls2 := service.NewLineSegment(p2, q2)
+
+	got := ls1.IsIntersects(ls2)
+	want := false
 
 	if got != want {
 		t.Errorf("got %t, wanted %t", got, want)

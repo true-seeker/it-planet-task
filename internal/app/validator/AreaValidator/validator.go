@@ -61,20 +61,37 @@ func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
 }
 
 func ValidateIntersection(area *entity.Area, existingArea *entity.Area) *errorHandler.HttpErr {
+	areaLineSegments := make([]service.LineSegment, 0)
+	for i := 0; i < len(area.AreaPoints)-1; i++ {
+		areaLineSegments = append(areaLineSegments, *service.NewLineSegment(area.AreaPoints[i], area.AreaPoints[i+1]))
+	}
+	areaLineSegments = append(areaLineSegments, *service.NewLineSegment(area.AreaPoints[0], area.AreaPoints[len(area.AreaPoints)-1]))
+
 	existingLineSegments := make([]service.LineSegment, 0)
 	for i := 0; i < len(existingArea.AreaPoints)-1; i++ {
 		existingLineSegments = append(existingLineSegments, *service.NewLineSegment(existingArea.AreaPoints[i], existingArea.AreaPoints[i+1]))
 	}
 	existingLineSegments = append(existingLineSegments, *service.NewLineSegment(existingArea.AreaPoints[0], existingArea.AreaPoints[len(existingArea.AreaPoints)-1]))
 
-	for _, point := range area.AreaPoints {
-		if service.IsPointInsideArea(&point, &existingLineSegments) {
-			return &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("area intersects with area with id %d", existingArea.Id)),
-				StatusCode: http.StatusBadRequest,
+	for i := 0; i < len(existingLineSegments); i++ {
+		for j := 0; j < len(areaLineSegments); j++ {
+			if existingLineSegments[i].IsIntersects(&areaLineSegments[j]) {
+				return &errorHandler.HttpErr{
+					Err:        errors.New(fmt.Sprintf("area intersects with area with id %d", existingArea.Id)),
+					StatusCode: http.StatusBadRequest,
+				}
 			}
 		}
 	}
+
+	//for _, point := range area.AreaPoints {
+	//	if service.IsPointInsideArea(&point, &existingLineSegments) {
+	//		return &errorHandler.HttpErr{
+	//			Err:        errors.New(fmt.Sprintf("area intersects with area with id %d", existingArea.Id)),
+	//			StatusCode: http.StatusBadRequest,
+	//		}
+	//	}
+	//}
 
 	//for i := 0; i < len(existingLineSegments); i++ {
 	//	for j := i; j < len(existingLineSegments); j++ {
