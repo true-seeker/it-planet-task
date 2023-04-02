@@ -66,6 +66,7 @@ func (a *AreaRepository) Search(params *filter.AreaFilterParams) (*[]entity.Area
 	var areas []entity.Area
 	err := a.Db.
 		Scopes(paginator.Paginate(params)).
+		Preload("AreaPoints").
 		Order("id").
 		Find(&areas).Error
 	if err != nil {

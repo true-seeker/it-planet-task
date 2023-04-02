@@ -61,7 +61,6 @@ func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
 }
 
 func ValidateIntersection(area *entity.Area, existingArea *entity.Area) *errorHandler.HttpErr {
-
 	existingLineSegments := make([]service.LineSegment, 0)
 	for i := 0; i < len(existingArea.AreaPoints)-1; i++ {
 		existingLineSegments = append(existingLineSegments, *service.NewLineSegment(existingArea.AreaPoints[i], existingArea.AreaPoints[i+1]))

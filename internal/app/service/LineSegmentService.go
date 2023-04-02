@@ -102,18 +102,18 @@ func rayIntersectsSegment(p entity.AreaPoint, s *LineSegment) bool {
 	if *p.Longitude < *a.Longitude || *p.Longitude > *b.Longitude {
 		return false
 	}
-	if *a.Latitude > *b.Latitude {
+	if *a.Latitude >= *b.Latitude {
 		if *p.Latitude > *a.Latitude {
 			return false
 		}
-		if *p.Latitude < *b.Latitude {
+		if *p.Latitude <= *b.Latitude {
 			return true
 		}
 	} else {
 		if *p.Latitude > *b.Latitude {
 			return false
 		}
-		if *p.Latitude < *a.Latitude {
+		if *p.Latitude <= *a.Latitude {
 			return true
 		}
 	}
