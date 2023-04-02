@@ -91,34 +91,22 @@ func ValidateIntersection(area *entity.Area, existingArea *entity.Area) *errorHa
 		}
 	}
 
-	//for _, point := range area.AreaPoints {
-	//	if service.IsPointInsideArea(&point, &existingLineSegments) {
-	//		return &errorHandler.HttpErr{
-	//			Err:        errors.New(fmt.Sprintf("area intersects with area with id %d", existingArea.Id)),
-	//			StatusCode: http.StatusBadRequest,
-	//		}
-	//	}
-	//}
+	for _, point := range area.AreaPoints {
+		if service.IsPointInsideArea(&point, &existingLineSegments) {
+			return &errorHandler.HttpErr{
+				Err:        errors.New(fmt.Sprintf("area lays inside area with id %d", existingArea.Id)),
+				StatusCode: http.StatusBadRequest,
+			}
+		}
+	}
 
-	//for i := 0; i < len(existingLineSegments); i++ {
-	//	for j := i; j < len(existingLineSegments); j++ {
-	//		if existingLineSegments[i].IsIntersects(&existingLineSegments[j]) {
-	//			return &errorHandler.HttpErr{
-	//				Err:        errors.New("area must be non self-intersecting"),
-	//				StatusCode: http.StatusBadRequest,
-	//			}
-	//		}
-	//	}
-	//}
-
-	//polygonCandidate := service.NewPolygon(&area.AreaPoints)
-	//existingPolygon := service.NewPolygon(&existingArea.AreaPoints)
-	//if polygonCandidate.IsIntersect(existingPolygon) {
-	//	return &errorHandler.HttpErr{
-	//		Err:        errors.New(fmt.Sprintf("area intersect with existing area with id %d", existingArea.Id)),
-	//		StatusCode: http.StatusBadRequest,
-	//	}
-	//}
-	//
+	for _, point := range existingArea.AreaPoints {
+		if service.IsPointInsideArea(&point, &areaLineSegments) {
+			return &errorHandler.HttpErr{
+				Err:        errors.New(fmt.Sprintf("area contains area with id %d", existingArea.Id)),
+				StatusCode: http.StatusBadRequest,
+			}
+		}
+	}
 	return nil
 }
