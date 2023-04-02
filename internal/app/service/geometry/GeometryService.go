@@ -1,9 +1,16 @@
-package service
+package geometry
 
 import (
 	"it-planet-task/internal/app/model/entity"
 	"math"
 )
+
+type GeometryService struct {
+}
+
+func NewGeometryService() *GeometryService {
+	return &GeometryService{}
+}
 
 type LineSegment struct {
 	P entity.AreaPoint
@@ -34,7 +41,7 @@ func orientation(p entity.AreaPoint, q entity.AreaPoint, r entity.AreaPoint) int
 	}
 }
 
-func (l *LineSegment) IsPointOnLineSegment(c *entity.AreaPoint) bool {
+func (g *GeometryService) IsPointOnLineSegment(l *LineSegment, c *entity.AreaPoint) bool {
 	crossProduct := (*c.Longitude-*l.P.Longitude)*(*l.Q.Latitude-*l.P.Latitude) - (*c.Latitude-*l.P.Latitude)*(*l.Q.Longitude-*l.P.Longitude)
 	if math.Abs(crossProduct) > 0 {
 		return false
@@ -53,9 +60,8 @@ func (l *LineSegment) IsPointOnLineSegment(c *entity.AreaPoint) bool {
 	return true
 }
 
-// IsIntersects https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
-func (l *LineSegment) IsIntersects(l2 *LineSegment) bool {
-	if l.IsPointOnLineSegment(&l2.P) || l.IsPointOnLineSegment(&l2.Q) || l2.IsPointOnLineSegment(&l.P) || l2.IsPointOnLineSegment(&l.Q) {
+func (g *GeometryService) IsIntersects(l *LineSegment, l2 *LineSegment) bool {
+	if g.IsPointOnLineSegment(l, &l2.P) || g.IsPointOnLineSegment(l, &l2.Q) || g.IsPointOnLineSegment(l, &l.P) || g.IsPointOnLineSegment(l, &l.Q) {
 		return false
 	}
 
@@ -101,11 +107,11 @@ func (l *LineSegment) IsIntersects(l2 *LineSegment) bool {
 	return false
 }
 
-func IsPointInsideArea(pt *entity.AreaPoint, pg *entity.Area) bool {
+func (g *GeometryService) IsPointInsideArea(pt *entity.AreaPoint, pg *entity.Area) bool {
 	in := rayIntersectsSegment(*pt, pg.AreaPoints[len(pg.AreaPoints)-1], pg.AreaPoints[0])
 	for i := 1; i < len(pg.AreaPoints); i++ {
 		ls := NewLineSegment(pg.AreaPoints[i-1], pg.AreaPoints[i])
-		if ls.IsPointOnLineSegment(pt) {
+		if g.IsPointOnLineSegment(ls, pt) {
 			return false
 		}
 		if rayIntersectsSegment(*pt, pg.AreaPoints[i-1], pg.AreaPoints[i]) {
@@ -116,13 +122,12 @@ func IsPointInsideArea(pt *entity.AreaPoint, pg *entity.Area) bool {
 
 }
 
-// https://rosettacode.org/wiki/Ray-casting_algorithm#Go
 func rayIntersectsSegment(p, a, b entity.AreaPoint) bool {
 	return (*a.Longitude > *p.Longitude) != (*b.Longitude > *p.Longitude) &&
 		*p.Latitude < (*b.Latitude-*a.Latitude)*(*p.Longitude-*a.Longitude)/(*b.Longitude-*a.Longitude)+*a.Latitude
 }
 
-func IsAllPointsOnOneLine(points *[]entity.AreaPoint) bool {
+func (g *GeometryService) IsAllPointsOnOneLine(points *[]entity.AreaPoint) bool {
 	dx := *(*points)[0].Latitude - *(*points)[1].Latitude
 	dy := *(*points)[0].Longitude - *(*points)[1].Longitude
 	for i := 2; i < len(*points); i++ {
