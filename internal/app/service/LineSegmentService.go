@@ -36,6 +36,12 @@ func orientation(p entity.AreaPoint, q entity.AreaPoint, r entity.AreaPoint) int
 
 // IsIntersects https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 func (l *LineSegment) IsIntersects(l2 *LineSegment) bool {
+	if (l.p.IsEqual(&l2.p) && !l.q.IsEqual(&l2.q)) ||
+		(l.q.IsEqual(&l2.q) && !l.p.IsEqual(&l2.p)) ||
+		(l.q.IsEqual(&l2.p) && !l.p.IsEqual(&l2.q)) ||
+		(l.p.IsEqual(&l2.q) && !l.q.IsEqual(&l2.q)) {
+		return false
+	}
 	// Find the four orientations needed for general and
 	// special cases
 	o1 := orientation(l.p, l.q, l2.p)
