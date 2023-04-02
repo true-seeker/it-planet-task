@@ -142,3 +142,16 @@ func rayIntersectsSegment(p entity.AreaPoint, s *LineSegment) bool {
 	}
 	return (*p.Longitude-*a.Longitude)/(*p.Latitude-*a.Latitude) >= (*b.Longitude-*a.Longitude)/(*b.Latitude-*a.Latitude)
 }
+
+func IsAllPointsOnOneLine(points *[]entity.AreaPoint) bool {
+	dx := *(*points)[0].Latitude - *(*points)[1].Latitude
+	dy := *(*points)[0].Longitude - *(*points)[1].Longitude
+	for i := 2; i < len(*points); i++ {
+		dx1 := *(*points)[0].Latitude - *(*points)[i].Latitude
+		dy1 := *(*points)[0].Longitude - *(*points)[i].Longitude
+		if dx1*dy != dy1*dx {
+			return false
+		}
+	}
+	return true
+}

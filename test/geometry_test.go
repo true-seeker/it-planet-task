@@ -190,43 +190,6 @@ func TestTouchingIntersectingLineSegments(t *testing.T) {
 	}
 }
 
-//func TestPointInsideConvexPolygon(t *testing.T) {
-//	p1 := entity.AreaPoint{
-//		Latitude:  makeFloatPtr(0),
-//		Longitude: makeFloatPtr(1.5),
-//	}
-//	q1 := entity.AreaPoint{
-//		Latitude:  makeFloatPtr(1),
-//		Longitude: makeFloatPtr(1.5),
-//	}
-//	p2 := entity.AreaPoint{
-//		Latitude:  makeFloatPtr(2),
-//		Longitude: makeFloatPtr(2),
-//	}
-//	q2 := entity.AreaPoint{
-//		Latitude:  makeFloatPtr(1.5),
-//		Longitude: makeFloatPtr(3),
-//	}
-//
-//	point := entity.AreaPoint{
-//		Latitude:  makeFloatPtr(1.5),
-//		Longitude: makeFloatPtr(2),
-//	}
-//	lss := make([]service.LineSegment, 0)
-//
-//	lss = append(lss, *service.NewLineSegment(p1, q1))
-//	lss = append(lss, *service.NewLineSegment(q1, p2))
-//	lss = append(lss, *service.NewLineSegment(p2, q2))
-//	lss = append(lss, *service.NewLineSegment(q2, p1))
-//
-//	got := service.IsPointInsideArea(&point, &lss)
-//	want := true
-//
-//	if got != want {
-//		t.Errorf("got %t, wanted %t", got, want)
-//	}
-//}
-
 func TestPointInsideConveyPolygon(t *testing.T) {
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(0),
@@ -331,6 +294,60 @@ func TestPointOnBorderConvexPolygon(t *testing.T) {
 	lss = append(lss, *service.NewLineSegment(p2, q1))
 
 	got := service.IsPointInsideArea(&point, &lss)
+	want := false
+
+	if got != want {
+		t.Errorf("got %t, wanted %t", got, want)
+	}
+}
+
+func TestOneLinePolygon(t *testing.T) {
+	points := make([]entity.AreaPoint, 0)
+	points = append(points, entity.AreaPoint{
+		Latitude:  makeFloatPtr(-29),
+		Longitude: makeFloatPtr(-179),
+	})
+	points = append(points, entity.AreaPoint{
+		Latitude:  makeFloatPtr(-29),
+		Longitude: makeFloatPtr(-175.75),
+	})
+	points = append(points, entity.AreaPoint{
+		Latitude:  makeFloatPtr(-29),
+		Longitude: makeFloatPtr(-172.5),
+	})
+	points = append(points, entity.AreaPoint{
+		Latitude:  makeFloatPtr(-29),
+		Longitude: makeFloatPtr(-169.25),
+	})
+
+	got := service.IsAllPointsOnOneLine(&points)
+	want := true
+
+	if got != want {
+		t.Errorf("got %t, wanted %t", got, want)
+	}
+}
+
+func TestNotOneLinePolygon(t *testing.T) {
+	points := make([]entity.AreaPoint, 0)
+	points = append(points, entity.AreaPoint{
+		Latitude:  makeFloatPtr(-28),
+		Longitude: makeFloatPtr(-179),
+	})
+	points = append(points, entity.AreaPoint{
+		Latitude:  makeFloatPtr(-26),
+		Longitude: makeFloatPtr(-175.75),
+	})
+	points = append(points, entity.AreaPoint{
+		Latitude:  makeFloatPtr(-25),
+		Longitude: makeFloatPtr(-172.5),
+	})
+	points = append(points, entity.AreaPoint{
+		Latitude:  makeFloatPtr(-20),
+		Longitude: makeFloatPtr(-169.25),
+	})
+
+	got := service.IsAllPointsOnOneLine(&points)
 	want := false
 
 	if got != want {
