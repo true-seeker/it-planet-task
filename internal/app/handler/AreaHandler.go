@@ -68,7 +68,7 @@ func (a *AreaHandler) Create(c *gin.Context) {
 			break
 		}
 		for _, existingArea := range *existingAreas {
-			httpErr = AreaValidator.ValidateIntersection(newArea, &existingArea)
+			httpErr = AreaValidator.ValidateIntersectionAndAreaRepeats(newArea, &existingArea)
 			if httpErr != nil {
 				c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 				return

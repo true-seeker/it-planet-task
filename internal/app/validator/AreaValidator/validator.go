@@ -78,7 +78,46 @@ func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
 	return nil
 }
 
-func ValidateIntersection(area *entity.Area, existingArea *entity.Area) *errorHandler.HttpErr {
+func ValidateIntersectionAndAreaRepeats(area *entity.Area, existingArea *entity.Area) *errorHandler.HttpErr {
+	if area.Name == existingArea.Name {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("area with this name already exists"),
+			StatusCode: http.StatusConflict,
+		}
+	}
+
+	if len(area.AreaPoints) == len(existingArea.AreaPoints) {
+		indexOfFirstFoundOverlap := -1
+		for i := 0; i < len(existingArea.AreaPoints) && indexOfFirstFoundOverlap == -1; i++ {
+			if existingArea.AreaPoints[i].IsEqual(&area.AreaPoints[0]) {
+				indexOfFirstFoundOverlap = i
+			}
+		}
+
+		isFullOverlapFound := true
+		j := 1
+		for i := indexOfFirstFoundOverlap + 1; i != indexOfFirstFoundOverlap && isFullOverlapFound; {
+			if existingArea.AreaPoints[i].IsEqual(&area.AreaPoints[j]) {
+				if i < len(existingArea.AreaPoints)-1 {
+					i++
+				} else {
+					i = 0
+				}
+				j++
+			} else {
+				isFullOverlapFound = false
+			}
+		}
+
+		if isFullOverlapFound {
+			return &errorHandler.HttpErr{
+				Err:        errors.New(fmt.Sprintf("area with these points already exists with id %d", existingArea.Id)),
+				StatusCode: http.StatusConflict,
+			}
+		}
+
+	}
+
 	areaLineSegments := make([]service.LineSegment, 0)
 	for i := 0; i < len(area.AreaPoints)-1; i++ {
 		areaLineSegments = append(areaLineSegments, *service.NewLineSegment(area.AreaPoints[i], area.AreaPoints[i+1]))
