@@ -97,6 +97,9 @@ func ValidateIntersectionAndAreaRepeats(area *entity.Area, existingArea *entity.
 		isFullOverlapFound := true
 		j := 1
 		for i := indexOfFirstFoundOverlap + 1; i != indexOfFirstFoundOverlap && isFullOverlapFound; {
+			if i == len(existingArea.AreaPoints) {
+				i = 0
+			}
 			if existingArea.AreaPoints[i].IsEqual(&area.AreaPoints[j]) {
 				if i < len(existingArea.AreaPoints)-1 {
 					i++
