@@ -40,6 +40,13 @@ func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
 		}
 	}
 
+	if service.IsAllPointsOnOneLine(&area.AreaPoints) {
+		return &errorHandler.HttpErr{
+			Err:        errors.New("all points are on the same line"),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
 	lineSegments := make([]service.LineSegment, 0)
 	for i := 0; i < len(area.AreaPoints)-1; i++ {
 		lineSegments = append(lineSegments, *service.NewLineSegment(area.AreaPoints[i], area.AreaPoints[i+1]))
