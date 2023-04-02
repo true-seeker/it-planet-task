@@ -1,16 +1,13 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/repository"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
 	"it-planet-task/internal/app/validator/AreaValidator"
 	"net/http"
-	"net/url"
 )
 
 type AreaHandler struct {
@@ -52,34 +49,9 @@ func (a *AreaHandler) Create(c *gin.Context) {
 		return
 	}
 
-	from := 0
-	size := 10
-	// TODO разобраться
-	for {
-		query := fmt.Sprintf("size=%d&from=%d", size, from)
-		values, _ := url.ParseQuery(query)
-		params, _ := filter.NewAreaFilterParams(values)
-		existingAreas, err := a.areaRepo.Search(params)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
-			return
-		}
-		if len(*existingAreas) == 0 {
-			break
-		}
-		for _, existingArea := range *existingAreas {
-			httpErr = AreaValidator.ValidateIntersectionAndAreaRepeats(newArea, &existingArea)
-			if httpErr != nil {
-				c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
-				return
-			}
-		}
-		from += size
-	}
-
-	area, err := a.areaService.Create(newArea)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+	area, httpErr := a.areaService.Create(newArea)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 	c.JSON(http.StatusCreated, area)
@@ -113,9 +85,9 @@ func (a *AreaHandler) Update(c *gin.Context) {
 
 	newArea.Id = id
 
-	area, err := a.areaService.Update(newArea)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+	area, httpErr := a.areaService.Update(newArea)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
