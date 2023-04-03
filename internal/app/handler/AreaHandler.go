@@ -101,6 +101,12 @@ func (a *AreaHandler) Delete(c *gin.Context) {
 		return
 	}
 
+	_, httpErr = a.areaService.Get(id)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
 	err := a.areaService.Delete(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
