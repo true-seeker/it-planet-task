@@ -110,7 +110,11 @@ func (g *GeometryService) IsPointInsideArea(pt *entity.AreaPoint, pg *entity.Are
 	in := rayIntersectsSegment(*pt, pg.AreaPoints[len(pg.AreaPoints)-1], pg.AreaPoints[0])
 	for i := 1; i < len(pg.AreaPoints); i++ {
 		ls := NewLineSegment(pg.AreaPoints[i-1], pg.AreaPoints[i])
-		if !isOnEdgeCounts {
+		if isOnEdgeCounts {
+			if g.IsPointOnLineSegment(ls, pt) {
+				return true
+			}
+		} else {
 			if g.IsPointOnLineSegment(ls, pt) {
 				return false
 			}

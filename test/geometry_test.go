@@ -2,15 +2,15 @@ package test
 
 import (
 	"it-planet-task/internal/app/model/entity"
-	"it-planet-task/internal/app/service"
+	"it-planet-task/internal/app/service/geometry"
 	"testing"
 )
 
 func makeFloatPtr(a float64) *float64 {
 	return &a
 }
-
 func TestIntersectingLineSegments(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(0),
 		Longitude: makeFloatPtr(1.5),
@@ -28,10 +28,10 @@ func TestIntersectingLineSegments(t *testing.T) {
 		Longitude: makeFloatPtr(3),
 	}
 
-	ls1 := service.NewLineSegment(p1, q1)
-	ls2 := service.NewLineSegment(p2, q2)
+	ls1 := geometry.NewLineSegment(p1, q1)
+	ls2 := geometry.NewLineSegment(p2, q2)
 
-	got := ls1.IsIntersects(ls2)
+	got := geometryService.IsIntersects(ls1, ls2)
 	want := true
 
 	if got != want {
@@ -40,6 +40,7 @@ func TestIntersectingLineSegments(t *testing.T) {
 }
 
 func TestIntersectingLineSegments2(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(1),
 		Longitude: makeFloatPtr(-179.0),
@@ -56,18 +57,17 @@ func TestIntersectingLineSegments2(t *testing.T) {
 		Latitude:  makeFloatPtr(7),
 		Longitude: makeFloatPtr(-180),
 	}
-	lss := make([]service.LineSegment, 0)
+	lss := make([]geometry.LineSegment, 0)
 
-	lss = append(lss, *service.NewLineSegment(p1, q1))
-	lss = append(lss, *service.NewLineSegment(q1, p2))
-	lss = append(lss, *service.NewLineSegment(p2, q2))
-	lss = append(lss, *service.NewLineSegment(q2, p1))
+	lss = append(lss, *geometry.NewLineSegment(p1, q1))
+	lss = append(lss, *geometry.NewLineSegment(q1, p2))
+	lss = append(lss, *geometry.NewLineSegment(p2, q2))
+	lss = append(lss, *geometry.NewLineSegment(q2, p1))
 
 	for i := 0; i < len(lss); i++ {
 		for j := i + 1; j < len(lss); j++ {
-			if lss[i].IsIntersects(&lss[j]) {
+			if geometryService.IsIntersects(&lss[j], &lss[i]) {
 				t.Errorf("got %t, wanted %t", true, false)
-				//t.Errorf("%f:%f, %f:%f, %f:%f, %f:%f", *lss[i].P.Latitude, *lss[i].P.Longitude, *lss[i].Q.Latitude, *lss[i].Q.Longitude, *lss[j].P.Latitude, *lss[j].P.Longitude, *lss[j].Q.Latitude, *lss[j].Q.Longitude)
 				return
 			}
 		}
@@ -75,6 +75,7 @@ func TestIntersectingLineSegments2(t *testing.T) {
 }
 
 func TestNonIntersectingLineSegments(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(0),
 		Longitude: makeFloatPtr(1.5),
@@ -92,10 +93,10 @@ func TestNonIntersectingLineSegments(t *testing.T) {
 		Longitude: makeFloatPtr(2),
 	}
 
-	ls1 := service.NewLineSegment(p1, q1)
-	ls2 := service.NewLineSegment(p2, q2)
+	ls1 := geometry.NewLineSegment(p1, q1)
+	ls2 := geometry.NewLineSegment(p2, q2)
 
-	got := ls1.IsIntersects(ls2)
+	got := geometryService.IsIntersects(ls2, ls1)
 	want := false
 
 	if got != want {
@@ -104,6 +105,7 @@ func TestNonIntersectingLineSegments(t *testing.T) {
 }
 
 func TestTouchingMiddleIntersectingLineSegments(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(0),
 		Longitude: makeFloatPtr(0),
@@ -121,10 +123,10 @@ func TestTouchingMiddleIntersectingLineSegments(t *testing.T) {
 		Longitude: makeFloatPtr(1),
 	}
 
-	ls1 := service.NewLineSegment(p1, q1)
-	ls2 := service.NewLineSegment(p2, q2)
+	ls1 := geometry.NewLineSegment(p1, q1)
+	ls2 := geometry.NewLineSegment(p2, q2)
 
-	got := ls1.IsIntersects(ls2)
+	got := geometryService.IsIntersects(ls2, ls1)
 	want := false
 
 	if got != want {
@@ -133,6 +135,7 @@ func TestTouchingMiddleIntersectingLineSegments(t *testing.T) {
 }
 
 func TestContainingLineSegments(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(0),
 		Longitude: makeFloatPtr(0),
@@ -150,10 +153,10 @@ func TestContainingLineSegments(t *testing.T) {
 		Longitude: makeFloatPtr(4),
 	}
 
-	ls1 := service.NewLineSegment(p1, q1)
-	ls2 := service.NewLineSegment(p2, q2)
+	ls1 := geometry.NewLineSegment(p1, q1)
+	ls2 := geometry.NewLineSegment(p2, q2)
 
-	got := ls1.IsIntersects(ls2)
+	got := geometryService.IsIntersects(ls2, ls1)
 	want := false
 
 	if got != want {
@@ -162,6 +165,7 @@ func TestContainingLineSegments(t *testing.T) {
 }
 
 func TestTouchingIntersectingLineSegments(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(0),
 		Longitude: makeFloatPtr(1.5),
@@ -179,10 +183,10 @@ func TestTouchingIntersectingLineSegments(t *testing.T) {
 		Longitude: makeFloatPtr(2),
 	}
 
-	ls1 := service.NewLineSegment(p1, q1)
-	ls2 := service.NewLineSegment(p2, q2)
+	ls1 := geometry.NewLineSegment(p1, q1)
+	ls2 := geometry.NewLineSegment(p2, q2)
 
-	got := ls1.IsIntersects(ls2)
+	got := geometryService.IsIntersects(ls2, ls1)
 	want := false
 
 	if got != want {
@@ -191,6 +195,7 @@ func TestTouchingIntersectingLineSegments(t *testing.T) {
 }
 
 func TestPointInsideConveyPolygon(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(0),
 		Longitude: makeFloatPtr(1.5),
@@ -207,19 +212,23 @@ func TestPointInsideConveyPolygon(t *testing.T) {
 		Latitude:  makeFloatPtr(1.5),
 		Longitude: makeFloatPtr(3),
 	}
+	areaPoints := make([]entity.AreaPoint, 0)
+
+	areaPoints = append(areaPoints, p1)
+	areaPoints = append(areaPoints, q1)
+	areaPoints = append(areaPoints, q2)
+	areaPoints = append(areaPoints, p2)
+
+	area := entity.Area{
+		AreaPoints: areaPoints,
+	}
 
 	point := entity.AreaPoint{
 		Latitude:  makeFloatPtr(1.5),
 		Longitude: makeFloatPtr(2.5),
 	}
-	lss := make([]service.LineSegment, 0)
 
-	lss = append(lss, *service.NewLineSegment(p1, q1))
-	lss = append(lss, *service.NewLineSegment(q1, p2))
-	lss = append(lss, *service.NewLineSegment(p2, q2))
-	lss = append(lss, *service.NewLineSegment(p2, q1))
-
-	got := service.IsPointInsideArea(&point, &lss)
+	got := geometryService.IsPointInsideArea(&point, &area, false)
 	want := true
 
 	if got != want {
@@ -228,6 +237,7 @@ func TestPointInsideConveyPolygon(t *testing.T) {
 }
 
 func TestPointOutsideConvexPolygon(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(0),
 		Longitude: makeFloatPtr(1.5),
@@ -249,14 +259,18 @@ func TestPointOutsideConvexPolygon(t *testing.T) {
 		Latitude:  makeFloatPtr(5),
 		Longitude: makeFloatPtr(2),
 	}
-	lss := make([]service.LineSegment, 0)
 
-	lss = append(lss, *service.NewLineSegment(p1, q1))
-	lss = append(lss, *service.NewLineSegment(q1, p2))
-	lss = append(lss, *service.NewLineSegment(p2, q2))
-	lss = append(lss, *service.NewLineSegment(p2, q1))
+	areaPoints := make([]entity.AreaPoint, 0)
+	areaPoints = append(areaPoints, p1)
+	areaPoints = append(areaPoints, q1)
+	areaPoints = append(areaPoints, q2)
+	areaPoints = append(areaPoints, p2)
 
-	got := service.IsPointInsideArea(&point, &lss)
+	area := entity.Area{
+		AreaPoints: areaPoints,
+	}
+
+	got := geometryService.IsPointInsideArea(&point, &area, false)
 	want := false
 
 	if got != want {
@@ -265,6 +279,7 @@ func TestPointOutsideConvexPolygon(t *testing.T) {
 }
 
 func TestPointOnBorderConvexPolygon(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	p1 := entity.AreaPoint{
 		Latitude:  makeFloatPtr(1),
 		Longitude: makeFloatPtr(1),
@@ -286,14 +301,17 @@ func TestPointOnBorderConvexPolygon(t *testing.T) {
 		Latitude:  makeFloatPtr(2),
 		Longitude: makeFloatPtr(1.5),
 	}
-	lss := make([]service.LineSegment, 0)
+	areaPoints := make([]entity.AreaPoint, 0)
+	areaPoints = append(areaPoints, p1)
+	areaPoints = append(areaPoints, q1)
+	areaPoints = append(areaPoints, q2)
+	areaPoints = append(areaPoints, p2)
 
-	lss = append(lss, *service.NewLineSegment(p1, q1))
-	lss = append(lss, *service.NewLineSegment(q1, p2))
-	lss = append(lss, *service.NewLineSegment(p2, q2))
-	lss = append(lss, *service.NewLineSegment(p2, q1))
+	area := entity.Area{
+		AreaPoints: areaPoints,
+	}
 
-	got := service.IsPointInsideArea(&point, &lss)
+	got := geometryService.IsPointInsideArea(&point, &area, false)
 	want := false
 
 	if got != want {
@@ -302,6 +320,7 @@ func TestPointOnBorderConvexPolygon(t *testing.T) {
 }
 
 func TestOneLinePolygon(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	points := make([]entity.AreaPoint, 0)
 	points = append(points, entity.AreaPoint{
 		Latitude:  makeFloatPtr(-29),
@@ -320,7 +339,7 @@ func TestOneLinePolygon(t *testing.T) {
 		Longitude: makeFloatPtr(-169.25),
 	})
 
-	got := service.IsAllPointsOnOneLine(&points)
+	got := geometryService.IsAllPointsOnOneLine(&points)
 	want := true
 
 	if got != want {
@@ -329,6 +348,7 @@ func TestOneLinePolygon(t *testing.T) {
 }
 
 func TestNotOneLinePolygon(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
 	points := make([]entity.AreaPoint, 0)
 	points = append(points, entity.AreaPoint{
 		Latitude:  makeFloatPtr(-28),
@@ -347,9 +367,93 @@ func TestNotOneLinePolygon(t *testing.T) {
 		Longitude: makeFloatPtr(-169.25),
 	})
 
-	got := service.IsAllPointsOnOneLine(&points)
+	got := geometryService.IsAllPointsOnOneLine(&points)
 	want := false
 
+	if got != want {
+		t.Errorf("got %t, wanted %t", got, want)
+	}
+}
+
+func TestPointOnLineSegment(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
+	p1 := entity.AreaPoint{
+		Latitude:  makeFloatPtr(1),
+		Longitude: makeFloatPtr(1),
+	}
+	q1 := entity.AreaPoint{
+		Latitude:  makeFloatPtr(2),
+		Longitude: makeFloatPtr(1),
+	}
+
+	ls := geometry.LineSegment{
+		P: p1,
+		Q: q1,
+	}
+
+	point := entity.AreaPoint{
+		Latitude:  makeFloatPtr(1.5),
+		Longitude: makeFloatPtr(1),
+	}
+
+	got := geometryService.IsPointOnLineSegment(&ls, &point)
+	want := true
+	if got != want {
+		t.Errorf("got %t, wanted %t", got, want)
+	}
+}
+
+func TestPointNotOnLineSegment(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
+	p1 := entity.AreaPoint{
+		Latitude:  makeFloatPtr(1),
+		Longitude: makeFloatPtr(1),
+	}
+	q1 := entity.AreaPoint{
+		Latitude:  makeFloatPtr(2),
+		Longitude: makeFloatPtr(1),
+	}
+
+	ls := geometry.LineSegment{
+		P: p1,
+		Q: q1,
+	}
+
+	point := entity.AreaPoint{
+		Latitude:  makeFloatPtr(3),
+		Longitude: makeFloatPtr(1.5),
+	}
+
+	got := geometryService.IsPointOnLineSegment(&ls, &point)
+	want := false
+	if got != want {
+		t.Errorf("got %t, wanted %t", got, want)
+	}
+}
+
+func TestPointOnLineSegment2(t *testing.T) {
+	geometryService := geometry.NewGeometryService()
+	p1 := entity.AreaPoint{
+		Latitude:  makeFloatPtr(0),
+		Longitude: makeFloatPtr(0),
+	}
+	q1 := entity.AreaPoint{
+		Latitude:  makeFloatPtr(2),
+		Longitude: makeFloatPtr(2),
+	}
+
+	ls := geometry.LineSegment{
+		P: p1,
+		Q: q1,
+	}
+
+	point := entity.AreaPoint{
+		Latitude:  makeFloatPtr(1),
+		Longitude: makeFloatPtr(1),
+	}
+
+	got := geometryService.IsPointOnLineSegment(&ls, &point)
+	want := true
 	if got != want {
 		t.Errorf("got %t, wanted %t", got, want)
 	}
