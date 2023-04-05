@@ -64,11 +64,19 @@ func (a *AreaRepository) Delete(id int) error {
 
 func (a *AreaRepository) Search(params *filter.AreaFilterParams) (*[]entity.Area, error) {
 	var areas []entity.Area
-	err := a.Db.
-		Scopes(paginator.Paginate(params)).
+	query := a.Db.
 		Preload("AreaPoints").
-		Order("id").
-		Find(&areas).Error
+		Order("id")
+
+	if params != nil {
+		query = query.
+			Scopes(paginator.Paginate(params))
+	}
+
+	err := query.
+		Find(&areas).
+		Error
+
 	if err != nil {
 		return nil, err
 	}

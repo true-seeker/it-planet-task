@@ -145,7 +145,7 @@ func ValidateIntersectionAndAreaRepeats(area *entity.Area, existingArea *entity.
 	}
 
 	for _, point := range area.AreaPoints {
-		if geometryService.IsPointInsideArea(&point, existingArea) {
+		if geometryService.IsPointInsideArea(&point, existingArea, false) {
 			return &errorHandler.HttpErr{
 				Err:        errors.New(fmt.Sprintf("area lays inside area with id %d", existingArea.Id)),
 				StatusCode: http.StatusBadRequest,
@@ -154,7 +154,7 @@ func ValidateIntersectionAndAreaRepeats(area *entity.Area, existingArea *entity.
 	}
 
 	for _, point := range existingArea.AreaPoints {
-		if geometryService.IsPointInsideArea(&point, area) {
+		if geometryService.IsPointInsideArea(&point, area, false) {
 			return &errorHandler.HttpErr{
 				Err:        errors.New(fmt.Sprintf("area contains area with id %d", existingArea.Id)),
 				StatusCode: http.StatusBadRequest,

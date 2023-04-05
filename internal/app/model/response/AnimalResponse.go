@@ -16,3 +16,9 @@ type Animal struct {
 	VisitedLocationsId []int      `json:"visitedLocations"`
 	DeathDateTime      *time.Time `json:"deathDateTime"`
 }
+
+type AnimalForAreaAnalyticsDTO struct {
+	AnimalId     int    `json:"animal_id"`
+	Type         string `json:"type"`
+	AnimalTypeId int    `json:"animal_type_id"`
+}

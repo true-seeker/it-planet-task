@@ -65,12 +65,6 @@ func (a *AccountHandler) Update(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	//authenticatedAccountEmail, _, _ := middleware.GetCredentials(c)
-	//authenticatedAccount, err := a.accountService.GetByEmail(&entity.Account{Email: authenticatedAccountEmail})
-	//if authenticatedAccount.Id != id {
-	//	c.AbortWithStatusJSON(http.StatusForbidden, "Cant edit another's account")
-	//	return
-	//}
 	authorizedAccountAny, _ := c.Get("account")
 	authorizedAccount := authorizedAccountAny.(*entity.Account)
 	if (authorizedAccount.Role == entity.UserRole || authorizedAccount.Role == entity.ChipperRole) && (id != authorizedAccount.Id) {
