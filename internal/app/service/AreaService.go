@@ -9,6 +9,7 @@ import (
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
+	"it-planet-task/internal/app/service/geometry"
 	"it-planet-task/internal/app/validator/AreaValidator"
 	"it-planet-task/pkg/errorHandler"
 	"net/http"
@@ -21,14 +22,17 @@ type Area interface {
 	Update(area *entity.Area) (*response.Area, *errorHandler.HttpErr)
 	Delete(id int) error
 	Search(params *filter.AreaFilterParams) (*[]response.Area, *errorHandler.HttpErr)
+	Analytics(areaId int, params *filter.AreaAnalyticsFilterParams) (*response.AreaAnalytics, *errorHandler.HttpErr)
 }
 
 type AreaService struct {
-	areaRepo repository.Area
+	areaRepo              repository.Area
+	animalLocationService AnimalLocation
+	geometryService       geometry.Geometry
 }
 
-func NewAreaService(areaRepo repository.Area) Area {
-	return &AreaService{areaRepo: areaRepo}
+func NewAreaService(areaRepo repository.Area, animalLocationService AnimalLocation, geometryService geometry.Geometry) Area {
+	return &AreaService{areaRepo: areaRepo, animalLocationService: animalLocationService, geometryService: geometryService}
 }
 
 func (a *AreaService) Get(id int) (*response.Area, *errorHandler.HttpErr) {
@@ -160,4 +164,91 @@ func (a *AreaService) Search(params *filter.AreaFilterParams) (*[]response.Area,
 	areaResponses = mapper.AreasToAreaResponses(areas)
 
 	return areaResponses, nil
+}
+
+func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterParams) (*response.AreaAnalytics, *errorHandler.HttpErr) {
+	var animalAnalyticsResponse []response.AnimalAnalytics
+	areaAnalyticsResponse := response.AreaAnalytics{
+		AnimalAnalytics: []response.AnimalAnalytics{},
+	}
+	uniqueAreaExits := make(map[int]map[int]bool)
+	uniqueAreaEntries := make(map[int]map[int]bool)
+	animalsInsideArea := make(map[int]map[int]bool)
+	animalTypes := make(map[int]string)
+
+	areaResponse, httpErr := a.Get(areaId)
+	if httpErr != nil {
+		return nil, httpErr
+	}
+	area := mapper.AreaResponseToArea(areaResponse)
+
+	animalLocationParams := &filter.AnimalLocationFilterParams{
+		StartDateTime: params.StartDateTime,
+		EndDateTime:   params.EndDateTime,
+	}
+	animalLocationsForAreaAnalytics, httpErr := a.animalLocationService.SearchForAreaAnalytics(animalLocationParams)
+	if httpErr != nil {
+		return nil, httpErr
+	}
+	// TODO chipping location
+	for _, animalLocationForAreaAnalytics := range *animalLocationsForAreaAnalytics {
+		fmt.Println(animalLocationForAreaAnalytics.Animal.Id, animalLocationForAreaAnalytics.DateTimeOfVisitLocationPoint)
+		if a.geometryService.IsPointInsideArea(mapper.LocationToAreaPoint(&animalLocationForAreaAnalytics.Location), area, true) {
+			for _, animalType := range animalLocationForAreaAnalytics.Animal.AnimalTypes {
+				animalTypes[animalType.Id] = animalType.Type
+				_, ok := uniqueAreaEntries[animalType.Id]
+				if !ok {
+					uniqueAreaEntries[animalType.Id] = make(map[int]bool)
+				}
+				uniqueAreaEntries[animalType.Id][animalLocationForAreaAnalytics.Animal.Id] = true
+
+				_, ok = animalsInsideArea[animalType.Id]
+				if !ok {
+					animalsInsideArea[animalType.Id] = make(map[int]bool)
+				}
+				animalsInsideArea[animalType.Id][animalLocationForAreaAnalytics.Animal.Id] = true
+			}
+		} else {
+			for animalTypeId := range uniqueAreaEntries {
+				for animalId := range uniqueAreaEntries[animalTypeId] {
+					if animalId == animalLocationForAreaAnalytics.Animal.Id {
+						_, ok := uniqueAreaExits[animalTypeId]
+						if !ok {
+							uniqueAreaExits[animalTypeId] = make(map[int]bool)
+						}
+						uniqueAreaExits[animalTypeId][animalLocationForAreaAnalytics.Animal.Id] = true
+						animalsInsideArea[animalTypeId][animalId] = false
+					}
+				}
+			}
+		}
+	}
+
+	for animalTypeId := range uniqueAreaEntries {
+		animalAnalytics := response.AnimalAnalytics{
+			AnimalType:   animalTypes[animalTypeId],
+			AnimalTypeId: animalTypeId,
+		}
+		for range uniqueAreaEntries[animalTypeId] {
+			animalAnalytics.AnimalsArrived++
+		}
+		for range uniqueAreaExits[animalTypeId] {
+			animalAnalytics.AnimalsGone++
+		}
+		for _, isAnimalInsideArea := range animalsInsideArea[animalTypeId] {
+			if isAnimalInsideArea {
+				animalAnalytics.QuantityAnimals++
+			}
+		}
+		animalAnalyticsResponse = append(animalAnalyticsResponse, animalAnalytics)
+	}
+
+	for _, animalAnalytics := range animalAnalyticsResponse {
+		areaAnalyticsResponse.AnimalAnalytics = append(areaAnalyticsResponse.AnimalAnalytics, animalAnalytics)
+		areaAnalyticsResponse.TotalQuantityAnimals += animalAnalytics.QuantityAnimals
+		areaAnalyticsResponse.TotalAnimalsArrived += animalAnalytics.AnimalsArrived
+		areaAnalyticsResponse.TotalAnimalsGone += animalAnalytics.AnimalsGone
+	}
+
+	return &areaAnalyticsResponse, nil
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/repository"
 	"it-planet-task/internal/app/service"
@@ -114,4 +115,26 @@ func (a *AreaHandler) Delete(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+func (a *AreaHandler) Analytics(c *gin.Context) {
+	id, httpErr := validator.ValidateAndReturnId(c.Param("id"), "id")
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	params, httpErr := filter.NewAreaAnalyticsFilterParams(c.Request.URL.Query())
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	areaAnalyticsResponse, httpErr := a.areaService.Analytics(id, params)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, areaAnalyticsResponse)
 }

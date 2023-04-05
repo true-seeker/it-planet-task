@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
+	"it-planet-task/internal/app/model/response"
 	"it-planet-task/pkg/paginator"
 )
 
@@ -14,14 +15,16 @@ type AnimalLocation interface {
 	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*entity.AnimalLocation, error)
 	DeleteAnimalLocationPoint(id int) error
 	Get(id int) (*entity.AnimalLocation, error)
+	SearchForAreaAnalytics(params *filter.AnimalLocationFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, error)
 }
 
 type AnimalLocationRepository struct {
-	Db *gorm.DB
+	Db               *gorm.DB
+	animalRepository Animal
 }
 
-func NewAnimalLocationRepository(db *gorm.DB) AnimalLocation {
-	return &AnimalLocationRepository{Db: db}
+func NewAnimalLocationRepository(db *gorm.DB, animalRepository Animal) AnimalLocation {
+	return &AnimalLocationRepository{Db: db, animalRepository: animalRepository}
 }
 
 func (a *AnimalLocationRepository) GetAnimalLocations(animalId int, params *filter.AnimalLocationFilterParams) (*[]entity.AnimalLocation, error) {
@@ -37,6 +40,55 @@ func (a *AnimalLocationRepository) GetAnimalLocations(animalId int, params *filt
 	}
 
 	return &animalLocations, nil
+}
+
+func (a *AnimalLocationRepository) SearchForAreaAnalytics(params *filter.AnimalLocationFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, error) {
+	var animalLocationsForAreaAnalytics []entity.AnimalLocationForAreaAnalytics
+	var animalLocationsForAreaAnalyticsDTO []response.AnimalLocationForAreaAnalyticsDTO
+	var animalIds []int
+	animalsForAreaAnalyticsMap := make(map[int]entity.Animal)
+	err := a.Db.
+		Table("animal_locations as al").
+		Select("a.id as animal_id, al.date_time_of_visit_location_point, l.latitude, l.longitude").
+		Joins("JOIN locations l on l.id = al.location_point_id").
+		Joins("JOIN animals a on a.id = al.animal_id").
+		Scopes(filter.AreaAnalyticsFilter(params)).
+		Scan(&animalLocationsForAreaAnalyticsDTO).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _, animalLocationForAreaAnalyticsDTO := range animalLocationsForAreaAnalyticsDTO {
+		animalIds = append(animalIds, animalLocationForAreaAnalyticsDTO.AnimalId)
+	}
+
+	animals, err := a.animalRepository.GetByIds(&animalIds)
+	if err != nil {
+		return nil, err
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, animal := range *animals {
+		animalsForAreaAnalyticsMap[animal.Id] = animal
+	}
+
+	for _, animalLocationForAreaAnalyticsDTO := range animalLocationsForAreaAnalyticsDTO {
+		animalLocationForAreaAnalytics := entity.AnimalLocationForAreaAnalytics{
+			DateTimeOfVisitLocationPoint: animalLocationForAreaAnalyticsDTO.DateTimeOfVisitLocationPoint,
+			Location: entity.Location{
+				Latitude:  animalLocationForAreaAnalyticsDTO.Latitude,
+				Longitude: animalLocationForAreaAnalyticsDTO.Longitude,
+			},
+			Animal: animalsForAreaAnalyticsMap[animalLocationForAreaAnalyticsDTO.AnimalId],
+		}
+		animalLocationsForAreaAnalytics = append(animalLocationsForAreaAnalytics, animalLocationForAreaAnalytics)
+	}
+
+	return &animalLocationsForAreaAnalytics, nil
 }
 
 func (a *AnimalLocationRepository) AddAnimalLocationPoint(newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error) {

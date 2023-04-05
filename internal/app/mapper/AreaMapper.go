@@ -24,3 +24,13 @@ func AreasToAreaResponses(areas *[]entity.Area) *[]response.Area {
 
 	return &rs
 }
+
+func AreaResponseToArea(areaResponse *response.Area) *entity.Area {
+	r := entity.Area{
+		Id:         areaResponse.Id,
+		Name:       areaResponse.Name,
+		AreaPoints: *AreaPointResponsesToAreaPoints(&areaResponse.AreaPoints),
+	}
+
+	return &r
+}

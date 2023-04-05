@@ -10,6 +10,7 @@ import (
 
 type Animal interface {
 	Get(id int) (*entity.Animal, error)
+	GetByIds(ids *[]int) (*[]entity.Animal, error)
 	Search(params *filter.AnimalFilterParams) (*[]entity.Animal, error)
 	GetAnimalsByAccountId(accountId int) (*[]entity.Animal, error)
 	GetAnimalsByAnimalTypeId(accountId int) (*[]entity.Animal, error)
@@ -42,6 +43,20 @@ func (a *AnimalRepository) Get(id int) (*entity.Animal, error) {
 	}
 
 	return &animal, nil
+}
+
+func (a *AnimalRepository) GetByIds(ids *[]int) (*[]entity.Animal, error) {
+	var animals []entity.Animal
+	err := a.Db.
+		Select("id").
+		Preload("AnimalTypes").
+		Find(&animals, ids).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &animals, nil
 }
 
 func (a *AnimalRepository) Search(params *filter.AnimalFilterParams) (*[]entity.Animal, error) {

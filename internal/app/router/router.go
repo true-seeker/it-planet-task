@@ -6,6 +6,7 @@ import (
 	"it-planet-task/internal/app/handler"
 	"it-planet-task/internal/app/repository"
 	"it-planet-task/internal/app/service"
+	"it-planet-task/internal/app/service/geometry"
 	"it-planet-task/internal/pkg/middleware"
 )
 
@@ -25,11 +26,13 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 	animalRepo := repository.NewAnimalRepository(helpers.GetConnectionOrCreateAndGet())
 	animalService := service.NewAnimalService(animalRepo)
 
-	animalLocationRepo := repository.NewAnimalLocationRepository(helpers.GetConnectionOrCreateAndGet())
+	animalLocationRepo := repository.NewAnimalLocationRepository(helpers.GetConnectionOrCreateAndGet(), animalRepo)
 	animalLocationService := service.NewAnimalLocationService(animalLocationRepo)
 
+	geometryService := geometry.NewGeometryService()
+
 	areaRepo := repository.NewAreaRepository(helpers.GetConnectionOrCreateAndGet())
-	areaService := service.NewAreaService(areaRepo)
+	areaService := service.NewAreaService(areaRepo, animalLocationService, geometryService)
 
 	animalHandler := handler.NewAnimalHandler(animalService, animalTypeService, accountService, locationService, animalLocationService)
 	animalGroup := api.Group("animals")
@@ -95,6 +98,7 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 		areaGroup.POST("", middleware.BasicAuth, middleware.AdminRequired, areaHandler.Create)
 		areaGroup.PUT("/:id", middleware.BasicAuth, middleware.AdminRequired, areaHandler.Update)
 		areaGroup.DELETE("/:id", middleware.BasicAuth, middleware.AdminRequired, areaHandler.Delete)
+		areaGroup.GET("/:id/analytics", middleware.BasicAuth, areaHandler.Analytics)
 	}
 
 	return r

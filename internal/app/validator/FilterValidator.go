@@ -69,7 +69,18 @@ func ValidateAndReturnId(idStr, fieldName string) (int, *errorHandler.HttpErr) {
 }
 
 func ValidateAndReturnDateTime(field, fieldName string) (*time.Time, *errorHandler.HttpErr) {
-	date, err := time.Parse(config.TimeLayout, field)
+	date, err := time.Parse(config.DateTimeLayout, field)
+	if err != nil {
+		return nil, &errorHandler.HttpErr{
+			Err:        errors.New(fmt.Sprintf("%s must be in ISO-8601 format", fieldName)),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	return &date, nil
+}
+
+func ValidateAndReturnDate(field, fieldName string) (*time.Time, *errorHandler.HttpErr) {
+	date, err := time.Parse(config.DateLayout, field)
 	if err != nil {
 		return nil, &errorHandler.HttpErr{
 			Err:        errors.New(fmt.Sprintf("%s must be in ISO-8601 format", fieldName)),

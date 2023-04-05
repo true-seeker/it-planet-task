@@ -5,10 +5,17 @@ import (
 	"math"
 )
 
+type Geometry interface {
+	IsPointOnLineSegment(l *LineSegment, c *entity.AreaPoint) bool
+	IsIntersects(l *LineSegment, l2 *LineSegment) bool
+	IsPointInsideArea(pt *entity.AreaPoint, pg *entity.Area, isOnEdgeCounts bool) bool
+	IsAllPointsOnOneLine(points *[]entity.AreaPoint) bool
+}
+
 type GeometryService struct {
 }
 
-func NewGeometryService() *GeometryService {
+func NewGeometryService() Geometry {
 	return &GeometryService{}
 }
 
@@ -19,14 +26,6 @@ type LineSegment struct {
 
 func NewLineSegment(p entity.AreaPoint, q entity.AreaPoint) *LineSegment {
 	return &LineSegment{P: p, Q: q}
-}
-
-func onSegment(p entity.AreaPoint, q entity.AreaPoint, r entity.AreaPoint) bool {
-	if *q.Latitude <= math.Max(*p.Latitude, *r.Latitude) && *q.Latitude >= math.Min(*p.Latitude, *r.Latitude) &&
-		*q.Longitude <= math.Max(*p.Longitude, *r.Longitude) && *q.Longitude >= math.Min(*p.Longitude, *r.Longitude) {
-		return true
-	}
-	return false
 }
 
 func orientation(p entity.AreaPoint, q entity.AreaPoint, r entity.AreaPoint) int {
@@ -107,12 +106,14 @@ func (g *GeometryService) IsIntersects(l *LineSegment, l2 *LineSegment) bool {
 	return false
 }
 
-func (g *GeometryService) IsPointInsideArea(pt *entity.AreaPoint, pg *entity.Area) bool {
+func (g *GeometryService) IsPointInsideArea(pt *entity.AreaPoint, pg *entity.Area, isOnEdgeCounts bool) bool {
 	in := rayIntersectsSegment(*pt, pg.AreaPoints[len(pg.AreaPoints)-1], pg.AreaPoints[0])
 	for i := 1; i < len(pg.AreaPoints); i++ {
 		ls := NewLineSegment(pg.AreaPoints[i-1], pg.AreaPoints[i])
-		if g.IsPointOnLineSegment(ls, pt) {
-			return false
+		if !isOnEdgeCounts {
+			if g.IsPointOnLineSegment(ls, pt) {
+				return false
+			}
 		}
 		if rayIntersectsSegment(*pt, pg.AreaPoints[i-1], pg.AreaPoints[i]) {
 			in = !in
