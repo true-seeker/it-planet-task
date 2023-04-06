@@ -259,7 +259,7 @@ func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterPa
 	}
 
 	for _, animalAnalytics := range animalAnalyticsResponse {
-		areaAnalyticsResponse.AnimalAnalytics = append(areaAnalyticsResponse.AnimalAnalytics, animalAnalytics)
+		areaAnalyticsResponse.AnimalsAnalytics = append(areaAnalyticsResponse.AnimalsAnalytics, animalAnalytics)
 	}
 	for _, isAnimalInsideArea := range isAnimalsInsideArea {
 		if isAnimalInsideArea {
