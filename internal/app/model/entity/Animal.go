@@ -23,4 +23,5 @@ type AnimalLocationForAreaAnalytics struct {
 	DateTimeOfVisitLocationPoint time.Time `json:"dateTimeOfVisitLocationPoint"`
 	Location                     Location  `json:"location"`
 	Animal                       Animal    `json:"animal"`
+	IsPrevious                   bool      `json:"isPrevious"`
 }

@@ -63,8 +63,6 @@ func (a *AnimalLocationService) SearchForAreaAnalytics(params *filter.AnimalLoca
 		}
 	}
 
-	//animalLocationsResponse = mapper.AnimalLocationsToAnimalLocationResponses(animalLocationForAreaAnalytics)
-
 	return animalLocationForAreaAnalytics, nil
 }
 

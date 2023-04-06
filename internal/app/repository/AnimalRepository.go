@@ -48,8 +48,9 @@ func (a *AnimalRepository) Get(id int) (*entity.Animal, error) {
 func (a *AnimalRepository) GetByIds(ids *[]int) (*[]entity.Animal, error) {
 	var animals []entity.Animal
 	err := a.Db.
-		Select("id").
+		Select("id, chipping_date_time, chipping_location_id").
 		Preload("AnimalTypes").
+		Preload("ChippingLocation").
 		Find(&animals, ids).Error
 
 	if err != nil {
@@ -61,11 +62,16 @@ func (a *AnimalRepository) GetByIds(ids *[]int) (*[]entity.Animal, error) {
 
 func (a *AnimalRepository) Search(params *filter.AnimalFilterParams) (*[]entity.Animal, error) {
 	var animals []entity.Animal
-	err := a.Db.
-		Scopes(paginator.Paginate(params), filter.AnimalFilter(params)).
+	query := a.Db.
 		Order("id").
 		Preload("AnimalTypes").
-		Find(&animals).Error
+		Preload("ChippingLocation")
+	if params != nil {
+		query = query.Scopes(paginator.Paginate(params), filter.AnimalFilter(params))
+	}
+	err := query.
+		Find(&animals).
+		Error
 	if err != nil {
 		return nil, err
 	}

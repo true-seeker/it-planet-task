@@ -13,4 +13,5 @@ type AnimalLocationForAreaAnalyticsDTO struct {
 	DateTimeOfVisitLocationPoint time.Time `json:"dateTimeOfVisitLocationPoint"`
 	Latitude                     *float64  `json:"latitude"`
 	Longitude                    *float64  `json:"longitude"`
+	IsPrevious                   bool      `json:"isPrevious"`
 }
