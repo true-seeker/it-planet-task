@@ -194,10 +194,23 @@ func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterPa
 		return nil, httpErr
 	}
 	for _, animalLocationAnalytics := range *animalLocationsForAreaAnalytics {
+		fmt.Println(animalLocationAnalytics.Animal.Id, animalLocationAnalytics.Location.Latitude, animalLocationAnalytics.Location.Longitude)
+		if animalLocationAnalytics.Animal.Id == 21 {
+			fmt.Println("asd")
+		}
 		if animalLocationAnalytics.IsPrevious {
 			isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] = a.geometryService.IsPointInsideArea(mapper.LocationToAreaPoint(&animalLocationAnalytics.Location), area, true)
 			uniqueAnimalAreaExits[animalLocationAnalytics.Animal.Id] = false
 			uniqueAnimalAreaEntries[animalLocationAnalytics.Animal.Id] = false
+			for _, animalType := range animalLocationAnalytics.Animal.AnimalTypes {
+				if isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] {
+					_, ok := isAnimalTypeInsideArea[animalType.Id]
+					if !ok {
+						isAnimalTypeInsideArea[animalType.Id] = make(map[int]bool)
+					}
+					isAnimalTypeInsideArea[animalType.Id][animalLocationAnalytics.Animal.Id] = true
+				}
+			}
 		} else {
 			if a.geometryService.IsPointInsideArea(mapper.LocationToAreaPoint(&animalLocationAnalytics.Location), area, true) {
 				if !isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] {
@@ -242,14 +255,23 @@ func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterPa
 		}
 	}
 
-	for animalTypeId := range uniqueAreaTypeEntries {
-		animalAnalytics := response.AnimalAnalytics{
-			AnimalType:     animalTypes[animalTypeId],
-			AnimalTypeId:   animalTypeId,
-			AnimalsArrived: len(uniqueAreaTypeEntries[animalTypeId]),
-			AnimalsGone:    len(uniqueAreaTypeExits[animalTypeId]),
+	for animalTypeId, animalType := range animalTypes {
+		animalsArrivedMap, ok := uniqueAreaTypeEntries[animalTypeId]
+		animalsArrived := 0
+		if ok {
+			animalsArrived = len(animalsArrivedMap)
 		}
-
+		animalsGoneMap, ok := uniqueAreaTypeExits[animalTypeId]
+		animalsGone := 0
+		if ok {
+			animalsGone = len(animalsGoneMap)
+		}
+		animalAnalytics := response.AnimalAnalytics{
+			AnimalType:     animalType,
+			AnimalTypeId:   animalTypeId,
+			AnimalsArrived: animalsArrived,
+			AnimalsGone:    animalsGone,
+		}
 		for _, isAnimalInsideArea := range isAnimalTypeInsideArea[animalTypeId] {
 			if isAnimalInsideArea {
 				animalAnalytics.QuantityAnimals++
