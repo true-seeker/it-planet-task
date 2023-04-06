@@ -169,7 +169,7 @@ func (a *AreaService) Search(params *filter.AreaFilterParams) (*[]response.Area,
 func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterParams) (*response.AreaAnalytics, *errorHandler.HttpErr) {
 	var animalAnalyticsResponse []response.AnimalAnalytics
 	areaAnalyticsResponse := response.AreaAnalytics{
-		AnimalAnalytics: []response.AnimalAnalytics{},
+		AnimalsAnalytics: []response.AnimalAnalytics{},
 	}
 	uniqueAreaExits := make(map[int]map[int]bool)
 	uniqueAreaEntries := make(map[int]map[int]bool)
@@ -244,7 +244,7 @@ func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterPa
 	}
 
 	for _, animalAnalytics := range animalAnalyticsResponse {
-		areaAnalyticsResponse.AnimalAnalytics = append(areaAnalyticsResponse.AnimalAnalytics, animalAnalytics)
+		areaAnalyticsResponse.AnimalsAnalytics = append(areaAnalyticsResponse.AnimalsAnalytics, animalAnalytics)
 		areaAnalyticsResponse.TotalQuantityAnimals += animalAnalytics.QuantityAnimals
 		areaAnalyticsResponse.TotalAnimalsArrived += animalAnalytics.AnimalsArrived
 		areaAnalyticsResponse.TotalAnimalsGone += animalAnalytics.AnimalsGone

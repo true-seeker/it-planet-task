@@ -128,13 +128,17 @@ func ValidateIntersectionAndAreaRepeats(area *entity.Area, existingArea *entity.
 	for i := 0; i < len(area.AreaPoints)-1; i++ {
 		areaLineSegments = append(areaLineSegments, *geometry.NewLineSegment(area.AreaPoints[i], area.AreaPoints[i+1]))
 	}
-	areaLineSegments = append(areaLineSegments, *geometry.NewLineSegment(area.AreaPoints[0], area.AreaPoints[len(area.AreaPoints)-1]))
+	if len(areaLineSegments) > 0 {
+		areaLineSegments = append(areaLineSegments, *geometry.NewLineSegment(area.AreaPoints[0], area.AreaPoints[len(area.AreaPoints)-1]))
+	}
 
 	existingLineSegments := make([]geometry.LineSegment, 0)
 	for i := 0; i < len(existingArea.AreaPoints)-1; i++ {
 		existingLineSegments = append(existingLineSegments, *geometry.NewLineSegment(existingArea.AreaPoints[i], existingArea.AreaPoints[i+1]))
 	}
-	existingLineSegments = append(existingLineSegments, *geometry.NewLineSegment(existingArea.AreaPoints[0], existingArea.AreaPoints[len(existingArea.AreaPoints)-1]))
+	if len(existingLineSegments) > 0 {
+		existingLineSegments = append(existingLineSegments, *geometry.NewLineSegment(existingArea.AreaPoints[0], existingArea.AreaPoints[len(existingArea.AreaPoints)-1]))
+	}
 
 	for i := 0; i < len(existingLineSegments); i++ {
 		for j := 0; j < len(areaLineSegments); j++ {

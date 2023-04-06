@@ -1,8 +1,8 @@
 package response
 
 type AreaAnalytics struct {
-	TotalQuantityAnimals int
-	TotalAnimalsArrived  int
-	TotalAnimalsGone     int
-	AnimalAnalytics      []AnimalAnalytics
+	TotalQuantityAnimals int               `json:"totalQuantityAnimals"`
+	TotalAnimalsArrived  int               `json:"totalAnimalsArrived"`
+	TotalAnimalsGone     int               `json:"totalAnimalsGone"`
+	AnimalsAnalytics     []AnimalAnalytics `json:"animalsAnalytics"`
 }
