@@ -32,7 +32,7 @@ func GetConnectionOrCreateAndGet() *gorm.DB {
 		return DB
 	}
 
-	db, err := gorm.Open(postgres.Open(BuildPostgresConnectionString()), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
+	db, err := gorm.Open(postgres.Open(BuildPostgresConnectionString()), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	errorHandler.FailOnError(err, "Failed to connect to DB")
 	DB = db
 	return db
