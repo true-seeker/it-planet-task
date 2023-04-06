@@ -20,7 +20,7 @@ type AnimalLocation interface {
 	AddAnimalLocationPoint(animalId int, pointId int) (*response.AnimalLocation, error)
 	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*response.AnimalLocation, error)
 	DeleteAnimalLocationPoint(visitedPointId int) error
-	SearchForAreaAnalytics(params *filter.AnimalLocationFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, *errorHandler.HttpErr)
+	SearchForAreaAnalytics(params *filter.AreaAnalyticsFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, *errorHandler.HttpErr)
 }
 
 type AnimalLocationService struct {
@@ -54,7 +54,7 @@ func (a *AnimalLocationService) GetAnimalLocations(animalId int, params *filter.
 	return animalLocationsResponse, nil
 }
 
-func (a *AnimalLocationService) SearchForAreaAnalytics(params *filter.AnimalLocationFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, *errorHandler.HttpErr) {
+func (a *AnimalLocationService) SearchForAreaAnalytics(params *filter.AreaAnalyticsFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, *errorHandler.HttpErr) {
 	animalLocationForAreaAnalytics, err := a.animalLocationRepo.SearchForAreaAnalytics(params)
 	if err != nil {
 		return nil, &errorHandler.HttpErr{

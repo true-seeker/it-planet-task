@@ -166,6 +166,22 @@ func (a *AreaService) Search(params *filter.AreaFilterParams) (*[]response.Area,
 	return areaResponses, nil
 }
 
+func setAnimalTypeMap(mp map[int]map[int]bool, animalTypeId int, animalId int, value bool) {
+	_, ok := mp[animalTypeId]
+	if !ok {
+		mp[animalTypeId] = make(map[int]bool)
+	}
+	mp[animalTypeId][animalId] = value
+}
+
+func countTrueEntities(counter *int, countable map[int]bool) {
+	for _, value := range countable {
+		if value {
+			*counter++
+		}
+	}
+}
+
 func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterParams) (*response.AreaAnalytics, *errorHandler.HttpErr) {
 	var animalAnalyticsResponse []response.AnimalAnalytics
 	areaAnalyticsResponse := response.AreaAnalytics{
@@ -183,32 +199,21 @@ func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterPa
 	if httpErr != nil {
 		return nil, httpErr
 	}
+
 	area := mapper.AreaResponseToArea(areaResponse)
 
-	animalLocationParams := &filter.AnimalLocationFilterParams{
-		StartDateTime: params.StartDateTime,
-		EndDateTime:   params.EndDateTime,
-	}
-	animalLocationsForAreaAnalytics, httpErr := a.animalLocationService.SearchForAreaAnalytics(animalLocationParams)
+	animalLocationsForAreaAnalytics, httpErr := a.animalLocationService.SearchForAreaAnalytics(params)
 	if httpErr != nil {
 		return nil, httpErr
 	}
 	for _, animalLocationAnalytics := range *animalLocationsForAreaAnalytics {
-		fmt.Println(animalLocationAnalytics.Animal.Id, animalLocationAnalytics.Location.Latitude, animalLocationAnalytics.Location.Longitude)
-		if animalLocationAnalytics.Animal.Id == 21 {
-			fmt.Println("asd")
-		}
 		if animalLocationAnalytics.IsPrevious {
 			isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] = a.geometryService.IsPointInsideArea(mapper.LocationToAreaPoint(&animalLocationAnalytics.Location), area, true)
 			uniqueAnimalAreaExits[animalLocationAnalytics.Animal.Id] = false
 			uniqueAnimalAreaEntries[animalLocationAnalytics.Animal.Id] = false
 			for _, animalType := range animalLocationAnalytics.Animal.AnimalTypes {
 				if isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] {
-					_, ok := isAnimalTypeInsideArea[animalType.Id]
-					if !ok {
-						isAnimalTypeInsideArea[animalType.Id] = make(map[int]bool)
-					}
-					isAnimalTypeInsideArea[animalType.Id][animalLocationAnalytics.Animal.Id] = true
+					setAnimalTypeMap(isAnimalTypeInsideArea, animalType.Id, animalLocationAnalytics.Animal.Id, true)
 				}
 			}
 		} else {
@@ -216,17 +221,8 @@ func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterPa
 				if !isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] {
 					for _, animalType := range animalLocationAnalytics.Animal.AnimalTypes {
 						animalTypes[animalType.Id] = animalType.Type
-						_, ok := uniqueAreaTypeEntries[animalType.Id]
-						if !ok {
-							uniqueAreaTypeEntries[animalType.Id] = make(map[int]bool)
-						}
-						uniqueAreaTypeEntries[animalType.Id][animalLocationAnalytics.Animal.Id] = true
-
-						_, ok = isAnimalTypeInsideArea[animalType.Id]
-						if !ok {
-							isAnimalTypeInsideArea[animalType.Id] = make(map[int]bool)
-						}
-						isAnimalTypeInsideArea[animalType.Id][animalLocationAnalytics.Animal.Id] = true
+						setAnimalTypeMap(uniqueAreaTypeEntries, animalType.Id, animalLocationAnalytics.Animal.Id, true)
+						setAnimalTypeMap(isAnimalTypeInsideArea, animalType.Id, animalLocationAnalytics.Animal.Id, true)
 					}
 					isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] = true
 					uniqueAnimalAreaEntries[animalLocationAnalytics.Animal.Id] = true
@@ -236,17 +232,8 @@ func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterPa
 				if isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] {
 					for _, animalType := range animalLocationAnalytics.Animal.AnimalTypes {
 						animalTypes[animalType.Id] = animalType.Type
-						_, ok := uniqueAreaTypeExits[animalType.Id]
-						if !ok {
-							uniqueAreaTypeExits[animalType.Id] = make(map[int]bool)
-						}
-						uniqueAreaTypeExits[animalType.Id][animalLocationAnalytics.Animal.Id] = true
-
-						_, ok = isAnimalTypeInsideArea[animalType.Id]
-						if !ok {
-							isAnimalTypeInsideArea[animalType.Id] = make(map[int]bool)
-						}
-						isAnimalTypeInsideArea[animalType.Id][animalLocationAnalytics.Animal.Id] = false
+						setAnimalTypeMap(uniqueAreaTypeExits, animalType.Id, animalLocationAnalytics.Animal.Id, true)
+						setAnimalTypeMap(isAnimalTypeInsideArea, animalType.Id, animalLocationAnalytics.Animal.Id, false)
 					}
 					isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] = false
 					uniqueAnimalAreaExits[animalLocationAnalytics.Animal.Id] = true
@@ -261,6 +248,7 @@ func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterPa
 		if ok {
 			animalsArrived = len(animalsArrivedMap)
 		}
+
 		animalsGoneMap, ok := uniqueAreaTypeExits[animalTypeId]
 		animalsGone := 0
 		if ok {
@@ -272,31 +260,15 @@ func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterPa
 			AnimalsArrived: animalsArrived,
 			AnimalsGone:    animalsGone,
 		}
-		for _, isAnimalInsideArea := range isAnimalTypeInsideArea[animalTypeId] {
-			if isAnimalInsideArea {
-				animalAnalytics.QuantityAnimals++
-			}
-		}
+		countTrueEntities(&animalAnalytics.QuantityAnimals, isAnimalTypeInsideArea[animalTypeId])
 		animalAnalyticsResponse = append(animalAnalyticsResponse, animalAnalytics)
 	}
 
 	for _, animalAnalytics := range animalAnalyticsResponse {
 		areaAnalyticsResponse.AnimalsAnalytics = append(areaAnalyticsResponse.AnimalsAnalytics, animalAnalytics)
 	}
-	for _, isAnimalInsideArea := range isAnimalsInsideArea {
-		if isAnimalInsideArea {
-			areaAnalyticsResponse.TotalQuantityAnimals++
-		}
-	}
-	for _, uniqueAnimalAreaEntry := range uniqueAnimalAreaEntries {
-		if uniqueAnimalAreaEntry {
-			areaAnalyticsResponse.TotalAnimalsArrived++
-		}
-	}
-	for _, uniqueAnimalAreaExit := range uniqueAnimalAreaExits {
-		if uniqueAnimalAreaExit {
-			areaAnalyticsResponse.TotalAnimalsGone++
-		}
-	}
+	countTrueEntities(&areaAnalyticsResponse.TotalQuantityAnimals, isAnimalsInsideArea)
+	countTrueEntities(&areaAnalyticsResponse.TotalAnimalsArrived, uniqueAnimalAreaEntries)
+	countTrueEntities(&areaAnalyticsResponse.TotalAnimalsGone, uniqueAnimalAreaExits)
 	return &areaAnalyticsResponse, nil
 }

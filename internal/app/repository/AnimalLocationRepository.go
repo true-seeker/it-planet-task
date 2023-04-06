@@ -14,7 +14,7 @@ type AnimalLocation interface {
 	EditAnimalLocationPoint(visitedLocationPointId int, locationPointId int) (*entity.AnimalLocation, error)
 	DeleteAnimalLocationPoint(id int) error
 	Get(id int) (*entity.AnimalLocation, error)
-	SearchForAreaAnalytics(params *filter.AnimalLocationFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, error)
+	SearchForAreaAnalytics(params *filter.AreaAnalyticsFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, error)
 }
 
 type AnimalLocationRepository struct {
@@ -41,12 +41,12 @@ func (a *AnimalLocationRepository) GetAnimalLocations(animalId int, params *filt
 	return &animalLocations, nil
 }
 
-func (a *AnimalLocationRepository) SearchForAreaAnalytics(params *filter.AnimalLocationFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, error) {
-	var animalLocationsForAreaAnalytics []entity.AnimalLocationForAreaAnalytics
-	var animalLocationsForAreaAnalyticsDTO []response.AnimalLocationForAreaAnalyticsDTO
-
+func (a *AnimalLocationRepository) SearchForAreaAnalytics(params *filter.AreaAnalyticsFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, error) {
+	var analytics []entity.AnimalLocationForAreaAnalytics
+	var animalLocationsAnalyticsDTO []response.AnimalLocationForAreaAnalyticsDTO
 	animalsHavePreviousPointMap := make(map[int]bool)
 	animalsMap := make(map[int]entity.Animal)
+
 	err := a.Db.Raw(`
      WITH 
      q1 as (SELECT a1.id animal_id,
@@ -93,7 +93,7 @@ func (a *AnimalLocationRepository) SearchForAreaAnalytics(params *filter.AnimalL
 	 WHERE al4.date_time_of_visit_location_point = q3.date_time_of_visit_location_point 
      ORDER BY animal_id, date_time_of_visit_location_point;`, params.StartDateTime, params.EndDateTime).
 		Preload("ChippingLocation").
-		Scan(&animalLocationsForAreaAnalyticsDTO).
+		Scan(&animalLocationsAnalyticsDTO).
 		Error
 
 	animals, err := a.animalRepository.Search(nil)
@@ -106,38 +106,27 @@ func (a *AnimalLocationRepository) SearchForAreaAnalytics(params *filter.AnimalL
 		animalsMap[animal.Id] = animal
 	}
 
-	for _, animalLocationForAreaAnalyticsDTO := range animalLocationsForAreaAnalyticsDTO {
-		animalLocationForAreaAnalytics := entity.AnimalLocationForAreaAnalytics{
-			DateTimeOfVisitLocationPoint: animalLocationForAreaAnalyticsDTO.DateTimeOfVisitLocationPoint,
-			Location: entity.Location{
-				Latitude:  animalLocationForAreaAnalyticsDTO.Latitude,
-				Longitude: animalLocationForAreaAnalyticsDTO.Longitude,
-			},
-			Animal:     animalsMap[animalLocationForAreaAnalyticsDTO.AnimalId],
-			IsPrevious: animalLocationForAreaAnalyticsDTO.IsPrevious,
-		}
-		animalLocationsForAreaAnalytics = append(animalLocationsForAreaAnalytics, animalLocationForAreaAnalytics)
-		if animalLocationForAreaAnalyticsDTO.IsPrevious {
-			animalsHavePreviousPointMap[animalLocationForAreaAnalyticsDTO.AnimalId] = animalLocationForAreaAnalyticsDTO.IsPrevious
+	for _, animalLocationAnalyticsDTO := range animalLocationsAnalyticsDTO {
+		location := entity.NewLocation(0, animalLocationAnalyticsDTO.Latitude, animalLocationAnalyticsDTO.Longitude)
+		animalLocationForAreaAnalytics := entity.NewAnimalLocationForAreaAnalytics(animalLocationAnalyticsDTO.DateTimeOfVisitLocationPoint,
+			*location,
+			animalsMap[animalLocationAnalyticsDTO.AnimalId],
+			animalLocationAnalyticsDTO.IsPrevious)
+		analytics = append(analytics, *animalLocationForAreaAnalytics)
+		if animalLocationAnalyticsDTO.IsPrevious {
+			animalsHavePreviousPointMap[animalLocationAnalyticsDTO.AnimalId] = animalLocationAnalyticsDTO.IsPrevious
 		}
 	}
 
 	for animalId, hasPreviousPoint := range animalsHavePreviousPointMap {
 		if !hasPreviousPoint {
-			animalLocationForAreaAnalytics := entity.AnimalLocationForAreaAnalytics{
-				DateTimeOfVisitLocationPoint: animalsMap[animalId].ChippingDateTime,
-				Location: entity.Location{
-					Latitude:  animalsMap[animalId].ChippingLocation.Latitude,
-					Longitude: animalsMap[animalId].ChippingLocation.Longitude,
-				},
-				Animal:     animalsMap[animalId],
-				IsPrevious: true,
-			}
-			animalLocationsForAreaAnalytics = append([]entity.AnimalLocationForAreaAnalytics{animalLocationForAreaAnalytics}, animalLocationsForAreaAnalytics...)
+			location := entity.NewLocation(0, animalsMap[animalId].ChippingLocation.Latitude, animalsMap[animalId].ChippingLocation.Longitude)
+			animalLocationAnalytics := entity.NewAnimalLocationForAreaAnalytics(animalsMap[animalId].ChippingDateTime, *location, animalsMap[animalId], true)
+			analytics = append([]entity.AnimalLocationForAreaAnalytics{*animalLocationAnalytics}, analytics...)
 		}
 	}
 
-	return &animalLocationsForAreaAnalytics, nil
+	return &analytics, nil
 }
 
 func (a *AnimalLocationRepository) AddAnimalLocationPoint(newAnimalLocation *entity.AnimalLocation) (*entity.AnimalLocation, error) {

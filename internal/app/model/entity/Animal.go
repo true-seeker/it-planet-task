@@ -25,3 +25,7 @@ type AnimalLocationForAreaAnalytics struct {
 	Animal                       Animal    `json:"animal"`
 	IsPrevious                   bool      `json:"isPrevious"`
 }
+
+func NewAnimalLocationForAreaAnalytics(dateTimeOfVisitLocationPoint time.Time, location Location, animal Animal, isPrevious bool) *AnimalLocationForAreaAnalytics {
+	return &AnimalLocationForAreaAnalytics{DateTimeOfVisitLocationPoint: dateTimeOfVisitLocationPoint, Location: location, Animal: animal, IsPrevious: isPrevious}
+}
