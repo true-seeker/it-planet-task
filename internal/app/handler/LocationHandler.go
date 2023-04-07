@@ -80,14 +80,9 @@ func (l *LocationHandler) GeoHash(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-
-	//locationResponse, httpErr := l.locationService.GetByCoordinates(location)
-	//if httpErr != nil {
-	//	c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
-	//	return
-	//}
-
-	c.JSON(http.StatusOK, geohash.Encode(*params.Latitude, *params.Longitude))
+	// todo geohash db
+	a := geohash.Encode(*params.Latitude, *params.Longitude)
+	c.String(http.StatusOK, a)
 }
 
 func (l *LocationHandler) GeoHashV2(c *gin.Context) {
@@ -106,12 +101,6 @@ func (l *LocationHandler) GeoHashV2(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-
-	//locationResponse, httpErr := l.locationService.GetByCoordinates(location)
-	//if httpErr != nil {
-	//	c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
-	//	return
-	//}
 
 	c.JSON(http.StatusOK, geohash.Encode(*params.Latitude, *params.Longitude))
 }
@@ -132,12 +121,6 @@ func (l *LocationHandler) GeoHashV3(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-
-	//locationResponse, httpErr := l.locationService.GetByCoordinates(location)
-	//if httpErr != nil {
-	//	c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
-	//	return
-	//}
 
 	c.JSON(http.StatusOK, geohash.Encode(*params.Latitude, *params.Longitude))
 }
