@@ -77,12 +77,8 @@ func (l *LocationHandler) Create(c *gin.Context) {
 		return
 	}
 
-	duplicateLocation, httpErr := l.locationService.GetByCoordinates(newLocation)
-	if httpErr != nil {
-		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
-		return
-	}
-	if duplicateLocation.Id != 0 {
+	_, httpErr = l.locationService.GetByCoordinates(newLocation)
+	if httpErr == nil {
 		c.AbortWithStatusJSON(http.StatusConflict, "Location already exists")
 		return
 	}
@@ -123,14 +119,11 @@ func (l *LocationHandler) Update(c *gin.Context) {
 	}
 
 	duplicateLocation, httpErr := l.locationService.GetByCoordinates(newLocation)
-	if httpErr != nil {
-		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
-		return
-	}
-	if duplicateLocation.Id != 0 && oldLocation.Id != duplicateLocation.Id {
+	if httpErr == nil && oldLocation.Id != duplicateLocation.Id {
 		c.AbortWithStatusJSON(http.StatusConflict, "Location already exists")
 		return
 	}
+
 	newLocation.Id = id
 	location, err := l.locationService.Update(newLocation)
 	if err != nil {
