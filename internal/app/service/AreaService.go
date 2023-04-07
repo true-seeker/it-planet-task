@@ -166,7 +166,7 @@ func (a *AreaService) Search(params *filter.AreaFilterParams) (*[]response.Area,
 	return areaResponses, nil
 }
 
-func setAnimalTypeMap(mp map[int]map[int]bool, animalTypeId int, animalId int, value bool) {
+func setTypeMap(mp map[int]map[int]bool, animalTypeId int, animalId int, value bool) {
 	_, ok := mp[animalTypeId]
 	if !ok {
 		mp[animalTypeId] = make(map[int]bool)
@@ -182,17 +182,23 @@ func countTrueEntities(counter *int, countable map[int]bool) {
 	}
 }
 
+func getLenOfMapIfExists(value map[int]bool) int {
+	if value != nil {
+		return len(value)
+	}
+	return 0
+}
+
 func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterParams) (*response.AreaAnalytics, *errorHandler.HttpErr) {
-	var animalAnalyticsResponse []response.AnimalAnalytics
 	areaAnalyticsResponse := response.AreaAnalytics{
 		AnimalsAnalytics: []response.AnimalAnalytics{},
 	}
-	uniqueAreaTypeExits := make(map[int]map[int]bool)
-	uniqueAreaTypeEntries := make(map[int]map[int]bool)
-	isAnimalTypeInsideArea := make(map[int]map[int]bool)
-	uniqueAnimalAreaExits := make(map[int]bool)
-	uniqueAnimalAreaEntries := make(map[int]bool)
-	isAnimalsInsideArea := make(map[int]bool)
+	uniqueTypeExits := make(map[int]map[int]bool)
+	uniqueTypeEntries := make(map[int]map[int]bool)
+	uniqueAreaExits := make(map[int]bool)
+	uniqueAreaEntries := make(map[int]bool)
+	isTypeInsideArea := make(map[int]map[int]bool)
+	isAnimalInsideArea := make(map[int]bool)
 	animalTypes := make(map[int]string)
 
 	areaResponse, httpErr := a.Get(areaId)
@@ -202,73 +208,68 @@ func (a *AreaService) Analytics(areaId int, params *filter.AreaAnalyticsFilterPa
 
 	area := mapper.AreaResponseToArea(areaResponse)
 
-	animalLocationsForAreaAnalytics, httpErr := a.animalLocationService.SearchForAreaAnalytics(params)
+	points, httpErr := a.animalLocationService.SearchForAreaAnalytics(params)
 	if httpErr != nil {
 		return nil, httpErr
 	}
-	for _, animalLocationAnalytics := range *animalLocationsForAreaAnalytics {
-		if animalLocationAnalytics.IsPrevious {
-			isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] = a.geometryService.IsPointInsideArea(mapper.LocationToAreaPoint(&animalLocationAnalytics.Location), area, true)
-			uniqueAnimalAreaExits[animalLocationAnalytics.Animal.Id] = false
-			uniqueAnimalAreaEntries[animalLocationAnalytics.Animal.Id] = false
-			for _, animalType := range animalLocationAnalytics.Animal.AnimalTypes {
-				if isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] {
-					setAnimalTypeMap(isAnimalTypeInsideArea, animalType.Id, animalLocationAnalytics.Animal.Id, true)
+
+	// проходим по каждой найденной точке локации животных
+	for _, point := range *points {
+		if point.IsPrevious {
+			// если точка отмечена как предыдущая, то определяем входит ли она в зону и проставляем соответствующие флаги
+			// это нужно для определения вошло ли животное в зону из точки, которая не удовлетворяет параметрам запроса
+			isAnimalInsideArea[point.Animal.Id] = a.geometryService.IsPointInsideArea(mapper.LocationToAreaPoint(&point.Location), area, true)
+			uniqueAreaExits[point.Animal.Id] = false
+			uniqueAreaEntries[point.Animal.Id] = false
+			if isAnimalInsideArea[point.Animal.Id] {
+				for _, animalType := range point.Animal.AnimalTypes {
+					animalTypes[animalType.Id] = animalType.Type
+					setTypeMap(isTypeInsideArea, animalType.Id, point.Animal.Id, true)
 				}
 			}
 		} else {
-			if a.geometryService.IsPointInsideArea(mapper.LocationToAreaPoint(&animalLocationAnalytics.Location), area, true) {
-				if !isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] {
-					for _, animalType := range animalLocationAnalytics.Animal.AnimalTypes {
+			if a.geometryService.IsPointInsideArea(mapper.LocationToAreaPoint(&point.Location), area, true) {
+				if !isAnimalInsideArea[point.Animal.Id] {
+					// если очередная точка в зоне, но до этого животное было вне
+					for _, animalType := range point.Animal.AnimalTypes {
 						animalTypes[animalType.Id] = animalType.Type
-						setAnimalTypeMap(uniqueAreaTypeEntries, animalType.Id, animalLocationAnalytics.Animal.Id, true)
-						setAnimalTypeMap(isAnimalTypeInsideArea, animalType.Id, animalLocationAnalytics.Animal.Id, true)
+						setTypeMap(uniqueTypeEntries, animalType.Id, point.Animal.Id, true)
+						setTypeMap(isTypeInsideArea, animalType.Id, point.Animal.Id, true)
 					}
-					isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] = true
-					uniqueAnimalAreaEntries[animalLocationAnalytics.Animal.Id] = true
+					isAnimalInsideArea[point.Animal.Id] = true
+					uniqueAreaEntries[point.Animal.Id] = true
 				}
 
 			} else {
-				if isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] {
-					for _, animalType := range animalLocationAnalytics.Animal.AnimalTypes {
+				if isAnimalInsideArea[point.Animal.Id] {
+					// если очередная точка не в зоне, но до этого животное было в ней
+					for _, animalType := range point.Animal.AnimalTypes {
 						animalTypes[animalType.Id] = animalType.Type
-						setAnimalTypeMap(uniqueAreaTypeExits, animalType.Id, animalLocationAnalytics.Animal.Id, true)
-						setAnimalTypeMap(isAnimalTypeInsideArea, animalType.Id, animalLocationAnalytics.Animal.Id, false)
+						setTypeMap(uniqueTypeExits, animalType.Id, point.Animal.Id, true)
+						setTypeMap(isTypeInsideArea, animalType.Id, point.Animal.Id, false)
 					}
-					isAnimalsInsideArea[animalLocationAnalytics.Animal.Id] = false
-					uniqueAnimalAreaExits[animalLocationAnalytics.Animal.Id] = true
+					isAnimalInsideArea[point.Animal.Id] = false
+					uniqueAreaExits[point.Animal.Id] = true
 				}
 			}
 		}
 	}
 
+	// подсчёт статистики для каждого типа
 	for animalTypeId, animalType := range animalTypes {
-		animalsArrivedMap, ok := uniqueAreaTypeEntries[animalTypeId]
-		animalsArrived := 0
-		if ok {
-			animalsArrived = len(animalsArrivedMap)
-		}
-
-		animalsGoneMap, ok := uniqueAreaTypeExits[animalTypeId]
-		animalsGone := 0
-		if ok {
-			animalsGone = len(animalsGoneMap)
-		}
 		animalAnalytics := response.AnimalAnalytics{
 			AnimalType:     animalType,
 			AnimalTypeId:   animalTypeId,
-			AnimalsArrived: animalsArrived,
-			AnimalsGone:    animalsGone,
+			AnimalsArrived: getLenOfMapIfExists(uniqueTypeEntries[animalTypeId]),
+			AnimalsGone:    getLenOfMapIfExists(uniqueTypeExits[animalTypeId]),
 		}
-		countTrueEntities(&animalAnalytics.QuantityAnimals, isAnimalTypeInsideArea[animalTypeId])
-		animalAnalyticsResponse = append(animalAnalyticsResponse, animalAnalytics)
-	}
-
-	for _, animalAnalytics := range animalAnalyticsResponse {
+		countTrueEntities(&animalAnalytics.QuantityAnimals, isTypeInsideArea[animalTypeId])
 		areaAnalyticsResponse.AnimalsAnalytics = append(areaAnalyticsResponse.AnimalsAnalytics, animalAnalytics)
 	}
-	countTrueEntities(&areaAnalyticsResponse.TotalQuantityAnimals, isAnimalsInsideArea)
-	countTrueEntities(&areaAnalyticsResponse.TotalAnimalsArrived, uniqueAnimalAreaEntries)
-	countTrueEntities(&areaAnalyticsResponse.TotalAnimalsGone, uniqueAnimalAreaExits)
+
+	// подсчёт общей статистики
+	countTrueEntities(&areaAnalyticsResponse.TotalQuantityAnimals, isAnimalInsideArea)
+	countTrueEntities(&areaAnalyticsResponse.TotalAnimalsArrived, uniqueAreaEntries)
+	countTrueEntities(&areaAnalyticsResponse.TotalAnimalsGone, uniqueAreaExits)
 	return &areaAnalyticsResponse, nil
 }
