@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/mmcloughlin/geohash"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
@@ -61,6 +62,84 @@ func (l *LocationHandler) GetByCoordinates(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, locationResponse.Id)
+}
+
+func (l *LocationHandler) GeoHash(c *gin.Context) {
+	params, httpErr := filter.NewLocationCoordinatesParams(c.Request.URL.Query())
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	location := &entity.Location{
+		Latitude:  params.Latitude,
+		Longitude: params.Longitude,
+	}
+
+	httpErr = LocationValidator.ValidateLocation(location)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	//locationResponse, httpErr := l.locationService.GetByCoordinates(location)
+	//if httpErr != nil {
+	//	c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+	//	return
+	//}
+
+	c.JSON(http.StatusOK, geohash.Encode(*params.Latitude, *params.Longitude))
+}
+
+func (l *LocationHandler) GeoHashV2(c *gin.Context) {
+	params, httpErr := filter.NewLocationCoordinatesParams(c.Request.URL.Query())
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	location := &entity.Location{
+		Latitude:  params.Latitude,
+		Longitude: params.Longitude,
+	}
+
+	httpErr = LocationValidator.ValidateLocation(location)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	//locationResponse, httpErr := l.locationService.GetByCoordinates(location)
+	//if httpErr != nil {
+	//	c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+	//	return
+	//}
+
+	c.JSON(http.StatusOK, geohash.Encode(*params.Latitude, *params.Longitude))
+}
+
+func (l *LocationHandler) GeoHashV3(c *gin.Context) {
+	params, httpErr := filter.NewLocationCoordinatesParams(c.Request.URL.Query())
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	location := &entity.Location{
+		Latitude:  params.Latitude,
+		Longitude: params.Longitude,
+	}
+
+	httpErr = LocationValidator.ValidateLocation(location)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	//locationResponse, httpErr := l.locationService.GetByCoordinates(location)
+	//if httpErr != nil {
+	//	c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+	//	return
+	//}
+
+	c.JSON(http.StatusOK, geohash.Encode(*params.Latitude, *params.Longitude))
 }
 
 func (l *LocationHandler) Create(c *gin.Context) {

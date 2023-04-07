@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.9.0
+	github.com/mmcloughlin/geohash v0.10.0
 	github.com/spf13/viper v1.15.0
 	gorm.io/driver/postgres v1.4.8
 	gorm.io/gorm v1.24.2
