@@ -60,7 +60,7 @@ func (l *LocationHandler) GetByCoordinates(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, locationResponse)
+	c.JSON(http.StatusOK, locationResponse.Id)
 }
 
 func (l *LocationHandler) Create(c *gin.Context) {
