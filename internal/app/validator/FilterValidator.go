@@ -53,6 +53,17 @@ func ValidateAndReturnIntField(field, fieldName string) (int, *errorHandler.Http
 	return intField, nil
 }
 
+func ValidateAndReturnFloatField(field, fieldName string, precision int) (float64, *errorHandler.HttpErr) {
+	floatField, err := strconv.ParseFloat(field, precision)
+	if err != nil {
+		return 0, &errorHandler.HttpErr{
+			Err:        errors.New(fmt.Sprintf("%s must be float", fieldName)),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+	return floatField, nil
+}
+
 func ValidateAndReturnId(idStr, fieldName string) (int, *errorHandler.HttpErr) {
 	id, httpErr := ValidateAndReturnIntField(idStr, fieldName)
 	if httpErr != nil {

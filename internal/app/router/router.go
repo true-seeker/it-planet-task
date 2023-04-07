@@ -79,6 +79,7 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 	locationGroup := api.Group("locations")
 	{
 		locationGroup.GET("/:id", middleware.BasicAuth, locationHandler.Get)
+		locationGroup.GET("", middleware.BasicAuth, locationHandler.GetByCoordinates)
 		locationGroup.POST("", middleware.BasicAuth, middleware.AdminOrChipperRequired, locationHandler.Create)
 		locationGroup.PUT("/:id", middleware.BasicAuth, middleware.AdminOrChipperRequired, locationHandler.Update)
 		locationGroup.DELETE("/:id", middleware.BasicAuth, middleware.AdminRequired, locationHandler.Delete)

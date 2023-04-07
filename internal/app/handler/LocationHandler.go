@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
@@ -36,6 +37,32 @@ func (l *LocationHandler) Get(c *gin.Context) {
 	c.JSON(http.StatusOK, location)
 }
 
+func (l *LocationHandler) GetByCoordinates(c *gin.Context) {
+	params, httpErr := filter.NewLocationCoordinatesParams(c.Request.URL.Query())
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+	location := &entity.Location{
+		Latitude:  params.Latitude,
+		Longitude: params.Longitude,
+	}
+
+	httpErr = LocationValidator.ValidateLocation(location)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	locationResponse, httpErr := l.locationService.GetByCoordinates(location)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, locationResponse)
+}
+
 func (l *LocationHandler) Create(c *gin.Context) {
 	newLocation := &entity.Location{}
 	err := c.BindJSON(&newLocation)
@@ -50,7 +77,7 @@ func (l *LocationHandler) Create(c *gin.Context) {
 		return
 	}
 
-	duplicateLocation, err := l.locationService.GetByCords(newLocation)
+	duplicateLocation, err := l.locationService.GetByCoordinates(newLocation)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -95,7 +122,7 @@ func (l *LocationHandler) Update(c *gin.Context) {
 		return
 	}
 
-	duplicateLocation, err := l.locationService.GetByCords(newLocation)
+	duplicateLocation, err := l.locationService.GetByCoordinates(newLocation)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return

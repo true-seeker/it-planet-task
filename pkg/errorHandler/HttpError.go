@@ -8,6 +8,7 @@ type HttpErr struct {
 	StatusCode int
 }
 
+// todo constructor
 func (r *HttpErr) Error() string {
 	return fmt.Sprintf("status %d: err %v", r.StatusCode, r.Err)
 }

@@ -17,7 +17,7 @@ type Location interface {
 	Create(location *entity.Location) (*response.Location, error)
 	Update(location *entity.Location) (*response.Location, error)
 	Delete(id int) error
-	GetByCords(location *entity.Location) (*entity.Location, error)
+	GetByCoordinates(location *entity.Location) (*response.Location, *errorHandler.HttpErr)
 }
 
 type LocationService struct {
@@ -81,6 +81,24 @@ func (l *LocationService) Delete(id int) error {
 	return l.locationRepo.Delete(id)
 }
 
-func (l *LocationService) GetByCords(location *entity.Location) (*entity.Location, error) {
-	return l.locationRepo.GetByCords(location)
+func (l *LocationService) GetByCoordinates(location *entity.Location) (*response.Location, *errorHandler.HttpErr) {
+	locationResponse := &response.Location{}
+	location, err := l.locationRepo.GetByCoordinates(location)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &errorHandler.HttpErr{
+				Err:        errors.New("location with these coordinates does not exists"),
+				StatusCode: http.StatusNotFound,
+			}
+		} else {
+			return nil, &errorHandler.HttpErr{
+				Err:        err,
+				StatusCode: http.StatusBadRequest,
+			}
+		}
+	}
+
+	locationResponse = mapper.LocationToLocationResponse(location)
+
+	return locationResponse, nil
 }
