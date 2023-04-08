@@ -41,7 +41,7 @@ func InitAccounts(db *gorm.DB) {
 		Role:      "USER",
 	}
 
-	db.Create(adminAccount)
-	db.Create(chipperAccount)
-	db.Create(userAccount)
+	db.Save(adminAccount)
+	db.Save(chipperAccount)
+	db.Save(userAccount)
 }

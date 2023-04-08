@@ -39,7 +39,7 @@ func (a *AccountHandler) Get(c *gin.Context) {
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
-	} // TODO мб сделать проверку на админа АПИ 2.1 Для аккаунтов с ролями "ADMIN": Аккаунт с таким accountId не найден
+	}
 
 	c.JSON(http.StatusOK, account)
 }
