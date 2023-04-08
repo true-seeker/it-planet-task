@@ -107,6 +107,10 @@ func (g *GeometryService) IsIntersects(l *LineSegment, l2 *LineSegment) bool {
 }
 
 func (g *GeometryService) IsPointInsideArea(pt *entity.AreaPoint, pg *entity.Area, isOnEdgeCounts bool) bool {
+	if len(pg.AreaPoints) == 0 {
+		return false
+	}
+
 	in := rayIntersectsSegment(*pt, pg.AreaPoints[len(pg.AreaPoints)-1], pg.AreaPoints[0])
 	for i := 1; i < len(pg.AreaPoints); i++ {
 		ls := NewLineSegment(pg.AreaPoints[i-1], pg.AreaPoints[i])
