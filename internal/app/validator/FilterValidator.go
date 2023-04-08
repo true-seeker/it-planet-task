@@ -1,7 +1,6 @@
 package validator
 
 import (
-	"errors"
 	"fmt"
 	"it-planet-task/pkg/config"
 	"it-planet-task/pkg/errorHandler"
@@ -19,10 +18,7 @@ func ValidateAndReturnPagination(from, size string) (*paginator.Pagination, *err
 			return nil, httpErr
 		}
 		if from < 0 {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New("from must be greater or equal to 0"),
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr("from must be greater or equal to 0", http.StatusBadRequest)
 		}
 		pagination.From = from
 	}
@@ -32,10 +28,7 @@ func ValidateAndReturnPagination(from, size string) (*paginator.Pagination, *err
 			return nil, httpErr
 		}
 		if size <= 0 {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New("size must be greater than 0"),
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr("size must be greater than 0", http.StatusBadRequest)
 		}
 		pagination.Size = size
 	}
@@ -45,10 +38,7 @@ func ValidateAndReturnPagination(from, size string) (*paginator.Pagination, *err
 func ValidateAndReturnIntField(field, fieldName string) (int, *errorHandler.HttpErr) {
 	intField, err := strconv.Atoi(field)
 	if err != nil {
-		return 0, &errorHandler.HttpErr{
-			Err:        errors.New(fmt.Sprintf("%s must be integer", fieldName)),
-			StatusCode: http.StatusBadRequest,
-		}
+		return 0, errorHandler.NewHttpErr(fmt.Sprintf("%s must be integer", fieldName), http.StatusBadRequest)
 	}
 	return intField, nil
 }
@@ -56,10 +46,7 @@ func ValidateAndReturnIntField(field, fieldName string) (int, *errorHandler.Http
 func ValidateAndReturnFloatField(field, fieldName string, precision int) (float64, *errorHandler.HttpErr) {
 	floatField, err := strconv.ParseFloat(field, precision)
 	if err != nil {
-		return 0, &errorHandler.HttpErr{
-			Err:        errors.New(fmt.Sprintf("%s must be float", fieldName)),
-			StatusCode: http.StatusBadRequest,
-		}
+		return 0, errorHandler.NewHttpErr(fmt.Sprintf("%s must be float", fieldName), http.StatusBadRequest)
 	}
 	return floatField, nil
 }
@@ -71,10 +58,7 @@ func ValidateAndReturnId(idStr, fieldName string) (int, *errorHandler.HttpErr) {
 	}
 
 	if id <= 0 {
-		return 0, &errorHandler.HttpErr{
-			Err:        errors.New(fmt.Sprintf("%s must be greater than 0", fieldName)),
-			StatusCode: http.StatusBadRequest,
-		}
+		return 0, errorHandler.NewHttpErr(fmt.Sprintf("%s must be greater than 0", fieldName), http.StatusBadRequest)
 	}
 	return id, nil
 }
@@ -82,10 +66,7 @@ func ValidateAndReturnId(idStr, fieldName string) (int, *errorHandler.HttpErr) {
 func ValidateAndReturnDateTime(field, fieldName string) (*time.Time, *errorHandler.HttpErr) {
 	date, err := time.Parse(config.DateTimeLayout, field)
 	if err != nil {
-		return nil, &errorHandler.HttpErr{
-			Err:        errors.New(fmt.Sprintf("%s must be in ISO-8601 format", fieldName)),
-			StatusCode: http.StatusBadRequest,
-		}
+		return nil, errorHandler.NewHttpErr(fmt.Sprintf("%s must be in ISO-8601 format", fieldName), http.StatusBadRequest)
 	}
 	return &date, nil
 }
@@ -93,10 +74,7 @@ func ValidateAndReturnDateTime(field, fieldName string) (*time.Time, *errorHandl
 func ValidateAndReturnDate(field, fieldName string) (*time.Time, *errorHandler.HttpErr) {
 	date, err := time.Parse(config.DateLayout, field)
 	if err != nil {
-		return nil, &errorHandler.HttpErr{
-			Err:        errors.New(fmt.Sprintf("%s must be in ISO-8601 format", fieldName)),
-			StatusCode: http.StatusBadRequest,
-		}
+		return nil, errorHandler.NewHttpErr(fmt.Sprintf("%s must be in ISO-8601 format", fieldName), http.StatusBadRequest)
 	}
 	return &date, nil
 }

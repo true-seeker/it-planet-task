@@ -44,15 +44,9 @@ func (a *AnimalService) Get(id int) (*response.Animal, *errorHandler.HttpErr) {
 	animal, err := a.animalRepo.Get(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("Animal with id %d does not exists", id)),
-				StatusCode: http.StatusNotFound,
-			}
+			return nil, errorHandler.NewHttpErr(fmt.Sprintf("Animal with id %d does not exists", id), http.StatusNotFound)
 		} else {
-			return nil, &errorHandler.HttpErr{
-				Err:        err,
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 		}
 	}
 

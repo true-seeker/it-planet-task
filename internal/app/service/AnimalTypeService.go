@@ -35,15 +35,9 @@ func (a *AnimalTypeService) Get(id int) (*response.AnimalType, *errorHandler.Htt
 	animalType, err := a.animalTypeRepo.Get(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("Account type with id %d does not exists", id)),
-				StatusCode: http.StatusNotFound,
-			}
+			return nil, errorHandler.NewHttpErr(fmt.Sprintf("Account type with id %d does not exists", id), http.StatusNotFound)
 		} else {
-			return nil, &errorHandler.HttpErr{
-				Err:        err,
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 		}
 	}
 

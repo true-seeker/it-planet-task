@@ -1,7 +1,6 @@
 package AreaValidator
 
 import (
-	"errors"
 	"fmt"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service/geometry"
@@ -14,24 +13,15 @@ import (
 func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
 	// TODO совместить сообщения об ошибках
 	if validator.IsStringEmpty(area.Name) {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("name is empty"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return errorHandler.NewHttpErr("name is empty", http.StatusBadRequest)
 	}
 
 	if area.AreaPoints == nil {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("areaPoints is empty"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return errorHandler.NewHttpErr("areaPoints is empty", http.StatusBadRequest)
 	}
 
 	if len(area.AreaPoints) < 3 {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("size of areaPoints must be greater than 2"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return errorHandler.NewHttpErr("size of areaPoints must be greater than 2", http.StatusBadRequest)
 	}
 	for _, areaPoint := range area.AreaPoints {
 		httpErr := AreaPointValidator.ValidateAreaPoint(&areaPoint)
@@ -42,19 +32,13 @@ func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
 	geometryService := geometry.NewGeometryService()
 
 	if geometryService.IsAllPointsOnOneLine(&area.AreaPoints) {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("all points are on the same line"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return errorHandler.NewHttpErr("all points are on the same line", http.StatusBadRequest)
 	}
 
 	for i := 0; i < len(area.AreaPoints); i++ {
 		for j := i + 1; j < len(area.AreaPoints); j++ {
 			if area.AreaPoints[i].IsEqual(&area.AreaPoints[j]) {
-				return &errorHandler.HttpErr{
-					Err:        errors.New("area contains duplicate points"),
-					StatusCode: http.StatusBadRequest,
-				}
+				return errorHandler.NewHttpErr("area contains duplicate points", http.StatusBadRequest)
 			}
 		}
 	}
@@ -68,10 +52,7 @@ func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
 	for i := 0; i < len(lineSegments); i++ {
 		for j := i + 1; j < len(lineSegments); j++ {
 			if geometryService.IsIntersects(&lineSegments[i], &lineSegments[j]) {
-				return &errorHandler.HttpErr{
-					Err:        errors.New("area must be non self-intersecting"),
-					StatusCode: http.StatusBadRequest,
-				}
+				return errorHandler.NewHttpErr("area must be non self-intersecting", http.StatusBadRequest)
 			}
 		}
 	}
@@ -83,10 +64,7 @@ func ValidateIntersectionAndAreaRepeats(area *entity.Area, existingArea *entity.
 	geometryService := geometry.NewGeometryService()
 
 	if area.Name == existingArea.Name {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("area with this name already exists"),
-			StatusCode: http.StatusConflict,
-		}
+		return errorHandler.NewHttpErr("area with this name already exists", http.StatusConflict)
 	}
 
 	if len(area.AreaPoints) == len(existingArea.AreaPoints) {
@@ -116,10 +94,7 @@ func ValidateIntersectionAndAreaRepeats(area *entity.Area, existingArea *entity.
 		}
 
 		if isFullOverlapFound {
-			return &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("area with these points already exists with id %d", existingArea.Id)),
-				StatusCode: http.StatusConflict,
-			}
+			return errorHandler.NewHttpErr(fmt.Sprintf("area with these points already exists with id %d", existingArea.Id), http.StatusConflict)
 		}
 
 	}
@@ -143,29 +118,20 @@ func ValidateIntersectionAndAreaRepeats(area *entity.Area, existingArea *entity.
 	for i := 0; i < len(existingLineSegments); i++ {
 		for j := 0; j < len(areaLineSegments); j++ {
 			if geometryService.IsIntersects(&existingLineSegments[i], &areaLineSegments[j]) {
-				return &errorHandler.HttpErr{
-					Err:        errors.New(fmt.Sprintf("area intersects with area with id %d", existingArea.Id)),
-					StatusCode: http.StatusBadRequest,
-				}
+				return errorHandler.NewHttpErr(fmt.Sprintf("area intersects with area with id %d", existingArea.Id), http.StatusBadRequest)
 			}
 		}
 	}
 
 	for _, point := range area.AreaPoints {
 		if geometryService.IsPointInsideArea(&point, existingArea, false) {
-			return &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("area lays inside area with id %d", existingArea.Id)),
-				StatusCode: http.StatusBadRequest,
-			}
+			return errorHandler.NewHttpErr(fmt.Sprintf("area lays inside area with id %d", existingArea.Id), http.StatusBadRequest)
 		}
 	}
 
 	for _, point := range existingArea.AreaPoints {
 		if geometryService.IsPointInsideArea(&point, area, false) {
-			return &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("area contains area with id %d", existingArea.Id)),
-				StatusCode: http.StatusBadRequest,
-			}
+			return errorHandler.NewHttpErr(fmt.Sprintf("area contains area with id %d", existingArea.Id), http.StatusBadRequest)
 		}
 	}
 	return nil

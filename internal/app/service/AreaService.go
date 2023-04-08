@@ -41,15 +41,9 @@ func (a *AreaService) Get(id int) (*response.Area, *errorHandler.HttpErr) {
 	area, err := a.areaRepo.Get(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("Area with id %d does not exists", id)),
-				StatusCode: http.StatusNotFound,
-			}
+			return nil, errorHandler.NewHttpErr(fmt.Sprintf("Area with id %d does not exists", id), http.StatusNotFound)
 		} else {
-			return nil, &errorHandler.HttpErr{
-				Err:        err,
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 		}
 	}
 
@@ -68,10 +62,7 @@ func (a *AreaService) Create(area *entity.Area) (*response.Area, *errorHandler.H
 		existingAreas, err := a.areaRepo.Search(params)
 
 		if err != nil {
-			return nil, &errorHandler.HttpErr{
-				Err:        err,
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 		}
 		if len(*existingAreas) == 0 {
 			break
@@ -89,10 +80,7 @@ func (a *AreaService) Create(area *entity.Area) (*response.Area, *errorHandler.H
 
 	area, err := a.areaRepo.Create(area)
 	if err != nil {
-		return nil, &errorHandler.HttpErr{
-			Err:        err,
-			StatusCode: http.StatusBadRequest,
-		}
+		return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 	}
 
 	areaResponse = mapper.AreaToAreaResponse(area)
@@ -110,10 +98,7 @@ func (a *AreaService) Update(area *entity.Area) (*response.Area, *errorHandler.H
 		existingAreas, err := a.areaRepo.Search(params)
 
 		if err != nil {
-			return nil, &errorHandler.HttpErr{
-				Err:        err,
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 		}
 		if len(*existingAreas) == 0 {
 			break
@@ -135,10 +120,7 @@ func (a *AreaService) Update(area *entity.Area) (*response.Area, *errorHandler.H
 
 	area, err := a.areaRepo.Update(area)
 	if err != nil {
-		return nil, &errorHandler.HttpErr{
-			Err:        err,
-			StatusCode: http.StatusBadRequest,
-		}
+		return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 	}
 
 	areaResponse = mapper.AreaToAreaResponse(area)
@@ -155,10 +137,7 @@ func (a *AreaService) Search(params *filter.AreaFilterParams) (*[]response.Area,
 
 	areas, err := a.areaRepo.Search(params)
 	if err != nil {
-		return nil, &errorHandler.HttpErr{
-			Err:        err,
-			StatusCode: http.StatusBadRequest,
-		}
+		return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 	}
 
 	areaResponses = mapper.AreasToAreaResponses(areas)

@@ -1,7 +1,6 @@
 package filter
 
 import (
-	"errors"
 	"it-planet-task/internal/app/validator"
 	"it-planet-task/pkg/errorHandler"
 	"net/http"
@@ -16,16 +15,10 @@ type LocationFilterParams struct {
 func NewLocationCoordinatesParams(q url.Values) (*LocationFilterParams, *errorHandler.HttpErr) {
 	params := &LocationFilterParams{}
 	if q.Get("latitude") == "" {
-		return nil, &errorHandler.HttpErr{
-			Err:        errors.New("latitude is missing"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return nil, errorHandler.NewHttpErr("latitude is missing", http.StatusBadRequest)
 	}
 	if q.Get("longitude") == "" {
-		return nil, &errorHandler.HttpErr{
-			Err:        errors.New("longitude is missing"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return nil, errorHandler.NewHttpErr("longitude is missing", http.StatusBadRequest)
 	}
 
 	latitude, httpErr := validator.ValidateAndReturnFloatField(q.Get("latitude"), "latitude", 64)

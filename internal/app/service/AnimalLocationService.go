@@ -37,15 +37,9 @@ func (a *AnimalLocationService) GetAnimalLocations(animalId int, params *filter.
 	animalLocations, err := a.animalLocationRepo.GetAnimalLocations(animalId, params)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("Animal with id %d does not exists", animalId)),
-				StatusCode: http.StatusNotFound,
-			}
+			return nil, errorHandler.NewHttpErr(fmt.Sprintf("Animal with id %d does not exists", animalId), http.StatusNotFound)
 		} else {
-			return nil, &errorHandler.HttpErr{
-				Err:        err,
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 		}
 	}
 
@@ -57,10 +51,7 @@ func (a *AnimalLocationService) GetAnimalLocations(animalId int, params *filter.
 func (a *AnimalLocationService) SearchForAreaAnalytics(params *filter.AreaAnalyticsFilterParams) (*[]entity.AnimalLocationForAreaAnalytics, *errorHandler.HttpErr) {
 	animalLocationForAreaAnalytics, err := a.animalLocationRepo.SearchForAreaAnalytics(params)
 	if err != nil {
-		return nil, &errorHandler.HttpErr{
-			Err:        err,
-			StatusCode: http.StatusBadRequest,
-		}
+		return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 	}
 
 	return animalLocationForAreaAnalytics, nil
@@ -108,15 +99,9 @@ func (a *AnimalLocationService) Get(id int) (*response.AnimalLocation, *errorHan
 	animalLocation, err := a.animalLocationRepo.Get(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("Animal with id %d does not exists", id)),
-				StatusCode: http.StatusNotFound,
-			}
+			return nil, errorHandler.NewHttpErr(fmt.Sprintf("Animal with id %d does not exists", id), http.StatusNotFound)
 		} else {
-			return nil, &errorHandler.HttpErr{
-				Err:        err,
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 		}
 	}
 

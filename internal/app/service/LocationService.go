@@ -34,15 +34,9 @@ func (l *LocationService) Get(id int) (*response.Location, *errorHandler.HttpErr
 	location, err := l.locationRepo.Get(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New(fmt.Sprintf("Location with id %d does not exists", id)),
-				StatusCode: http.StatusNotFound,
-			}
+			return nil, errorHandler.NewHttpErr(fmt.Sprintf("Location with id %d does not exists", id), http.StatusNotFound)
 		} else {
-			return nil, &errorHandler.HttpErr{
-				Err:        err,
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 		}
 	}
 
@@ -86,15 +80,9 @@ func (l *LocationService) GetByCoordinates(location *entity.Location) (*response
 	location, err := l.locationRepo.GetByCoordinates(location)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, &errorHandler.HttpErr{
-				Err:        errors.New("location with these coordinates does not exists"),
-				StatusCode: http.StatusNotFound,
-			}
+			return nil, errorHandler.NewHttpErr("location with these coordinates does not exists", http.StatusNotFound)
 		} else {
-			return nil, &errorHandler.HttpErr{
-				Err:        err,
-				StatusCode: http.StatusBadRequest,
-			}
+			return nil, errorHandler.NewHttpErr(err.Error(), http.StatusBadRequest)
 		}
 	}
 

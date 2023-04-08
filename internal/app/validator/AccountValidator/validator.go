@@ -1,7 +1,6 @@
 package AccountValidator
 
 import (
-	"errors"
 	"fmt"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/validator"
@@ -12,38 +11,23 @@ import (
 
 func ValidateAccountRegistration(account *entity.Account) *errorHandler.HttpErr {
 	if validator.IsStringEmpty(account.FirstName) {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("firstName is empty"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return errorHandler.NewHttpErr("firstName is empty", http.StatusBadRequest)
 	}
 
 	if validator.IsStringEmpty(account.LastName) {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("lastName is empty"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return errorHandler.NewHttpErr("lastName is empty", http.StatusBadRequest)
 	}
 
 	if validator.IsStringEmpty(account.Email) {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("email is empty"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return errorHandler.NewHttpErr("email is empty", http.StatusBadRequest)
 	}
 	_, err := mail.ParseAddress(account.Email)
 	if err != nil {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("email is invalid"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return errorHandler.NewHttpErr("email is invalid", http.StatusBadRequest)
 	}
 
 	if validator.IsStringEmpty(account.Password) {
-		return &errorHandler.HttpErr{
-			Err:        errors.New("password is empty"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return errorHandler.NewHttpErr("password is empty", http.StatusBadRequest)
 	}
 	return nil
 }
@@ -55,10 +39,7 @@ func ValidateAccount(account *entity.Account) *errorHandler.HttpErr {
 	}
 
 	if account.Role != entity.AdminRole && account.Role != entity.ChipperRole && account.Role != entity.UserRole {
-		return &errorHandler.HttpErr{
-			Err:        errors.New(fmt.Sprintf("role must be in [%s, %s, %s]", entity.AdminRole, entity.ChipperRole, entity.UserRole)),
-			StatusCode: http.StatusBadRequest,
-		}
+		return errorHandler.NewHttpErr(fmt.Sprintf("role must be in [%s, %s, %s]", entity.AdminRole, entity.ChipperRole, entity.UserRole), http.StatusBadRequest)
 	}
 
 	return nil

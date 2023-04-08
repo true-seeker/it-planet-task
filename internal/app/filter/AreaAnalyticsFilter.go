@@ -1,8 +1,6 @@
 package filter
 
 import (
-	"errors"
-	"gorm.io/gorm"
 	"it-planet-task/internal/app/validator"
 	"it-planet-task/pkg/errorHandler"
 	"it-planet-task/pkg/paginator"
@@ -41,10 +39,7 @@ func NewAreaAnalyticsFilterParams(q url.Values) (*AreaAnalyticsFilterParams, *er
 	}
 
 	if params.EndDateTime.Compare(*params.StartDateTime) == -1 {
-		return nil, &errorHandler.HttpErr{
-			Err:        errors.New("endDate must be lower than startDate"),
-			StatusCode: http.StatusBadRequest,
-		}
+		return nil, errorHandler.NewHttpErr("endDate must be lower than startDate", http.StatusBadRequest)
 	}
 
 	pagination, httpErr := validator.ValidateAndReturnPagination(q.Get("from"), q.Get("size"))
@@ -55,28 +50,4 @@ func NewAreaAnalyticsFilterParams(q url.Values) (*AreaAnalyticsFilterParams, *er
 	params.Pagination = *pagination
 
 	return params, nil
-}
-
-func AreaAnalyticsFilter(a *AnimalLocationFilterParams) func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		if a.StartDateTime != nil {
-			db = db.Where("date_time_of_visit_location_point >= ?", a.StartDateTime)
-		}
-
-		if a.EndDateTime != nil {
-			db = db.Where("date_time_of_visit_location_point <= ?", a.EndDateTime)
-		}
-
-		return db
-	}
-}
-
-func AreaAnalyticsLastLocationFilter(a *AnimalLocationFilterParams) func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		if a.StartDateTime != nil {
-			db = db.Where("date_time_of_visit_location_point < ?", a.StartDateTime)
-		}
-
-		return db
-	}
 }
