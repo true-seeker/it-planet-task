@@ -1,12 +1,13 @@
 package handler
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/mmcloughlin/geohash"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
+	"it-planet-task/internal/app/service/geohash"
 	"it-planet-task/internal/app/validator"
 	"it-planet-task/internal/app/validator/LocationValidator"
 	"net/http"
@@ -102,7 +103,10 @@ func (l *LocationHandler) GeoHashV2(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, geohash.Encode(*params.Latitude, *params.Longitude))
+	geohashV1 := geohash.Encode(*params.Latitude, *params.Longitude)
+	geohashV2 := base64.StdEncoding.EncodeToString([]byte(geohashV1))
+
+	c.String(http.StatusOK, geohashV2)
 }
 
 func (l *LocationHandler) GeoHashV3(c *gin.Context) {
