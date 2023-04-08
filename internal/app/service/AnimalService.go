@@ -10,7 +10,6 @@ import (
 	"it-planet-task/internal/app/model/input"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/internal/app/repository"
-	"it-planet-task/internal/app/validator/AnimalValidator"
 	"it-planet-task/pkg/errorHandler"
 	"net/http"
 	"time"
@@ -94,7 +93,7 @@ func (a *AnimalService) GetAnimalsByLocationId(locationId int) (*[]entity.Animal
 func (a *AnimalService) Create(animal *entity.Animal) (*response.Animal, error) {
 	animalResponse := &response.Animal{}
 
-	animal.LifeStatus = AnimalValidator.Alive
+	animal.LifeStatus = entity.Alive
 	animal.ChippingDateTime = time.Now()
 	animal.DeathDateTime = nil
 
@@ -111,7 +110,7 @@ func (a *AnimalService) Create(animal *entity.Animal) (*response.Animal, error) 
 func (a *AnimalService) Update(newAnimal *entity.Animal, oldAnimal *response.Animal) (*response.Animal, error) {
 	animalResponse := &response.Animal{}
 
-	if oldAnimal.LifeStatus == AnimalValidator.Alive && newAnimal.LifeStatus == AnimalValidator.Dead {
+	if oldAnimal.LifeStatus == entity.Alive && newAnimal.LifeStatus == entity.Dead {
 		deathDateTime := time.Now()
 		newAnimal.DeathDateTime = &deathDateTime
 	} else {

@@ -2,32 +2,23 @@ package AnimalValidator
 
 import (
 	"fmt"
+	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/input"
 	"it-planet-task/internal/app/model/response"
 	"it-planet-task/pkg/errorHandler"
 	"net/http"
 )
 
-const (
-	Alive = "ALIVE"
-	Dead  = "DEAD"
-)
-const (
-	Male   = "MALE"
-	Female = "FEMALE"
-	Other  = "OTHER"
-)
-
 func ValidateLifeStatus(lifeStatus string) *errorHandler.HttpErr {
-	if lifeStatus != Alive && lifeStatus != Dead {
-		return errorHandler.NewHttpErr(fmt.Sprintf("lifeStatus must be in [%s, %s]", Alive, Dead), http.StatusBadRequest)
+	if lifeStatus != entity.Alive && lifeStatus != entity.Dead {
+		return errorHandler.NewHttpErr(fmt.Sprintf("lifeStatus must be in [%s, %s]", entity.Alive, entity.Dead), http.StatusBadRequest)
 	}
 	return nil
 }
 
 func ValidateGender(gender string) *errorHandler.HttpErr {
-	if gender != Male && gender != Female && gender != Other {
-		return errorHandler.NewHttpErr(fmt.Sprintf("gender must be in [%s, %s, %s]", Male, Female, Other), http.StatusBadRequest)
+	if gender != entity.Male && gender != entity.Female && gender != entity.Other {
+		return errorHandler.NewHttpErr(fmt.Sprintf("gender must be in [%s, %s, %s]", entity.Male, entity.Female, entity.Other), http.StatusBadRequest)
 	}
 	return nil
 }
@@ -108,7 +99,7 @@ func ValidateAnimalUpdateInput(input *input.Animal, oldAnimal *response.Animal) 
 		return httpErr
 	}
 
-	if *input.LifeStatus == Alive && oldAnimal.LifeStatus == Dead {
+	if *input.LifeStatus == entity.Alive && oldAnimal.LifeStatus == entity.Dead {
 		return errorHandler.NewHttpErr("cant set status Alive to Dead animal", http.StatusBadRequest)
 	}
 	return nil

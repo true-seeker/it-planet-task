@@ -2,6 +2,16 @@ package entity
 
 import "time"
 
+const (
+	Alive = "ALIVE"
+	Dead  = "DEAD"
+)
+const (
+	Male   = "MALE"
+	Female = "FEMALE"
+	Other  = "OTHER"
+)
+
 type Animal struct {
 	Id                 int          `gorm:"primary_key"`
 	AnimalTypes        []AnimalType `gorm:"many2many:animal_animal_type;not_null;constraint:OnDelete:CASCADE;"`

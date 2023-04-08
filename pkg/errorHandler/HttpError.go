@@ -15,7 +15,6 @@ func NewHttpErr(errText string, statusCode int) *HttpErr {
 	return &HttpErr{Err: errors.New(errText), StatusCode: statusCode}
 }
 
-// todo constructor
 func (r *HttpErr) Error() string {
 	return fmt.Sprintf("status %d: err %v", r.StatusCode, r.Err)
 }

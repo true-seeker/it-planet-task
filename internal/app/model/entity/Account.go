@@ -4,7 +4,7 @@ const (
 	UserRole    = "USER"
 	ChipperRole = "CHIPPER"
 	AdminRole   = "ADMIN"
-) //TODO переместить константы к сущностям из валидаторов
+)
 
 type Account struct {
 	Id        int    `gorm:"primary_key"`

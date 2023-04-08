@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"it-planet-task/internal/app/filter"
+	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/input"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
@@ -62,7 +63,7 @@ func (a *AnimalLocationHandler) AddAnimalLocationPoint(c *gin.Context) {
 		return
 	}
 
-	if animalResponse.LifeStatus == AnimalValidator.Dead {
+	if animalResponse.LifeStatus == entity.Dead {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "Animal is dead")
 		return
 	}
