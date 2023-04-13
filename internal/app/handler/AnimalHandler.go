@@ -64,7 +64,7 @@ func (a *AnimalHandler) Search(c *gin.Context) {
 		pageCount = (*count) / int64(params.Pagination.Size)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"animals": animals, "totalCount": count, "pageCount": pageCount})
+	c.JSON(http.StatusOK, gin.H{"animals": animals, "totalCount": count, "pageCount": pageCount + 1})
 }
 
 func (a *AnimalHandler) Create(c *gin.Context) {
