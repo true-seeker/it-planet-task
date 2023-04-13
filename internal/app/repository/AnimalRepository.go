@@ -50,6 +50,7 @@ func (a *AnimalRepository) Search(params *filter.AnimalFilterParams) (*[]entity.
 	err := a.Db.
 		Scopes(paginator.Paginate(params), filter.AnimalFilter(params)).
 		Preload("AnimalTypes").
+		Preload("VisitedLocations").
 		Find(&animals).Error
 	if err != nil {
 		return nil, err
