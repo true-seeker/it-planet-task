@@ -59,7 +59,11 @@ func (a *AnimalHandler) Search(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	pageCount := (*count) / int64(params.Pagination.Size)
+	pageCount := int64(0)
+	if params.Pagination.Size != 0 {
+		pageCount = (*count) / int64(params.Pagination.Size)
+	}
+
 	c.JSON(http.StatusOK, gin.H{"animals": animals, "totalCount": count, "pageCount": pageCount})
 }
 
