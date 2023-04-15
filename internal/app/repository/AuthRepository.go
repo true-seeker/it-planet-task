@@ -7,6 +7,7 @@ import (
 
 type Auth interface {
 	Register(newAccount *entity.Account) (*entity.Account, error)
+	SaveToken(authToken *entity.AuthToken) (*entity.AuthToken, error)
 }
 
 type AuthRepository struct {
@@ -24,4 +25,13 @@ func (a AuthRepository) Register(newAccount *entity.Account) (*entity.Account, e
 	}
 
 	return newAccount, nil
+}
+
+func (a AuthRepository) SaveToken(authToken *entity.AuthToken) (*entity.AuthToken, error) {
+	err := a.Db.Save(&authToken).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return authToken, nil
 }

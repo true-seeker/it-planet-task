@@ -8,7 +8,7 @@ import (
 
 // GormMigrate Запуск миграций БД
 func GormMigrate(db *gorm.DB) {
-	err := db.AutoMigrate(&entity.AnimalType{}, &entity.Account{}, &entity.Animal{}, &entity.Location{}, &entity.AnimalLocation{})
+	err := db.AutoMigrate(&entity.AnimalType{}, &entity.Account{}, &entity.Animal{}, &entity.Location{}, &entity.AnimalLocation{}, &entity.AuthToken{})
 	if err != nil {
 		log.Fatal(err)
 	}

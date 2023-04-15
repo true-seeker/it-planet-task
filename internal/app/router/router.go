@@ -40,7 +40,6 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 		animalGroup.POST("/:id/types/:typeId", middleware.BasicAuth, animalHandler.AddAnimalType)
 		animalGroup.PUT("/:id/types", middleware.BasicAuth, animalHandler.EditAnimalType)
 		animalGroup.DELETE("/:id/types/:typeId", middleware.BasicAuth, animalHandler.DeleteAnimalType)
-
 	}
 
 	animalLocationHandler := handler.NewAnimalLocationHandler(animalLocationService, animalService, locationService)
@@ -85,6 +84,7 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 	authHandler := handler.NewAuthHandler(authService, accountService)
 	{
 		r.POST("api/registration", authHandler.Register)
+		r.POST("api/login", authHandler.Login)
 	}
 
 	mockHandler := handler.NewMockHandler(helpers.GetConnectionOrCreateAndGet())

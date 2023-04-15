@@ -51,3 +51,25 @@ func (a *AuthHandler) Register(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, account)
 }
+
+func (a *AuthHandler) Login(c *gin.Context) {
+	account := &entity.Account{}
+	err := c.BindJSON(&account)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	account = a.accountService.GetByCreds(account)
+	if account.Id == 0 {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	authToken, httpErr := a.authService.Login(account)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, authToken)
+}
