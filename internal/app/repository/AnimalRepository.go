@@ -65,6 +65,7 @@ func (a *AnimalRepository) Search(params *filter.AnimalFilterParams) (*[]entity.
 	query := a.Db.
 		Order("id").
 		Preload("AnimalTypes").
+		Preload("VisitedLocations").
 		Preload("ChippingLocation")
 	if params != nil {
 		query = query.Scopes(paginator.Paginate(params), filter.AnimalFilter(params))
