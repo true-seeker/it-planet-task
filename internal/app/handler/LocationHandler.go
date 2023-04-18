@@ -1,13 +1,11 @@
 package handler
 
 import (
-	"encoding/base64"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/service"
-	"it-planet-task/internal/app/service/geohash"
 	"it-planet-task/internal/app/validator"
 	"it-planet-task/internal/app/validator/LocationValidator"
 	"net/http"
@@ -65,7 +63,7 @@ func (l *LocationHandler) GetByCoordinates(c *gin.Context) {
 	c.JSON(http.StatusOK, locationResponse.Id)
 }
 
-func (l *LocationHandler) GeoHash(c *gin.Context) {
+func (l *LocationHandler) GeoHashV1(c *gin.Context) {
 	params, httpErr := filter.NewLocationCoordinatesParams(c.Request.URL.Query())
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
@@ -81,9 +79,14 @@ func (l *LocationHandler) GeoHash(c *gin.Context) {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
-	// todo geohash db
-	a := geohash.Encode(*params.Latitude, *params.Longitude)
-	c.String(http.StatusOK, a)
+
+	geohashv1, httpErr := l.locationService.GeoHashV1(location)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, *geohashv1)
 }
 
 func (l *LocationHandler) GeoHashV2(c *gin.Context) {
@@ -103,10 +106,13 @@ func (l *LocationHandler) GeoHashV2(c *gin.Context) {
 		return
 	}
 
-	geohashV1 := geohash.Encode(*params.Latitude, *params.Longitude)
-	geohashV2 := base64.StdEncoding.EncodeToString([]byte(geohashV1))
+	geohashv2, httpErr := l.locationService.GeoHashV2(location)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
 
-	c.String(http.StatusOK, geohashV2)
+	c.String(http.StatusOK, *geohashv2)
 }
 
 func (l *LocationHandler) GeoHashV3(c *gin.Context) {
@@ -126,7 +132,13 @@ func (l *LocationHandler) GeoHashV3(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, geohash.Encode(*params.Latitude, *params.Longitude))
+	geohashv3, httpErr := l.locationService.GeoHashV3(location)
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, *geohashv3)
 }
 
 func (l *LocationHandler) Create(c *gin.Context) {
