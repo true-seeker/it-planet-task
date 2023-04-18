@@ -11,7 +11,6 @@ import (
 )
 
 func ValidateArea(area *entity.Area) *errorHandler.HttpErr {
-	// TODO совместить сообщения об ошибках
 	if validator.IsStringEmpty(area.Name) {
 		return errorHandler.NewHttpErr("name is empty", http.StatusBadRequest)
 	}
