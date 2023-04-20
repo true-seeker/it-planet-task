@@ -13,6 +13,7 @@ import (
 type Auth interface {
 	Register(newAccount *entity.Account) (*response.Account, error)
 	Login(account *entity.Account) (*entity.AuthToken, *errorHandler.HttpErr)
+	CheckToken(token string) (bool, *errorHandler.HttpErr)
 }
 
 type AuthService struct {
@@ -53,4 +54,19 @@ func (a *AuthService) Login(account *entity.Account) (*entity.AuthToken, *errorH
 
 	return authToken, nil
 
+}
+
+func (a *AuthService) CheckToken(token string) (bool, *errorHandler.HttpErr) {
+	authToken := &entity.AuthToken{
+		Token: token,
+	}
+
+	authToken, err := a.authRepo.CheckToken(authToken)
+	if err != nil {
+		return false, &errorHandler.HttpErr{
+			Err:        err,
+			StatusCode: 401,
+		}
+	}
+	return true, nil
 }

@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"it-planet-task/internal/app/filter"
 	"it-planet-task/internal/app/mapper"
-	"it-planet-task/internal/app/model/entity"
 	"it-planet-task/internal/app/model/input"
 	"it-planet-task/internal/app/service"
 	"it-planet-task/internal/app/validator"
@@ -82,16 +81,16 @@ func (a *AnimalHandler) Create(c *gin.Context) {
 	}
 	newAnimal := mapper.AnimalInputToAnimal(animalInput)
 
-	chipper, httpErr := a.accountService.Get(newAnimal.ChipperId)
+	_, httpErr = a.accountService.Get(newAnimal.ChipperId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
-	if chipper.Role != entity.ChipperRole && chipper.Role != entity.AdminRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Cant set chipper without role Chipper or Admin")
-		return
-	}
+	//if chipper.Role != entity.ChipperRole && chipper.Role != entity.AdminRole {
+	//	c.AbortWithStatusJSON(http.StatusForbidden, "Cant set chipper without role Chipper or Admin")
+	//	return
+	//}
 
 	_, httpErr = a.locationService.Get(newAnimal.ChippingLocationId)
 	if httpErr != nil {
@@ -159,16 +158,16 @@ func (a *AnimalHandler) Update(c *gin.Context) {
 	animalInput.AnimalTypeIds = oldAnimal.AnimalTypesId
 	newAnimal := mapper.AnimalInputToAnimal(animalInput)
 
-	chipper, httpErr := a.accountService.Get(newAnimal.ChipperId)
+	_, httpErr = a.accountService.Get(newAnimal.ChipperId)
 	if httpErr != nil {
 		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
 		return
 	}
 
-	if chipper.Role != entity.ChipperRole && chipper.Role != entity.AdminRole {
-		c.AbortWithStatusJSON(http.StatusForbidden, "Cant set chipper without role Chipper or Admin")
-		return
-	}
+	//if chipper.Role != entity.ChipperRole && chipper.Role != entity.AdminRole {
+	//	c.AbortWithStatusJSON(http.StatusForbidden, "Cant set chipper without role Chipper or Admin")
+	//	return
+	//}
 
 	_, httpErr = a.locationService.Get(newAnimal.ChippingLocationId)
 	if httpErr != nil {

@@ -8,6 +8,7 @@ import (
 type Auth interface {
 	Register(newAccount *entity.Account) (*entity.Account, error)
 	SaveToken(authToken *entity.AuthToken) (*entity.AuthToken, error)
+	CheckToken(authToken *entity.AuthToken) (*entity.AuthToken, error)
 }
 
 type AuthRepository struct {
@@ -18,7 +19,7 @@ func NewAuthRepository(db *gorm.DB) Auth {
 	return &AuthRepository{Db: db}
 }
 
-func (a AuthRepository) Register(newAccount *entity.Account) (*entity.Account, error) {
+func (a *AuthRepository) Register(newAccount *entity.Account) (*entity.Account, error) {
 	err := a.Db.Save(&newAccount).Error
 	if err != nil {
 		return nil, err
@@ -27,8 +28,17 @@ func (a AuthRepository) Register(newAccount *entity.Account) (*entity.Account, e
 	return newAccount, nil
 }
 
-func (a AuthRepository) SaveToken(authToken *entity.AuthToken) (*entity.AuthToken, error) {
+func (a *AuthRepository) SaveToken(authToken *entity.AuthToken) (*entity.AuthToken, error) {
 	err := a.Db.Save(&authToken).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return authToken, nil
+}
+
+func (a *AuthRepository) CheckToken(authToken *entity.AuthToken) (*entity.AuthToken, error) {
+	err := a.Db.Where("token = ?", authToken.Token).First(&authToken).Error
 	if err != nil {
 		return nil, err
 	}
