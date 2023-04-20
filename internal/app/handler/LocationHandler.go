@@ -145,3 +145,13 @@ func (l *LocationHandler) Delete(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 }
+
+func (l *LocationHandler) Search(c *gin.Context) {
+	locations, httpErr := l.locationService.Search()
+	if httpErr != nil {
+		c.AbortWithStatusJSON(httpErr.StatusCode, httpErr.Err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, locations)
+}

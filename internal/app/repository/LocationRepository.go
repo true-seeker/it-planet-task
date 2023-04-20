@@ -11,6 +11,7 @@ type Location interface {
 	Update(location *entity.Location) (*entity.Location, error)
 	Delete(id int) error
 	GetByCords(location *entity.Location) (*entity.Location, error)
+	Search() (*[]entity.Location, error)
 }
 
 type LocationRepository struct {
@@ -61,4 +62,12 @@ func (a *LocationRepository) GetByCords(location *entity.Location) (*entity.Loca
 	lc := &entity.Location{}
 	a.Db.Where("longitude = ? AND latitude = ?", location.Longitude, location.Latitude).First(lc)
 	return lc, nil
+}
+
+func (a *LocationRepository) Search() (*[]entity.Location, error) {
+	lcs := &[]entity.Location{}
+
+	a.Db.Find(&lcs)
+
+	return lcs, nil
 }

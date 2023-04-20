@@ -77,6 +77,7 @@ func InitRoutes(r *gin.Engine) *gin.Engine {
 		locationGroup.POST("", middleware.TokenAuth, middleware.AdminOrChipperRequired, locationHandler.Create)
 		locationGroup.PUT("/:id", middleware.TokenAuth, middleware.AdminOrChipperRequired, locationHandler.Update)
 		locationGroup.DELETE("/:id", middleware.TokenAuth, middleware.AdminRequired, locationHandler.Delete)
+		locationGroup.GET("/search", middleware.TokenAuth, locationHandler.Search)
 	}
 
 	authRepo := repository.NewAuthRepository(helpers.GetConnectionOrCreateAndGet())

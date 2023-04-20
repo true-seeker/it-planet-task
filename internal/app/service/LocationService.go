@@ -18,6 +18,7 @@ type Location interface {
 	Update(location *entity.Location) (*response.Location, error)
 	Delete(id int) error
 	GetByCords(location *entity.Location) (*entity.Location, error)
+	Search() (*[]response.Location, *errorHandler.HttpErr)
 }
 
 type LocationService struct {
@@ -83,4 +84,20 @@ func (l *LocationService) Delete(id int) error {
 
 func (l *LocationService) GetByCords(location *entity.Location) (*entity.Location, error) {
 	return l.locationRepo.GetByCords(location)
+}
+
+func (l *LocationService) Search() (*[]response.Location, *errorHandler.HttpErr) {
+	var locationResponses *[]response.Location
+
+	locations, err := l.locationRepo.Search()
+	if err != nil {
+		return nil, &errorHandler.HttpErr{
+			Err:        err,
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	locationResponses = mapper.LocationsToLocationResponses(locations)
+
+	return locationResponses, nil
 }
