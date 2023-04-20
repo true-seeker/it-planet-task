@@ -14,6 +14,7 @@ func Init() {
 	config.Init("development")
 	helpers.GormMigrate(helpers.GetConnectionOrCreateAndGet())
 	helpers.InitAccounts(helpers.GetConnectionOrCreateAndGet())
+	helpers.InitData(helpers.GetConnectionOrCreateAndGet())
 }
 
 func main() {
