@@ -8,17 +8,17 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123456
-    ports:
-      - "5432:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 10
-
+    networks:
+      some_network:
 
   webapi:
     image: webapi
+    hostname: webapi
     build: ../
     ports:
       - "8080:8080"
@@ -26,17 +26,9 @@ services:
       database:
         condition: service_healthy
     command: ./it_planet_task -dbAddr=db -dbUser=postgres -dbPass=123456 -dbName=postgres -dbPort=5432 -srvAddr=webapi -srvPort=8080
+    networks:
+      some_network:
 
-  
-  tests:
-    image: mrexpen/planet_olymp_phase2
-#    pull_policy: always
-    ports:
-      - "8090:8080"
-    depends_on:
-      - webapi
-    environment:
-      SERVER_URL: http://webapi:8080/api
-      STAGE: all
-      # all - запуск всех тестов из трёх доступных этапов
-      # 0, 1 или 2 - запуск тестов для соответствующего этапа
+networks:
+  some_network:
+    name: 'some_network'
